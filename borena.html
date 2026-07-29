@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Borena Zone — PACIDA ASAL Climate Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="map" role="application" aria-label="Aerial map of Borena Zone"></div>
+
+<div class="overlay">
+
+<header class="glass">
+  <div class="brand">
+    <h1><a href="index.html">PACIDA <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <div class="sub">Borena Zone &middot; Southern Ethiopia (Oromia)</div>
+  </div>
+  <nav class="site"><a href="index.html">Home</a><a href="marsabit.html">Marsabit</a><a href="samburu.html">Samburu</a><a href="isiolo.html">Isiolo</a><a href="borena.html" class="active">Borena · S. Ethiopia</a></nav>
+  <div class="head-right">
+    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
+    <div class="clock mono" id="clock">--:--:-- EAT</div>
+    <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="cell glass"><div class="k">Need index (live)</div><div class="v" id="needV">&mdash;</div><div class="n" id="needN">recalculating from live weather</div></div>
+  <div class="cell glass"><div class="k">Now at Yabelo</div><div class="v" id="tempV">&mdash;</div><div class="n" id="tempN">&mdash;</div></div>
+  <div class="cell glass"><div class="k">Rain, past 30 days</div><div class="v" id="rainV">&mdash;</div><div class="n">vs ~60 mm ASAL expectation</div></div>
+  <div class="cell glass"><div class="k">Topsoil moisture</div><div class="v" id="soilV">&mdash;</div><div class="n">0&ndash;7 cm &middot; VCI proxy</div></div>
+  <div class="cell glass"><div class="k">Households</div><div class="v">232,000</div><div class="n">Population 1,210,000</div></div>
+  <div class="cell glass"><div class="k">Drought phase</div><div class="v" style="font-size:15px;font-family:'Archivo'">IPC Phase 2–3 (Stressed–Crisis)</div><div class="n">Poverty 78.0%</div></div>
+</div>
+
+<main>
+  <div class="map-window">
+    <div class="map-legend glass">
+      <h4>Monitoring sites</h4>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+      <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Shaded outline = Borena Zone. Pan &amp; zoom anywhere outside the glass panels. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card glass">
+      <div class="card-top"><div><h3>Borena Zone briefing</h3><div class="zone">Southern Ethiopia (Oromia) &middot; area ≈45,000 km² &middot; density ≈27 / km² &middot; avg household 5.2 persons</div></div></div>
+      <p style="font-size:13.5px;color:var(--muted);margin-top:10px">The Ethiopian half of PACIDA's cross-border footprint and the cultural heartland of the Borana Oromo, whose Gadaa governance system (UNESCO-listed) and deep-well 'tula' system — the famous singing wells — have managed these rangelands for five centuries. The zone lost an estimated 60%+ of cattle in the catastrophic 2020–23 drought (five consecutive failed seasons), a livelihood shock from which herds have not recovered. Rainfall is bimodal: Ganna long rains (Mar–May) and Hagayya short rains (Oct–Nov). Cross-border movement with Marsabit County (Moyale, Dukana–Dillo, Forolle) is constant — grazing, trade, kinship and conflict all flow across the line, which is why single-country programming fails here.</p>
+      <div class="hh-line"><span>GAM (acute malnutrition): <b style="font-family:'Archivo'">Persistently elevated; SAM admissions surged in 2022–23 drought and remain above pre-drought baselines</b></span></div>
+    </div>
+    <div class="card glass" id="hqCard">
+      <div class="card-top"><div><h3>Live conditions &mdash; Yabelo</h3><div class="zone">County/zone reference station</div></div><span class="badge" id="hqBadge" style="background:var(--alert)">&hellip;</span></div>
+      <div class="gauge"><div class="gauge-track"><div class="gauge-marker" id="hqMarker" style="left:0%"></div></div>
+      <div class="gauge-labels"><span>Watch</span><span>Elevated</span><span>High</span><span>Critical</span></div></div>
+      <div class="metrics" id="hqMetrics"><div class="loading">Fetching live weather&hellip;</div></div>
+      <div class="spark"><div class="mk">Rainfall &mdash; past 14 d &amp; next 7 d forecast (mm/day)</div><div id="hqSpark"></div></div>
+    </div>
+  </div>
+</main>
+
+<div class="wide">
+
+  <div class="panel glass">
+    <h2>Live conditions by settlement <span class="tag">every dot refreshes with the page</span></h2>
+    <div class="sites" id="siteGrid"></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sub-units, households &amp; key settlements <span class="tag">KNBS 2019 census / CSA projections</span></h2>
+    <div class="table-scroll">
+    <table class="ptable">
+      <thead><tr><th>Sub-county / woreda</th><th>Population</th><th>Households</th><th>Livelihood zone</th><th>Key settlements &amp; villages (indicative)</th></tr></thead>
+      <tbody><tr><td><b>Yabelo</b><br><small>HQ: Yabelo town</small></td><td class='mono'>≈120,000 †</td><td class='mono'>≈23,000 †</td><td>Pastoral / zone capital</td><td>Dida Hara, Surupa, Dharito, Elwaye road</td></tr><tr><td><b>Moyale (ET)</b><br><small>HQ: Moyale</small></td><td class='mono'>≈95,000 †</td><td class='mono'>≈18,000 †</td><td>Cross-border trade + pastoral</td><td>Bede, Lagasure, Chamuk, border kebeles</td></tr><tr><td><b>Dire</b><br><small>HQ: Mega</small></td><td class='mono'>≈100,000 †</td><td class='mono'>≈19,000 †</td><td>Pastoral — tula deep wells</td><td>Mega, Dubluk road, Magado crater</td></tr><tr><td><b>Teltele</b><br><small>HQ: Teltele</small></td><td class='mono'>≈95,000 †</td><td class='mono'>≈18,000 †</td><td>Pastoral / agro-pastoral west</td><td>Sarite, El Gof, Konso border kebeles</td></tr><tr><td><b>Arero</b><br><small>HQ: Arero</small></td><td class='mono'>≈90,000 †</td><td class='mono'>≈17,000 †</td><td>Pastoral — forest fringe</td><td>Web, Melbana, Mata Gafarsa</td></tr><tr><td><b>Dubluk</b><br><small>HQ: Dubluk</small></td><td class='mono'>≈55,000 †</td><td class='mono'>≈11,000 †</td><td>Pastoral — wells cluster</td><td>Dubluk town, Tula wells kebeles</td></tr><tr><td><b>Miyo</b><br><small>HQ: Miyo (Hidi Lola)</small></td><td class='mono'>≈60,000 †</td><td class='mono'>≈12,000 †</td><td>Pastoral border woreda</td><td>Hidi Lola, Tuka, border kebeles</td></tr><tr><td><b>Dillo</b><br><small>HQ: Dillo</small></td><td class='mono'>≈50,000 †</td><td class='mono'>≈10,000 †</td><td>Pastoral — Kenya border (Dukana axis)</td><td>Dillo town, Mado, border kebeles</td></tr><tr><td><b>Dhas</b><br><small>HQ: Dhas</small></td><td class='mono'>≈45,000 †</td><td class='mono'>≈9,000 †</td><td>Pastoral</td><td>Dhas town, Gorile</td></tr><tr><td><b>Gomole / Elwaye / Guchi / Wachile</b><br><small>HQ: various</small></td><td class='mono'>≈220,000 †</td><td class='mono'>≈42,000 †</td><td>Pastoral (newer woredas)</td><td>Elwaye, Wachile, Guchi, Gomole kebeles</td></tr></tbody>
+    </table>
+    </div>
+    <p style="font-size:12px;color:var(--faint);margin-top:8px">† Woreda figures are indicative projections from the 2007 CSA census pending a new national census; zone totals (~1.21 M people, ~232,000 households) are population-projection based. Boundary on the map is approximate.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Livelihood zones <span class="tag">FEWS NET livelihood zoning, indicative shares</span></h2>
+    <div class="lz"><div class="lz-row"><div>Pastoral (cattle-centred Borana system)</div><div class="lz-bar"><div class="lz-fill" style="width:75%;background:#D96C2B"></div></div><div class="lz-pct">75%</div></div><div class="lz-row"><div>Agro-pastoral (maize, haricot, teff pockets)</div><div class="lz-bar"><div class="lz-fill" style="width:20%;background:#7FA653"></div></div><div class="lz-pct">20%</div></div><div class="lz-row"><div>Trade & town economies (Moyale, Yabelo)</div><div class="lz-bar"><div class="lz-fill" style="width:5%;background:#E0A21B"></div></div><div class="lz-pct">5%</div></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Seasonal calendar</h2>
+    <div class="season"><div class="mo dry">J<small>Jilaal dry</small></div><div class="mo dry">F<small>dry</small></div><div class="mo rain">M<small>Long rains / Ganna</small></div><div class="mo rain">A<small>Long rains</small></div><div class="mo rain">M<small>Long rains</small></div><div class="mo dry">J<small>Adolessa dry</small></div><div class="mo dry">J<small>dry</small></div><div class="mo dry">A<small>dry</small></div><div class="mo dry">S<small>dry</small></div><div class="mo rain">O<small>Short rains / Hagayya</small></div><div class="mo rain">N<small>Short rains</small></div><div class="mo dry">D<small>Bona dry</small></div></div><div class="season-note">Bimodal ASAL calendar: long rains Mar–May (Ganna in Borana), short rains Oct–Dec (Hagayya). Both seasons must perform for pasture recovery; a single failed season triggers Alert, consecutive failures cascade to Alarm/Emergency.</div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sector deep-dive</h2>
+    <div class="src-grid"><div class="src"><b>Livestock economy</b><span>Cattle are wealth, identity and food security; the 2020–23 drought killed an estimated 3.3+ million livestock across Borena and neighbouring zones, collapsing herd capital. Restocking, fodder value-chains and shifting toward camels/small stock are the recovery frontier. Moyale is the region's cross-border trade artery.</span></div><div class="src"><b>Water & the tula system</b><span>The nine tula deep-well clusters (Dubluk, Mega, Web among them) are communally governed and drought-proof but labour-intensive; motorised boreholes and ponds (haro) supplement them. Water governance through Gadaa institutions is a resilience asset most interventions should build on, not replace.</span></div><div class="src"><b>Nutrition & health</b><span>SAM admissions surged through 2022–23 and stabilisation-centre caseloads remain above pre-drought baselines; measles and cholera outbreaks tracked displacement into IDP sites around Dubluk and Yabelo during the drought peak.</span></div><div class="src"><b>Rangelands & bush encroachment</b><span>Decades of fire suppression drove acacia/commiphora bush encroachment over prime grasslands — a slow-onset crisis reducing carrying capacity independent of rainfall. Participatory rangeland management and controlled clearing are priority interventions.</span></div><div class="src"><b>Conflict & cross-border dynamics</b><span>Borana–Gabra and Borana–Garre dynamics span the Kenya line; Moyale town has repeatedly split along it. Peace here is a precondition for drought-cycle mobility — closed borders during conflict episodes have trapped herds away from reserve grazing with fatal results.</span></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Drought history &mdash; the recurrence the index is built for</h2>
+    <div class="timeline"><div class="tl"><div class="yr">1999–2000</div><div class="tx">Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.</div></div><div class="tl"><div class="yr">2005–06</div><div class="tx">Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).</div></div><div class="tl"><div class="yr">2008–09</div><div class="tx">Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.</div></div><div class="tl"><div class="yr">2010–11</div><div class="tx">Horn of Africa famine — the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.</div></div><div class="tl"><div class="yr">2016–17</div><div class="tx">Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.</div></div><div class="tl"><div class="yr">2020–23</div><div class="tx">Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.</div></div><div class="tl"><div class="yr">2023–24</div><div class="tx">El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern.</div></div><div class="tl now"><div class="yr">2025–26</div><div class="tx">Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.</div></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>PACIDA in Borena Zone</h2>
+    <p>PACIDA's Ethiopian office anchors cross-border programming: drought emergency response, WASH around the tula clusters, livestock health, education support, and Borana-led peace and resource-sharing dialogues that keep the Marsabit–Borena grazing corridors open. Funded partners include Welthungerhilfe and BMZ programmes.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sources</h2>
+    <div class="src-grid">
+      <div class="src"><b>Live weather</b><span>Open-Meteo API per settlement point; auto-refresh every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
+      <div class="src"><b>Population &amp; households</b><span>Kenya 2019 Population &amp; Housing Census Vol. I &amp; II (KNBS); Ethiopia CSA projections for Borena. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
+      <div class="src"><b>Drought &amp; food security</b><span>NDMA monthly bulletins &amp; county early-warning; IPC analyses; FEWS NET East Africa. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>Programmes</b><span>PACIDA annual reports and programme pages. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+    </div>
+  </div>
+</div>
+
+<footer class="glass">
+  <div>PACIDA ASAL Climate Watch &middot; Borena Zone detail &middot; monitoring prototype &mdash; deployment decisions require ground-truthing</div>
+  <div class="mono" id="footTime"></div>
+</footer>
+
+</div><!-- /overlay -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/boundaries.js"></script>
+<script src="assets/common.js"></script>
+<script>
+const RID = "borena";
+const STATIC_VULN = 82;
+const SITES = [["Yabelo", 4.885, 38.083, "Zone capital"], ["Moyale (ET)", 3.554, 39.052, "Border twin-town with Kenya"], ["Mega", 4.07, 38.3, "Dire woreda \u2014 tula wells"], ["Dubluk", 4.35, 38.24, "Deep-well cluster"], ["Teltele", 4.8, 37.4, "Western woreda"], ["Dillo", 4.2, 37.73, "Kenya border, Dukana axis"], ["Arero", 4.75, 38.8, "Eastern forest fringe"], ["Hidi Lola", 3.85, 38.95, "Miyo woreda, border trade"]];  /* [name, lat, lon, note] */
+const HQ = {name:"Yabelo", lat:4.885, lon:38.083};
+
+startClock();
+const {map} = makeGlassMap([4.6, 38.4], 8);
+
+/* region outline */
+if (BOUNDARIES[RID]) {
+  L.geoJSON({type:"Feature",geometry:BOUNDARIES[RID]},{
+    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#E0A21B",fillOpacity:.06,
+           dashArray:RID==="borena"?"6 5":null}
+  }).addTo(map);
+}
+
+const siteLayer = L.layerGroup().addTo(map);
+const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));
+
+function drawSites(){
+  siteLayer.clearLayers();
+  siteState.forEach(s=>{
+    const need = s.live? s.live.need : null;
+    const band = need!=null? needBand(need):"elevated";
+    const color = PHASE_COLORS[band];
+    const m = L.circleMarker([s.lat,s.lon],{radius:9,color:"#fff",weight:1.5,fillColor:color,fillOpacity:.85});
+    m.bindPopup("<h4>"+s.name+"</h4>"
+      +"<div class='pop-k'>"+s.note+"</div>"
+      +(s.live? "<div><span class='pop-k'>Need:</span> <span class='pop-v'>"+need+" / 100 &middot; "+bandLabel(band)+"</span></div>"
+        +"<div><span class='pop-k'>Now:</span> <span class='pop-v'>"+s.live.temp.toFixed(1)+"&deg;C &middot; "+s.live.rh+"% RH</span></div>"
+        +"<div><span class='pop-k'>Rain 30 d:</span> <span class='pop-v'>"+s.live.rain30.toFixed(1)+" mm</span></div>"
+        +"<div><span class='pop-k'>Soil:</span> <span class='pop-v'>"+(s.live.soil*100).toFixed(1)+"%</span></div>"
+        : "<div class='pop-k'>loading&hellip;</div>"));
+    const label = L.marker([s.lat,s.lon],{interactive:false,
+      icon:L.divIcon({className:"",html:'<div class="site-label">'+s.name+'</div>',iconAnchor:[-10,7]})});
+    siteLayer.addLayer(m); siteLayer.addLayer(label);
+  });
+}
+drawSites();
+
+function renderSiteGrid(){
+  const g = document.getElementById("siteGrid");
+  const order=[...siteState].sort((a,b)=>((b.live?b.live.need:-1)-(a.live?a.live.need:-1)));
+  g.innerHTML = order.map(s=>{
+    const need = s.live? s.live.need:null;
+    const band = need!=null? needBand(need):"elevated";
+    return '<div class="site-card">'
+      +'<h4><span class="site-dot" style="background:'+PHASE_COLORS[band]+'"></span>'+s.name+'</h4>'
+      +'<div class="sc-sub">'+s.note+'</div>'
+      +(s.live?
+         '<div class="site-row"><span>Need index</span><b>'+need+' &middot; '+bandLabel(band)+'</b></div>'
+        +'<div class="site-row"><span>Temp now</span><b>'+s.live.temp.toFixed(1)+'&deg;C</b></div>'
+        +'<div class="site-row"><span>Rain 30 d</span><b>'+s.live.rain30.toFixed(0)+' mm</b></div>'
+        +'<div class="site-row"><span>Soil 0&ndash;7 cm</span><b>'+(s.live.soil*100).toFixed(1)+'%</b></div>'
+        +'<div class="site-row"><span>7-d max avg</span><b>'+s.live.tmax7.toFixed(1)+'&deg;C</b></div>'
+        : '<div class="loading">loading&hellip;</div>')
+      +'</div>';
+  }).join("");
+}
+renderSiteGrid();
+
+function renderHQ(w){
+  const need = w.need, band = needBand(need);
+  document.getElementById("hqBadge").textContent = bandLabel(band)+" &middot; "+need;
+  document.getElementById("hqBadge").innerHTML = bandLabel(band)+" &middot; "+need;
+  document.getElementById("hqBadge").style.background = PHASE_COLORS[band];
+  document.getElementById("hqMarker").style.left = need+"%";
+  document.getElementById("hqMetrics").innerHTML =
+     '<div class="m"><div class="mk">Now</div><div class="mv">'+w.temp.toFixed(1)+'<small>&deg;C</small></div></div>'
+    +'<div class="m"><div class="mk">Rain 30 d</div><div class="mv">'+w.rain30.toFixed(0)+'<small> mm</small></div></div>'
+    +'<div class="m"><div class="mk">Soil 0&ndash;7 cm</div><div class="mv">'+(w.soil*100).toFixed(1)+'<small>%</small></div></div>'
+    +'<div class="m"><div class="mk">7-d max avg</div><div class="mv">'+w.tmax7.toFixed(1)+'<small>&deg;C</small></div></div>';
+  document.getElementById("hqSpark").innerHTML = sparkline(w.dailyRain, w.splitIdx);
+  document.getElementById("needV").textContent = need;
+  document.getElementById("needN").textContent = bandLabel(band)+" &mdash; blended NDMA/IPC-aligned score";
+  document.getElementById("tempV").textContent = w.temp.toFixed(1)+"°C";
+  document.getElementById("tempN").textContent = w.rh+"% RH · wind "+w.wind.toFixed(0)+" km/h";
+  document.getElementById("rainV").textContent = w.rain30.toFixed(0)+" mm";
+  document.getElementById("soilV").textContent = (w.soil*100).toFixed(1)+"%";
+}
+
+async function refreshAll(){
+  const st=document.getElementById("liveState"), dotEl=document.getElementById("liveDot");
+  st.textContent="Updating…";
+  try{
+    const hqW = await fetchPoint(HQ.lat, HQ.lon);
+    hqW.need = computeNeed(STATIC_VULN, hqW);
+    renderHQ(hqW);
+    await Promise.all(siteState.map(async s=>{
+      try{
+        const w = await fetchPoint(s.lat, s.lon);
+        w.need = computeNeed(STATIC_VULN, w);
+        s.live = w;
+      }catch(e){ console.error(s.name, e); }
+    }));
+    drawSites(); renderSiteGrid();
+    st.textContent="Live · Open-Meteo";
+    dotEl.style.background="var(--normal)";
+  }catch(e){
+    console.error(e);
+    st.textContent="Feed unavailable — check connection";
+    dotEl.style.background="var(--emergency)";
+  }
+}
+document.getElementById("refreshBtn").addEventListener("click",refreshAll);
+refreshAll();
+setInterval(refreshAll, 10*60*1000);
+</script>
+</body>
+</html>

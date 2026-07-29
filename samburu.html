@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samburu County — PACIDA ASAL Climate Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="map" role="application" aria-label="Aerial map of Samburu County"></div>
+
+<div class="overlay">
+
+<header class="glass">
+  <div class="brand">
+    <h1><a href="index.html">PACIDA <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <div class="sub">Samburu County &middot; Kenya</div>
+  </div>
+  <nav class="site"><a href="index.html">Home</a><a href="marsabit.html">Marsabit</a><a href="samburu.html" class="active">Samburu</a><a href="isiolo.html">Isiolo</a><a href="borena.html">Borena · S. Ethiopia</a></nav>
+  <div class="head-right">
+    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
+    <div class="clock mono" id="clock">--:--:-- EAT</div>
+    <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="cell glass"><div class="k">Need index (live)</div><div class="v" id="needV">&mdash;</div><div class="n" id="needN">recalculating from live weather</div></div>
+  <div class="cell glass"><div class="k">Now at Maralal</div><div class="v" id="tempV">&mdash;</div><div class="n" id="tempN">&mdash;</div></div>
+  <div class="cell glass"><div class="k">Rain, past 30 days</div><div class="v" id="rainV">&mdash;</div><div class="n">vs ~60 mm ASAL expectation</div></div>
+  <div class="cell glass"><div class="k">Topsoil moisture</div><div class="v" id="soilV">&mdash;</div><div class="n">0&ndash;7 cm &middot; VCI proxy</div></div>
+  <div class="cell glass"><div class="k">Households</div><div class="v">65,910</div><div class="n">Population 310,327</div></div>
+  <div class="cell glass"><div class="k">Drought phase</div><div class="v" style="font-size:15px;font-family:'Archivo'">NDMA Alert</div><div class="n">Poverty 71.0%</div></div>
+</div>
+
+<main>
+  <div class="map-window">
+    <div class="map-legend glass">
+      <h4>Monitoring sites</h4>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+      <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Shaded outline = Samburu County. Pan &amp; zoom anywhere outside the glass panels. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card glass">
+      <div class="card-top"><div><h3>Samburu County briefing</h3><div class="zone">Kenya &middot; area 21,065 km² &middot; density 15 / km² &middot; avg household 4.7 persons</div></div></div>
+      <p style="font-size:13.5px;color:var(--muted);margin-top:10px">A transition county between the central highlands and the northern deserts — 92% classified ASAL. From the Lorroki plateau and Kirisia forests around Maralal (2,000&nbsp;m, agro-pastoral) the land falls north through Baragoi's Suguta corridor and east past the Mathews Range and Mt Ololokwe to the Ewaso Ng'iro lowlands at Archer's Post. The Samburu (Lokop) are cattle-culture pastoralists; drought forces herds into contested northern grazing where cattle rustling and armed conflict compound climate risk. Fewer than 15% of households have piped water.</p>
+      <div class="hh-line"><span>GAM (acute malnutrition): <b style="font-family:'Archivo'">13–20% in drought years (Samburu North highest)</b></span></div>
+    </div>
+    <div class="card glass" id="hqCard">
+      <div class="card-top"><div><h3>Live conditions &mdash; Maralal</h3><div class="zone">County/zone reference station</div></div><span class="badge" id="hqBadge" style="background:var(--alert)">&hellip;</span></div>
+      <div class="gauge"><div class="gauge-track"><div class="gauge-marker" id="hqMarker" style="left:0%"></div></div>
+      <div class="gauge-labels"><span>Watch</span><span>Elevated</span><span>High</span><span>Critical</span></div></div>
+      <div class="metrics" id="hqMetrics"><div class="loading">Fetching live weather&hellip;</div></div>
+      <div class="spark"><div class="mk">Rainfall &mdash; past 14 d &amp; next 7 d forecast (mm/day)</div><div id="hqSpark"></div></div>
+    </div>
+  </div>
+</main>
+
+<div class="wide">
+
+  <div class="panel glass">
+    <h2>Live conditions by settlement <span class="tag">every dot refreshes with the page</span></h2>
+    <div class="sites" id="siteGrid"></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sub-units, households &amp; key settlements <span class="tag">KNBS 2019 census / CSA projections</span></h2>
+    <div class="table-scroll">
+    <table class="ptable">
+      <thead><tr><th>Sub-county / woreda</th><th>Population</th><th>Households</th><th>Livelihood zone</th><th>Key settlements &amp; villages (indicative)</th></tr></thead>
+      <tbody><tr><td><b>Samburu West (Central)</b><br><small>HQ: Maralal</small></td><td class='mono'>≈134,000 *</td><td class='mono'>≈29,000 *</td><td>Agro-pastoral — Lorroki plateau</td><td>Kisima, Suguta Marmar, Loosuk, Poro, Morijo, Lodokejek</td></tr><tr><td><b>Samburu North</b><br><small>HQ: Baragoi</small></td><td class='mono'>≈97,000 *</td><td class='mono'>≈20,000 *</td><td>Pastoral — cattle & small stock</td><td>South Horr, Tuum, Marti, Nachola, Latakweny, Bendera</td></tr><tr><td><b>Samburu East</b><br><small>HQ: Wamba</small></td><td class='mono'>≈79,000 *</td><td class='mono'>≈17,000 *</td><td>Pastoral + conservancies & tourism</td><td>Archer's Post, Sereolipi, Lodungokwe, Ngilai, Lerata, Lpus</td></tr></tbody>
+    </table>
+    </div>
+    <p style="font-size:12px;color:var(--faint);margin-top:8px">* 2019 census county totals are exact (310,327 people / 65,910 households); sub-county splits shown are indicative estimates pending ward-level tabulation.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Livelihood zones <span class="tag">FEWS NET livelihood zoning, indicative shares</span></h2>
+    <div class="lz"><div class="lz-row"><div>Pastoral (cattle, small stock)</div><div class="lz-bar"><div class="lz-fill" style="width:68%;background:#D96C2B"></div></div><div class="lz-pct">68%</div></div><div class="lz-row"><div>Agro-pastoral (Lorroki plateau)</div><div class="lz-bar"><div class="lz-fill" style="width:20%;background:#7FA653"></div></div><div class="lz-pct">20%</div></div><div class="lz-row"><div>Tourism, conservancies & trade</div><div class="lz-bar"><div class="lz-fill" style="width:8%;background:#4E7C8A"></div></div><div class="lz-pct">8%</div></div><div class="lz-row"><div>Formal employment & other</div><div class="lz-bar"><div class="lz-fill" style="width:4%;background:#E0A21B"></div></div><div class="lz-pct">4%</div></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Seasonal calendar</h2>
+    <div class="season"><div class="mo dry">J<small>Jilaal dry</small></div><div class="mo dry">F<small>dry</small></div><div class="mo rain">M<small>Long rains / Ganna</small></div><div class="mo rain">A<small>Long rains</small></div><div class="mo rain">M<small>Long rains</small></div><div class="mo dry">J<small>Adolessa dry</small></div><div class="mo dry">J<small>dry</small></div><div class="mo dry">A<small>dry</small></div><div class="mo dry">S<small>dry</small></div><div class="mo rain">O<small>Short rains / Hagayya</small></div><div class="mo rain">N<small>Short rains</small></div><div class="mo dry">D<small>Bona dry</small></div></div><div class="season-note">Bimodal ASAL calendar: long rains Mar–May (Ganna in Borana), short rains Oct–Dec (Hagayya). Both seasons must perform for pasture recovery; a single failed season triggers Alert, consecutive failures cascade to Alarm/Emergency.</div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sector deep-dive</h2>
+    <div class="src-grid"><div class="src"><b>Livestock economy</b><span>Cattle-dominant with rapid small-stock growth as a drought adaptation; camels are being adopted in the north. Key markets: Maralal, Baragoi, Archer's Post; trekking routes to Rumuruti/Nyahururu. Livestock body condition and milk yields collapse fastest in Samburu East lowlands.</span></div><div class="src"><b>Water & WASH</b><span>Only ~14% of households have piped water (2019 census). Sources: seasonal rivers (Ewaso Ng'iro), sand dams, boreholes, springs on the plateau. Dry-season water distances in Samburu East and North commonly exceed 10 km for households and 20 km for herds.</span></div><div class="src"><b>Nutrition & health</b><span>Acute malnutrition remains high in Samburu North (Tiaty-adjacent belt): NDMA lists Samburu among counties with significant numbers of children 6–59 months needing urgent treatment (Jan 2026). Milk deficit during dry seasons is the primary driver.</span></div><div class="src"><b>Education</b><span>Secondary attainment 6.4% — about a quarter of the national rate (2019 census). Morans' herding duties and early marriage suppress enrolment; conservancy bursaries and school feeding are key levers.</span></div><div class="src"><b>Conflict & peace</b><span>Cattle-rustling corridors: Baragoi–Suguta valley (Samburu–Turkana), and Samburu East–Isiolo boundary over Ewaso grazing. Disarmament cycles and peace committees shape whether drought reserves (Kirisia forest, Mathews Range) can be shared safely.</span></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Drought history &mdash; the recurrence the index is built for</h2>
+    <div class="timeline"><div class="tl"><div class="yr">1999–2000</div><div class="tx">Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.</div></div><div class="tl"><div class="yr">2005–06</div><div class="tx">Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).</div></div><div class="tl"><div class="yr">2008–09</div><div class="tx">Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.</div></div><div class="tl"><div class="yr">2010–11</div><div class="tx">Horn of Africa famine — the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.</div></div><div class="tl"><div class="yr">2016–17</div><div class="tx">Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.</div></div><div class="tl"><div class="yr">2020–23</div><div class="tx">Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.</div></div><div class="tl"><div class="yr">2023–24</div><div class="tx">El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern.</div></div><div class="tl now"><div class="yr">2025–26</div><div class="tx">Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.</div></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>PACIDA in Samburu County</h2>
+    <p>PACIDA implements resilience and emergency programming in Samburu: drought response (water, cash and fodder), WASH, livestock health campaigns, and cross-county peace dialogues linking Samburu, Marsabit and Isiolo grazing communities under the Humanitarian-Development-Peace nexus approach.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sources</h2>
+    <div class="src-grid">
+      <div class="src"><b>Live weather</b><span>Open-Meteo API per settlement point; auto-refresh every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
+      <div class="src"><b>Population &amp; households</b><span>Kenya 2019 Population &amp; Housing Census Vol. I &amp; II (KNBS); Ethiopia CSA projections for Borena. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
+      <div class="src"><b>Drought &amp; food security</b><span>NDMA monthly bulletins &amp; county early-warning; IPC analyses; FEWS NET East Africa. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>Programmes</b><span>PACIDA annual reports and programme pages. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+    </div>
+  </div>
+</div>
+
+<footer class="glass">
+  <div>PACIDA ASAL Climate Watch &middot; Samburu County detail &middot; monitoring prototype &mdash; deployment decisions require ground-truthing</div>
+  <div class="mono" id="footTime"></div>
+</footer>
+
+</div><!-- /overlay -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/boundaries.js"></script>
+<script src="assets/common.js"></script>
+<script>
+const RID = "samburu";
+const STATIC_VULN = 72;
+const SITES = [["Maralal", 1.0966, 36.698, "County HQ \u2014 Lorroki plateau"], ["Baragoi", 1.783, 36.786, "Samburu North HQ"], ["Wamba", 0.982, 37.32, "Samburu East HQ, Mathews Range"], ["Archer's Post", 0.64, 37.669, "Ewaso Ng'iro lowlands"], ["South Horr", 2.088, 36.921, "Nyiro valley, route to L. Turkana"], ["Suguta Marmar", 0.88, 36.68, "Agro-pastoral plateau"], ["Sereolipi", 1.12, 37.63, "Eastern pastoral rangelands"]];  /* [name, lat, lon, note] */
+const HQ = {name:"Maralal", lat:1.0966, lon:36.698};
+
+startClock();
+const {map} = makeGlassMap([1.25, 36.95], 8);
+
+/* region outline */
+if (BOUNDARIES[RID]) {
+  L.geoJSON({type:"Feature",geometry:BOUNDARIES[RID]},{
+    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#E0A21B",fillOpacity:.06,
+           dashArray:RID==="borena"?"6 5":null}
+  }).addTo(map);
+}
+
+const siteLayer = L.layerGroup().addTo(map);
+const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));
+
+function drawSites(){
+  siteLayer.clearLayers();
+  siteState.forEach(s=>{
+    const need = s.live? s.live.need : null;
+    const band = need!=null? needBand(need):"elevated";
+    const color = PHASE_COLORS[band];
+    const m = L.circleMarker([s.lat,s.lon],{radius:9,color:"#fff",weight:1.5,fillColor:color,fillOpacity:.85});
+    m.bindPopup("<h4>"+s.name+"</h4>"
+      +"<div class='pop-k'>"+s.note+"</div>"
+      +(s.live? "<div><span class='pop-k'>Need:</span> <span class='pop-v'>"+need+" / 100 &middot; "+bandLabel(band)+"</span></div>"
+        +"<div><span class='pop-k'>Now:</span> <span class='pop-v'>"+s.live.temp.toFixed(1)+"&deg;C &middot; "+s.live.rh+"% RH</span></div>"
+        +"<div><span class='pop-k'>Rain 30 d:</span> <span class='pop-v'>"+s.live.rain30.toFixed(1)+" mm</span></div>"
+        +"<div><span class='pop-k'>Soil:</span> <span class='pop-v'>"+(s.live.soil*100).toFixed(1)+"%</span></div>"
+        : "<div class='pop-k'>loading&hellip;</div>"));
+    const label = L.marker([s.lat,s.lon],{interactive:false,
+      icon:L.divIcon({className:"",html:'<div class="site-label">'+s.name+'</div>',iconAnchor:[-10,7]})});
+    siteLayer.addLayer(m); siteLayer.addLayer(label);
+  });
+}
+drawSites();
+
+function renderSiteGrid(){
+  const g = document.getElementById("siteGrid");
+  const order=[...siteState].sort((a,b)=>((b.live?b.live.need:-1)-(a.live?a.live.need:-1)));
+  g.innerHTML = order.map(s=>{
+    const need = s.live? s.live.need:null;
+    const band = need!=null? needBand(need):"elevated";
+    return '<div class="site-card">'
+      +'<h4><span class="site-dot" style="background:'+PHASE_COLORS[band]+'"></span>'+s.name+'</h4>'
+      +'<div class="sc-sub">'+s.note+'</div>'
+      +(s.live?
+         '<div class="site-row"><span>Need index</span><b>'+need+' &middot; '+bandLabel(band)+'</b></div>'
+        +'<div class="site-row"><span>Temp now</span><b>'+s.live.temp.toFixed(1)+'&deg;C</b></div>'
+        +'<div class="site-row"><span>Rain 30 d</span><b>'+s.live.rain30.toFixed(0)+' mm</b></div>'
+        +'<div class="site-row"><span>Soil 0&ndash;7 cm</span><b>'+(s.live.soil*100).toFixed(1)+'%</b></div>'
+        +'<div class="site-row"><span>7-d max avg</span><b>'+s.live.tmax7.toFixed(1)+'&deg;C</b></div>'
+        : '<div class="loading">loading&hellip;</div>')
+      +'</div>';
+  }).join("");
+}
+renderSiteGrid();
+
+function renderHQ(w){
+  const need = w.need, band = needBand(need);
+  document.getElementById("hqBadge").textContent = bandLabel(band)+" &middot; "+need;
+  document.getElementById("hqBadge").innerHTML = bandLabel(band)+" &middot; "+need;
+  document.getElementById("hqBadge").style.background = PHASE_COLORS[band];
+  document.getElementById("hqMarker").style.left = need+"%";
+  document.getElementById("hqMetrics").innerHTML =
+     '<div class="m"><div class="mk">Now</div><div class="mv">'+w.temp.toFixed(1)+'<small>&deg;C</small></div></div>'
+    +'<div class="m"><div class="mk">Rain 30 d</div><div class="mv">'+w.rain30.toFixed(0)+'<small> mm</small></div></div>'
+    +'<div class="m"><div class="mk">Soil 0&ndash;7 cm</div><div class="mv">'+(w.soil*100).toFixed(1)+'<small>%</small></div></div>'
+    +'<div class="m"><div class="mk">7-d max avg</div><div class="mv">'+w.tmax7.toFixed(1)+'<small>&deg;C</small></div></div>';
+  document.getElementById("hqSpark").innerHTML = sparkline(w.dailyRain, w.splitIdx);
+  document.getElementById("needV").textContent = need;
+  document.getElementById("needN").textContent = bandLabel(band)+" &mdash; blended NDMA/IPC-aligned score";
+  document.getElementById("tempV").textContent = w.temp.toFixed(1)+"°C";
+  document.getElementById("tempN").textContent = w.rh+"% RH · wind "+w.wind.toFixed(0)+" km/h";
+  document.getElementById("rainV").textContent = w.rain30.toFixed(0)+" mm";
+  document.getElementById("soilV").textContent = (w.soil*100).toFixed(1)+"%";
+}
+
+async function refreshAll(){
+  const st=document.getElementById("liveState"), dotEl=document.getElementById("liveDot");
+  st.textContent="Updating…";
+  try{
+    const hqW = await fetchPoint(HQ.lat, HQ.lon);
+    hqW.need = computeNeed(STATIC_VULN, hqW);
+    renderHQ(hqW);
+    await Promise.all(siteState.map(async s=>{
+      try{
+        const w = await fetchPoint(s.lat, s.lon);
+        w.need = computeNeed(STATIC_VULN, w);
+        s.live = w;
+      }catch(e){ console.error(s.name, e); }
+    }));
+    drawSites(); renderSiteGrid();
+    st.textContent="Live · Open-Meteo";
+    dotEl.style.background="var(--normal)";
+  }catch(e){
+    console.error(e);
+    st.textContent="Feed unavailable — check connection";
+    dotEl.style.background="var(--emergency)";
+  }
+}
+document.getElementById("refreshBtn").addEventListener("click",refreshAll);
+refreshAll();
+setInterval(refreshAll, 10*60*1000);
+</script>
+</body>
+</html>
