@@ -1,4 +1,4 @@
-/* PACIDA ASAL Climate Watch — shared engine
+/* Kenya ASAL Climate Watch — shared engine
    Live data: Open-Meteo API (no key). Need index aligned to NDMA / IPC / WHO frameworks. */
 
 const PHASE_COLORS = { critical:"#E64A2E", high:"#E8834A", elevated:"#F0B22E", watch:"#8FBB5F" };
@@ -197,9 +197,114 @@ function monthChart(data){
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:112px;display:block" role="img" aria-label="12 month rainfall history">${bars}${labels}</svg>`;
 }
 
+/* ---------- village tags (OpenStreetMap-geocoded, see assets/villages.js), shown when zoomed in ---------- */
+function attachVillageLayer(map, slug){
+  if(typeof VILLAGES === "undefined" || !VILLAGES[slug] || !VILLAGES[slug].length) return null;
+  const layer = L.layerGroup();
+  VILLAGES[slug].forEach(([name, lat, lon])=>{
+    const dot = L.circleMarker([lat,lon],{radius:3,color:"#FBF7EC",weight:1,fillColor:"#C6BB9A",fillOpacity:.9});
+    const label = L.marker([lat,lon],{interactive:false,
+      icon:L.divIcon({className:"",html:'<div class="village-label">'+name+'</div>',iconAnchor:[-7,4]})});
+    layer.addLayer(dot); layer.addLayer(label);
+  });
+  const VILLAGE_ZOOM = 11;
+  const sync = ()=>{
+    const show = map.getZoom() >= VILLAGE_ZOOM;
+    if(show && !map.hasLayer(layer)) map.addLayer(layer);
+    if(!show && map.hasLayer(layer)) map.removeLayer(layer);
+  };
+  map.on("zoomend", sync);
+  sync();
+  return layer;
+}
+
+/* ---------- PACIDA interventions (real project data, see assets/interventions.js) ---------- */
+function projectsForSlug(slug){
+  if(typeof INTERVENTIONS === "undefined") return [];
+  return INTERVENTIONS.projects.filter(p => p.locations.some(l => l.slug === slug));
+}
+function officesForSlug(slug){
+  if(typeof INTERVENTIONS === "undefined") return [];
+  return INTERVENTIONS.offices.filter(o => o.slug === slug && o.lat != null);
+}
+function drawInterventionLayer(map, slug){
+  const layer = L.layerGroup();
+  projectsForSlug(slug).forEach(p=>{
+    const loc = p.locations.find(l=>l.slug===slug);
+    if(!loc) return;
+    const m = L.circleMarker([loc.lat, loc.lon], {
+      radius:6, color:"#fff", weight:1, fillColor:p.theme_color, fillOpacity:.85, className:"interv-dot"
+    });
+    m.bindPopup(
+      `<h4>${p.title}</h4>`
+      +`<div><span class="pop-k">Theme:</span> <span class="pop-v">${p.theme}</span></div>`
+      +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
+      +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
+      +(p.duration?`<div><span class="pop-k">Duration:</span> <span class="pop-v">${p.duration}</span></div>`:"")
+      +`<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`
+    );
+    layer.addLayer(m);
+  });
+  officesForSlug(slug).forEach(o=>{
+    const m = L.marker([o.lat, o.lon], {
+      icon: L.divIcon({className:"", html:'<div class="office-pin">&#9733;</div>', iconAnchor:[9,9]})
+    });
+    m.bindPopup(`<h4>${o.name}</h4><div class="pop-k">${o.note}</div>`);
+    layer.addLayer(m);
+  });
+  return layer;
+}
+function renderInterventionList(containerId, slug){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const projects = projectsForSlug(slug).sort((a,b)=>(b.year||0)-(a.year||0));
+  el.innerHTML = projects.map(p=>`<div class="interv-row">
+    <span class="interv-dot-sw" style="background:${p.theme_color}"></span>
+    <div class="interv-body">
+      <div class="interv-title">${p.title}</div>
+      <div class="interv-meta">${p.year||"—"} &middot; ${p.donor||"—"} &middot; ${p.theme} &middot; <span class="${p.status==='ongoing'?'status-ongoing':'status-done'}">${p.status==='ongoing'?'Ongoing':'Completed'}</span></div>
+    </div>
+  </div>`).join("") || '<div class="loading">No dated projects pinned to this specific area — see the full Impact Dashboard for regional programmes.</div>';
+}
+
+/* ---------- simple SVG charts (no external lib) ---------- */
+function donutChart(data, size){
+  size = size || 180;
+  const total = data.reduce((a,d)=>a+d.value,0) || 1;
+  const r = size/2, cx=size/2, cy=size/2, rInner = r*0.6;
+  let angle = -Math.PI/2, paths = "";
+  data.forEach(d=>{
+    const frac = d.value/total;
+    const a2 = angle + frac*Math.PI*2;
+    const x1=cx+r*Math.cos(angle), y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(a2), y2=cy+r*Math.sin(a2);
+    const xi1=cx+rInner*Math.cos(a2), yi1=cy+rInner*Math.sin(a2);
+    const xi2=cx+rInner*Math.cos(angle), yi2=cy+rInner*Math.sin(angle);
+    const large = frac>0.5?1:0;
+    paths += `<path d="M${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large} 1 ${x2.toFixed(2)},${y2.toFixed(2)} L${xi1.toFixed(2)},${yi1.toFixed(2)} A${rInner},${rInner} 0 ${large} 0 ${xi2.toFixed(2)},${yi2.toFixed(2)} Z" fill="${d.color}" opacity="0.92"><title>${d.label}: ${d.value}</title></path>`;
+    angle = a2;
+  });
+  return `<svg viewBox="0 0 ${size} ${size}" style="width:100%;max-width:${size}px;height:auto;display:block;margin:0 auto">${paths}<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="20" font-weight="700" fill="#FBF7EC" font-family="IBM Plex Mono">${total}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="#C6BB9A" font-family="Barlow Condensed" letter-spacing="1">PROJECTS</text></svg>`;
+}
+function yearBarChart(data){
+  const W=760,H=160,pad=26;
+  const max = Math.max(1, ...data.map(d=>d.completed+d.ongoing));
+  const bw = W/data.length;
+  let bars="", labels="";
+  data.forEach((d,i)=>{
+    const x = i*bw+3, w = Math.max(1,bw-6);
+    const hc = (d.completed/max)*(H-pad), ho=(d.ongoing/max)*(H-pad);
+    const yTop = H-pad-hc-ho;
+    if(d.ongoing) bars += `<rect x="${x.toFixed(1)}" y="${yTop.toFixed(1)}" width="${w.toFixed(1)}" height="${ho.toFixed(1)}" fill="#F0B22E"><title>${d.year}: ${d.ongoing} ongoing</title></rect>`;
+    if(d.completed) bars += `<rect x="${x.toFixed(1)}" y="${(yTop+ho).toFixed(1)}" width="${w.toFixed(1)}" height="${hc.toFixed(1)}" fill="#6FA3B4" opacity="0.85"><title>${d.year}: ${d.completed} completed</title></rect>`;
+    if(i%2===0 || data.length<14) labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-8}" font-size="9" fill="#9A8F70" text-anchor="middle">${String(d.year).slice(2)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:160px;display:block">${bars}${labels}</svg>`;
+}
+
 /* Standard glass map (satellite base + labels + dark alternative). Returns {map, layersControl}. */
-function makeGlassMap(center, zoom){
-  const map = L.map("map",{zoomControl:false, scrollWheelZoom:true}).setView(center, zoom);
+function makeGlassMap(center, zoom, elId){
+  const map = L.map(elId||"map",{zoomControl:false, scrollWheelZoom:true}).setView(center, zoom);
   L.control.zoom({position:"bottomright"}).addTo(map);
   const satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{
     attribution:'Imagery &copy; Esri, Maxar, Earthstar Geographics', maxZoom:17});

@@ -22,7 +22,7 @@
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">Taita Taveta County &middot; Kenya</div>
   </div>
-  <nav class="site"><a href="index.html">&larr; All ASAL counties</a></nav>
+  <nav class="site"><a href="index.html">&larr; All ASAL counties</a><a href="impact.html">PACIDA Impact Dashboard</a></nav>
   <div class="head-right">
     <div class="search-wrap">
       <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
@@ -124,6 +124,8 @@
 
   
 
+  
+
   <div class="panel glass">
     <h2>Sources</h2>
     <div class="src-grid">
@@ -146,6 +148,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/boundaries.js"></script>
 <script src="assets/county_index.js"></script>
+<script src="assets/villages.js"></script>
+<script src="assets/interventions.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const RID = "taita-taveta";
@@ -154,7 +158,7 @@ const SITES = [["Voi", -3.396, 38.5567, "County HQ \u2014 rail town, Tsavo gatew
 const HQ = {name:"Voi", lat:-3.396, lon:38.5567};
 
 startClock();
-const {map} = makeGlassMap([-3.409, 38.401], 8);
+const {map, layersControl} = makeGlassMap([-3.409, 38.401], 8);
 
 /* region outline */
 if (BOUNDARIES[RID]) {
@@ -163,6 +167,8 @@ if (BOUNDARIES[RID]) {
            dashArray:RID==="borena"?"6 5":null}
   }).addTo(map);
 }
+attachVillageLayer(map, RID);
+
 
 const siteLayer = L.layerGroup().addTo(map);
 const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));

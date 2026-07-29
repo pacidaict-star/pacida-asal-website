@@ -165,6 +165,7 @@ footer{margin:22px;border-radius:12px;padding:16px 22px;color:var(--muted);font-
 .shade-tip{background:rgba(31,27,18,.95);color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:'Archivo';font-size:12.5px}
 .region-label{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);text-shadow:0 1px 4px #000,0 0 10px #000;font-size:13px;white-space:nowrap}
 .site-label{font-family:'Barlow Condensed';font-weight:600;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000;font-size:11px;white-space:nowrap}
+.village-label{font-family:'Archivo';font-weight:500;letter-spacing:.02em;color:#EDE3CC;text-shadow:0 1px 3px #000,0 0 6px #000;font-size:10px;white-space:nowrap;opacity:.9}
 
 /* header search box */
 .search-wrap{position:relative;pointer-events:auto}
@@ -233,6 +234,42 @@ details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
 
 /* history chart panel */
 .hist-cap{font-size:12px;color:var(--faint);margin-top:6px}
+
+/* PACIDA interventions */
+.office-pin{color:var(--alert);font-size:18px;text-shadow:0 0 4px #000,0 0 8px #000;line-height:1}
+.interv-list{display:flex;flex-direction:column;gap:2px;margin-top:10px;max-height:420px;overflow-y:auto}
+.interv-row{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}
+.interv-dot-sw{width:10px;height:10px;border-radius:50%;flex:none;margin-top:4px}
+.interv-title{font-size:13px;color:var(--text)}
+.interv-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+.status-ongoing{color:var(--alert);font-weight:600}
+.status-done{color:var(--faint)}
+
+/* impact dashboard */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:12px}
+.stat-tile{border:1px solid rgba(251,247,236,.12);border-radius:10px;padding:14px 16px;background:rgba(38,33,21,.5)}
+.stat-tile .sn{font-family:'IBM Plex Mono';font-size:26px;font-weight:600;color:var(--alert)}
+.stat-tile .sl{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
+@media(max-width:800px){.split{grid-template-columns:1fr}}
+.split h3{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.08em;font-size:14px;margin-bottom:10px;color:var(--text)}
+.split.done h3{color:var(--normal)}
+.split.needs h3{color:var(--alarm)}
+.ach-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);align-items:baseline}
+.ach-row .an{font-family:'IBM Plex Mono';font-weight:700;color:var(--normal);flex:none;min-width:64px}
+.ach-row .al{font-size:12.5px;color:var(--muted)}
+.chal-row{padding:10px 0;border-bottom:1px dashed var(--line)}
+.chal-row .cc{font-size:12.5px;color:var(--text);font-weight:600}
+.chal-row .cm{font-size:12px;color:var(--muted);margin-top:3px}
+.legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.legend-sw{width:10px;height:10px;border-radius:50%;flex:none}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:14px}
+.hero-stats .hs{text-align:left}
+.hero-stats .hn{font-family:'IBM Plex Mono';font-size:30px;font-weight:700;color:var(--text)}
+.hero-stats .hl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:'Barlow Condensed';font-weight:600}
+.chart-row{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:center}
+@media(max-width:700px){.chart-row{grid-template-columns:1fr}}
 
 /* filter chips */
 .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}

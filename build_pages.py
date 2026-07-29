@@ -75,7 +75,8 @@ def fmtnum(v):
 
 def navbar(rid):
     home_active = ' class="active"' if rid == "home" else ""
-    return '<a href="index.html"%s>&larr; All ASAL counties</a>' % home_active
+    return ('<a href="index.html"%s>&larr; All ASAL counties</a>'
+            '<a href="impact.html">PACIDA Impact Dashboard</a>') % home_active
 
 
 def page(rid, r):
@@ -105,9 +106,20 @@ def page(rid, r):
         pacida_panel = '<div class="panel glass"><h2>PACIDA in %(title)s</h2><p>%(pacida)s</p></div>' % r
         sources_pacida = ('<div class="src"><b>Programmes</b><span>PACIDA annual reports and programme pages. </span>'
                            '<a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>')
+        interv_panel = ('<div class="panel glass"><h2>PACIDA interventions here <span class="tag">'
+                         '<a href="impact.html" style="color:var(--alert)">full impact dashboard &rarr;</a></span></h2>'
+                         '<p>Real projects from PACIDA\'s own project register, pinned where their title names a specific '
+                         'site in %(title)s. Star markers on the map are PACIDA field presence/offices.</p>'
+                         '<div class="interv-list" id="intervList"></div></div>') % r
+        interventions_js = ('const intervLayer = drawInterventionLayer(map, RID);\n'
+                             'intervLayer.addTo(map);\n'
+                             'layersControl.addOverlay(intervLayer, "PACIDA interventions");\n'
+                             'renderInterventionList("intervList", RID);')
     else:
         pacida_panel = ""
         sources_pacida = ""
+        interv_panel = ""
+        interventions_js = ""
 
     sites_json = json.dumps(r["sites"])
     nav = navbar(rid)
@@ -123,7 +135,8 @@ def page(rid, r):
         poverty=r["poverty"], staticVuln=r["staticVuln"], phase=r["phase"], gam=r["gam"],
         sub_rows=sub_rows, subnote=subnote, lz_rows=lz_rows, sectors=sect,
         seasoncal=seasoncal(), timeline_panel=timeline_panel, pacida_panel=pacida_panel,
-        sources_pacida=sources_pacida, sites_json=sites_json
+        sources_pacida=sources_pacida, sites_json=sites_json,
+        interv_panel=interv_panel, interventions_js=interventions_js
     )
 
 
@@ -251,6 +264,8 @@ TEMPLATE = """<!DOCTYPE html>
 
   %(timeline_panel)s
 
+  %(interv_panel)s
+
   %(pacida_panel)s
 
   <div class="panel glass">
@@ -275,6 +290,8 @@ TEMPLATE = """<!DOCTYPE html>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/boundaries.js"></script>
 <script src="assets/county_index.js"></script>
+<script src="assets/villages.js"></script>
+<script src="assets/interventions.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const RID = "%(rid)s";
@@ -283,7 +300,7 @@ const SITES = %(sites_json)s;  /* [name, lat, lon, note] */
 const HQ = {name:"%(hqname)s", lat:%(hqlat)s, lon:%(hqlon)s};
 
 startClock();
-const {map} = makeGlassMap(%(center)s, %(zoom)s);
+const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s);
 
 /* region outline */
 if (BOUNDARIES[RID]) {
@@ -292,6 +309,8 @@ if (BOUNDARIES[RID]) {
            dashArray:RID==="borena"?"6 5":null}
   }).addTo(map);
 }
+attachVillageLayer(map, RID);
+%(interventions_js)s
 
 const siteLayer = L.layerGroup().addTo(map);
 const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));
@@ -478,6 +497,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   <nav class="site">
     <a href="#pacida-section">PACIDA counties</a>
     <a href="#all-section">All ASAL counties</a>
+    <a href="impact.html">PACIDA Impact Dashboard</a>
     <a href="#about-section">About</a>
   </nav>
   <div class="head-right">

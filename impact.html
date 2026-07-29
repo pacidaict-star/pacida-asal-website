@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PACIDA Impact Dashboard — Kenya ASAL Climate Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%87%B0%F0%9F%87%AA%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<div class="overlay">
+
+<header class="glass">
+  <div class="brand">
+    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <div class="sub">PACIDA Impact Dashboard &middot; real project data, FY2010&ndash;FY2026</div>
+  </div>
+  <nav class="site">
+    <a href="index.html">&larr; All ASAL counties</a>
+    <a href="marsabit.html">Marsabit</a>
+    <a href="samburu.html">Samburu</a>
+    <a href="isiolo.html">Isiolo</a>
+    <a href="borena.html">Borena</a>
+  </nav>
+  <div class="head-right">
+    <div class="search-wrap">
+      <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+    <button class="iconbtn" id="exportBtn" type="button" title="Download the full project list as CSV">Export CSV</button>
+  </div>
+</header>
+
+<div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
+  <div class="gl-head"><h3>Glossary</h3><button class="gl-close" type="button" aria-label="Close glossary">&times;</button></div>
+  <input class="gl-search" type="text" placeholder="Filter terms&hellip;" aria-label="Filter glossary terms">
+  <div class="gl-body"></div>
+</div>
+<div class="gl-backdrop" id="glBackdrop"></div>
+
+<div class="wide" style="padding-top:22px">
+  <div class="panel glass">
+    <h2>PACIDA, at a glance</h2>
+    <p>Sixteen years of continuous humanitarian and development work across Marsabit, Samburu, Isiolo and the
+    cross-border Borena Zone of southern Ethiopia &mdash; drawn directly from PACIDA's own project register and its
+    externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
+    <div class="hero-stats"><div class="hs"><div class="hn">236</div><div class="hl">Real projects, FY2010–FY2026</div></div><div class="hs"><div class="hn">16</div><div class="hl">Years of continuous operation</div></div><div class="hs"><div class="hn">18</div><div class="hl">Projects active right now</div></div><div class="hs"><div class="hn">68</div><div class="hl">Donor &amp; implementing partners</div></div></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Achievements <span class="tag">selected headline results, 2023&ndash;2026</span></h2>
+    <div class="stat-grid" id="achGrid"></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Interventions by thematic area</h2>
+    <div class="chart-row">
+      <div id="donutHolder"></div>
+      <div>
+        <div id="yearChartHolder"></div>
+        <div class="hist-cap">Projects started per year, FY2010&ndash;FY2026 &middot; amber = still ongoing, blue = completed.</div>
+      </div>
+    </div>
+    <div class="legend-row" id="themeLegend"></div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Where the work is happening <span class="tag">click a theme to filter &middot; star = PACIDA office</span></h2>
+    <div class="chip-row" id="themeChips"></div>
+    <div class="map-window" style="min-height:56vh;border-radius:10px;overflow:hidden;position:relative">
+      <div id="impactMap" style="position:absolute;inset:0"></div>
+    </div>
+    <p class="hist-cap">86 of 236 projects name a specific site in their title and are pinned here;
+    the rest are regional or multi-county programmes (shown in the table below, not on the map, rather than guessing a location).</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Done, and what's still needed</h2>
+    <div class="split">
+      <div class="split done">
+        <h3>&#10003; What PACIDA has delivered</h3>
+        <div class="ach-row"><div class="an">123,902</div><div class="al">people gained access to safe water</div></div><div class="ach-row"><div class="an">26,034</div><div class="al">households on nutrition-sensitive cash transfers (~156,200 people)</div></div><div class="ach-row"><div class="an">640,692</div><div class="al">livestock vaccinated, treated or dewormed</div></div><div class="ach-row"><div class="an">50,447</div><div class="al">households reached with One Health crisis support</div></div><div class="ach-row"><div class="an">10,138</div><div class="al">households received nutritious food baskets</div></div><div class="ach-row"><div class="an">27,913</div><div class="al">students supported through school feeding (12,206 boys / 11,647 girls)</div></div><div class="ach-row"><div class="an">20</div><div class="al">boreholes drilled + 11 rehabilitated (52,298 people benefiting)</div></div><div class="ach-row"><div class="an">30+</div><div class="al">water sources solarized; 25 shallow wells improved; 5 water supply systems built</div></div><div class="ach-row"><div class="an">17,100</div><div class="al">households supported with livestock feeds</div></div><div class="ach-row"><div class="an">5,200+</div><div class="al">community health volunteers & pregnant/lactating women trained (SBCC)</div></div><div class="ach-row"><div class="an">2,940</div><div class="al">shoats + 40 camels distributed to vulnerable women's groups</div></div><div class="ach-row"><div class="an">2</div><div class="al">cross-border peace accords supported (Daasanach–Gabra; Dilo–Dukana review)</div></div><div class="ach-row"><div class="an">1,935</div><div class="al">teenage girls reached with menstrual hygiene management support</div></div><div class="ach-row"><div class="an">128</div><div class="al">water-trucking trips, delivering emergency water to 71,604 people</div></div>
+      </div>
+      <div class="split needs">
+        <h3>&#9888; What still needs more</h3>
+        <div class="chal-row"><div class="cc">Recurring droughts and climate shocks continue to undermine livelihoods</div><div class="cm">&rarr; Scale up Anticipatory Action, climate-smart livelihoods, and resilient natural resource management.</div></div><div class="chal-row"><div class="cc">Food insecurity and acute malnutrition remain critical in ASAL areas</div><div class="cm">&rarr; Strengthen integrated health, nutrition, food security, and cash assistance interventions.</div></div><div class="chal-row"><div class="cc">Resource-based conflicts and insecurity persist across pastoralist zones</div><div class="cm">&rarr; Promote community-led peacebuilding, conflict resolution, and cross-border collaboration.</div></div><div class="chal-row"><div class="cc">High illiteracy and low education access and retention among nomadic communities</div><div class="cm">&rarr; Expand access to inclusive, quality, and resilient education for pastoralist children.</div></div><div class="chal-row"><div class="cc">Water scarcity and weak WASH infrastructure continue to affect communities</div><div class="cm">&rarr; Invest in climate-resilient water systems and sustainable WASH services.</div></div><div class="chal-row"><div class="cc">High donor dependency remains a major institutional risk</div><div class="cm">&rarr; Diversify funding sources while strengthening institutional sustainability and partnerships.</div></div><div class="chal-row"><div class="cc">Drug and substance misuse, especially among youth</div><div class="cm">&rarr; Empower youth through prevention, life skills, livelihoods, and community support programmes.</div></div><div class="chal-row"><div class="cc">Political dynamics and governance challenges</div><div class="cm">&rarr; Strengthen stakeholder engagement, adaptive programming, and institutional risk management.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Full project register <span class="tag">236 projects &middot; click a column to sort</span></h2>
+    <div class="table-scroll">
+    <table class="ptable" id="projTable">
+      <thead><tr>
+        <th class="sortable" data-key="year">Year <span class="arrow">&#9662;</span></th>
+        <th class="sortable" data-key="theme">Theme <span class="arrow">&#9662;</span></th>
+        <th>Project</th>
+        <th class="sortable" data-key="donor">Donor <span class="arrow">&#9662;</span></th>
+        <th class="sortable" data-key="status">Status <span class="arrow">&#9662;</span></th>
+      </tr></thead>
+      <tbody id="projBody"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sources &amp; methodology</h2>
+    <div class="src-grid">
+      <div class="src"><b>Project register</b><span>PACIDA's internal Project Summary (FY2010&ndash;FY2026): donor, thematic area, title, duration and dates for every grant. Individual grant amounts are intentionally not published here &mdash; they read as internal financial detail rather than material PACIDA already shares externally.</span></div>
+      <div class="src"><b>Achievement figures</b><span>PACIDA's own "@ A Glance 2023-2026" partner briefing &mdash; the same headline numbers shared with donors and partners.</span></div>
+      <div class="src"><b>Challenges &amp; gaps</b><span>PACIDA's own stated challenges and mitigation measures, from the same briefing &mdash; not this dashboard's assessment.</span></div>
+      <div class="src"><b>Map locations</b><span>Only projects whose title names a specific settlement or ward are pinned, using this site's existing settlement coordinates. Regional/multi-county programmes are listed in the table but not placed on the map.</span></div>
+    </div>
+  </div>
+</div>
+
+<footer class="glass">
+  <div>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</div>
+  <div class="mono" id="footTime"></div>
+</footer>
+
+</div><!-- /overlay -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/boundaries.js"></script>
+<script src="assets/county_index.js"></script>
+<script src="assets/interventions.js"></script>
+<script src="assets/common.js"></script>
+<script>
+const DONUT_DATA = [{"label":"Emergency","value":64,"color":"#E64A2E"},{"label":"Livelihood","value":54,"color":"#8FBB5F"},{"label":"Disaster Risk Reduction","value":40,"color":"#E8834A"},{"label":"Education","value":26,"color":"#F0B22E"},{"label":"WASH","value":22,"color":"#6FA3B4"},{"label":"Peace & Governance","value":11,"color":"#9C87D9"},{"label":"Climate Change","value":9,"color":"#5FBF8F"},{"label":"Health & Nutrition","value":7,"color":"#D66FB0"},{"label":"Other","value":3,"color":"#9A8F70"}];
+const YEAR_DATA = [{"year":2010,"completed":1,"ongoing":0},{"year":2011,"completed":13,"ongoing":0},{"year":2012,"completed":9,"ongoing":2},{"year":2013,"completed":15,"ongoing":0},{"year":2014,"completed":4,"ongoing":0},{"year":2015,"completed":13,"ongoing":1},{"year":2016,"completed":18,"ongoing":1},{"year":2017,"completed":12,"ongoing":1},{"year":2018,"completed":9,"ongoing":0},{"year":2019,"completed":8,"ongoing":0},{"year":2020,"completed":20,"ongoing":0},{"year":2021,"completed":26,"ongoing":0},{"year":2022,"completed":31,"ongoing":2},{"year":2023,"completed":25,"ongoing":5},{"year":2024,"completed":7,"ongoing":2},{"year":2025,"completed":6,"ongoing":1},{"year":2026,"completed":1,"ongoing":3}];
+const PACIDA_SLUGS = ["marsabit","samburu","isiolo","borena"];
+
+function tickFoot(){
+  const now = new Date();
+  document.getElementById("footTime").textContent = now.toLocaleString("en-GB",{timeZone:"Africa/Nairobi"}) + " EAT";
+}
+tickFoot(); setInterval(tickFoot, 1000);
+
+/* achievements grid */
+document.getElementById("achGrid").innerHTML = INTERVENTIONS.achievements.map(a =>
+  `<div class="stat-tile"><div class="sn">${a.n}</div><div class="sl">${a.label}</div></div>`
+).join("");
+
+/* charts */
+document.getElementById("donutHolder").innerHTML = donutChart(DONUT_DATA, 190);
+document.getElementById("yearChartHolder").innerHTML = yearBarChart(YEAR_DATA);
+document.getElementById("themeLegend").innerHTML = INTERVENTIONS.themes.map(t =>
+  `<div class="legend-item"><span class="legend-sw" style="background:${t.color}"></span>${t.label}</div>`
+).join("");
+
+/* map (embedded in the panel below, not the page-wide fixed background) */
+const {map} = makeGlassMap([2.3, 38.2], 7, "impactMap");
+setTimeout(()=>map.invalidateSize(), 300);
+PACIDA_SLUGS.forEach(slug=>{
+  const geom = BOUNDARIES[slug];
+  if(!geom) return;
+  L.geoJSON({type:"Feature",geometry:geom},{
+    style:{color:"#FFFFFF",weight:1.4,opacity:.6,fillColor:"#8FBB5F",fillOpacity:.05,
+           dashArray:slug==="borena"?"6 5":null}
+  }).addTo(map);
+});
+let currentTheme = "all";
+let markerLayer = L.layerGroup().addTo(map);
+function drawImpactMarkers(){
+  markerLayer.clearLayers();
+  PACIDA_SLUGS.forEach(slug=>{
+    projectsForSlug(slug).forEach(p=>{
+      if(currentTheme!=="all" && p.theme!==currentTheme) return;
+      const loc = p.locations.find(l=>l.slug===slug);
+      if(!loc) return;
+      const m = L.circleMarker([loc.lat, loc.lon], {radius:6,color:"#fff",weight:1,fillColor:p.theme_color,fillOpacity:.88});
+      m.bindPopup(`<h4>${p.title}</h4>`
+        +`<div><span class="pop-k">Theme:</span> <span class="pop-v">${p.theme}</span></div>`
+        +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
+        +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
+        +`<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`);
+      markerLayer.addLayer(m);
+    });
+    officesForSlug(slug).forEach(o=>{
+      const m = L.marker([o.lat, o.lon], {icon: L.divIcon({className:"", html:'<div class="office-pin">&#9733;</div>', iconAnchor:[9,9]})});
+      m.bindPopup(`<h4>${o.name}</h4><div class="pop-k">${o.note}</div>`);
+      markerLayer.addLayer(m);
+    });
+  });
+}
+drawImpactMarkers();
+document.getElementById("themeChips").innerHTML = `<button class="chip-filter active" data-theme="all">All themes</button><button class="chip-filter" data-theme="Climate Change" style="border-color:#5FBF8F">Climate Change</button><button class="chip-filter" data-theme="Disaster Risk Reduction" style="border-color:#E8834A">Disaster Risk Reduction</button><button class="chip-filter" data-theme="Education" style="border-color:#F0B22E">Education</button><button class="chip-filter" data-theme="Emergency" style="border-color:#E64A2E">Emergency</button><button class="chip-filter" data-theme="Health & Nutrition" style="border-color:#D66FB0">Health & Nutrition</button><button class="chip-filter" data-theme="Livelihood" style="border-color:#8FBB5F">Livelihood</button><button class="chip-filter" data-theme="Other" style="border-color:#9A8F70">Other</button><button class="chip-filter" data-theme="Peace & Governance" style="border-color:#9C87D9">Peace & Governance</button><button class="chip-filter" data-theme="WASH" style="border-color:#6FA3B4">WASH</button>`;
+document.querySelectorAll("#themeChips .chip-filter").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("#themeChips .chip-filter").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTheme = btn.dataset.theme;
+    drawImpactMarkers();
+  });
+});
+
+/* project table */
+let sortKey="year", sortDir=-1;
+function renderProjTable(){
+  const rows = INTERVENTIONS.projects.slice().sort((a,b)=>{
+    const av=a[sortKey]||"", bv=b[sortKey]||"";
+    if(typeof av === "string") return sortDir*av.localeCompare(bv);
+    return sortDir*((av||0)-(bv||0));
+  });
+  document.getElementById("projBody").innerHTML = rows.map(p=>`<tr>
+    <td class="mono">${p.year||"—"}</td>
+    <td><span class="chip" style="background:${p.theme_color}"></span>${p.theme}</td>
+    <td>${p.title}</td>
+    <td>${p.donor||"—"}</td>
+    <td><span class="${p.status==='ongoing'?'status-ongoing':'status-done'}">${p.status==='ongoing'?'Ongoing':'Completed'}</span></td>
+  </tr>`).join("");
+  document.querySelectorAll("#projTable th.sortable").forEach(th=>{
+    th.classList.toggle("active", th.dataset.key===sortKey);
+    th.querySelector(".arrow").textContent = th.dataset.key===sortKey ? (sortDir===1?"▴":"▾") : "▾";
+  });
+}
+document.querySelectorAll("#projTable th.sortable").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const key = th.dataset.key;
+    if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
+    renderProjTable();
+  });
+});
+renderProjTable();
+
+/* glossary, search, export */
+attachGlossary();
+attachSearch(
+  ()=>COUNTY_INDEX.map(c=>({id:c.slug, label:c.name, kind:"county"})),
+  m=>{ window.location.href = m.id + ".html"; }
+);
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const rows = [["Year","Theme","Project","Donor","Duration","Start","End","Status"]];
+  INTERVENTIONS.projects.forEach(p=>{
+    rows.push([p.year, p.theme, p.title, p.donor, p.duration, p.start, p.end, p.status]);
+  });
+  downloadCSV("pacida-project-register.csv", rows);
+});
+</script>
+</body>
+</html>

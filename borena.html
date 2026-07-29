@@ -22,7 +22,7 @@
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">Borena Zone &middot; Southern Ethiopia (Oromia)</div>
   </div>
-  <nav class="site"><a href="index.html">&larr; All ASAL counties</a></nav>
+  <nav class="site"><a href="index.html">&larr; All ASAL counties</a><a href="impact.html">PACIDA Impact Dashboard</a></nav>
   <div class="head-right">
     <div class="search-wrap">
       <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
@@ -122,6 +122,8 @@
 
   <div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2><div class="timeline"><div class="tl"><div class="yr">1999–2000</div><div class="tx">Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.</div></div><div class="tl"><div class="yr">2005–06</div><div class="tx">Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).</div></div><div class="tl"><div class="yr">2008–09</div><div class="tx">Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.</div></div><div class="tl"><div class="yr">2010–11</div><div class="tx">Horn of Africa famine — the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.</div></div><div class="tl"><div class="yr">2016–17</div><div class="tx">Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.</div></div><div class="tl"><div class="yr">2020–23</div><div class="tx">Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.</div></div><div class="tl"><div class="yr">2023–24</div><div class="tx">El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern.</div></div><div class="tl now"><div class="yr">2025–26</div><div class="tx">Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.</div></div></div></div>
 
+  <div class="panel glass"><h2>PACIDA interventions here <span class="tag"><a href="impact.html" style="color:var(--alert)">full impact dashboard &rarr;</a></span></h2><p>Real projects from PACIDA's own project register, pinned where their title names a specific site in Borena Zone. Star markers on the map are PACIDA field presence/offices.</p><div class="interv-list" id="intervList"></div></div>
+
   <div class="panel glass"><h2>PACIDA in Borena Zone</h2><p>PACIDA's Ethiopian office anchors cross-border programming: drought emergency response, WASH around the tula clusters, livestock health, education support, and Borana-led peace and resource-sharing dialogues that keep the Marsabit–Borena grazing corridors open. Funded partners include Welthungerhilfe and BMZ programmes.</p></div>
 
   <div class="panel glass">
@@ -146,6 +148,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/boundaries.js"></script>
 <script src="assets/county_index.js"></script>
+<script src="assets/villages.js"></script>
+<script src="assets/interventions.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const RID = "borena";
@@ -154,7 +158,7 @@ const SITES = [["Yabelo", 4.885, 38.083, "Zone capital"], ["Moyale (ET)", 3.554,
 const HQ = {name:"Yabelo", lat:4.885, lon:38.083};
 
 startClock();
-const {map} = makeGlassMap([4.525, 38.225], 8);
+const {map, layersControl} = makeGlassMap([4.525, 38.225], 8);
 
 /* region outline */
 if (BOUNDARIES[RID]) {
@@ -163,6 +167,11 @@ if (BOUNDARIES[RID]) {
            dashArray:RID==="borena"?"6 5":null}
   }).addTo(map);
 }
+attachVillageLayer(map, RID);
+const intervLayer = drawInterventionLayer(map, RID);
+intervLayer.addTo(map);
+layersControl.addOverlay(intervLayer, "PACIDA interventions");
+renderInterventionList("intervList", RID);
 
 const siteLayer = L.layerGroup().addTo(map);
 const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));

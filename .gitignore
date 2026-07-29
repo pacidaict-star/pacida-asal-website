@@ -1,2 +1,3 @@
 __pycache__/
 *.pyc
+villages_geocode_cache.json
