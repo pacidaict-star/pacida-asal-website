@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%AA%3C/text%3E%3C/svg%3E">
 </head>
 <body>
 
@@ -23,11 +24,25 @@
   </div>
   <nav class="site"><a href="index.html">Home</a><a href="marsabit.html">Marsabit</a><a href="samburu.html">Samburu</a><a href="isiolo.html" class="active">Isiolo</a><a href="borena.html">Borena · S. Ethiopia</a></nav>
   <div class="head-right">
+    <div class="search-wrap">
+      <input type="text" id="searchBox" placeholder="Jump to a site&hellip;" aria-label="Search monitoring sites">
+      <div class="search-results" id="searchResults"></div>
+    </div>
     <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
     <div class="clock mono" id="clock">--:--:-- EAT</div>
+    <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
+    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+    <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
     <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
   </div>
 </header>
+
+<div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
+  <div class="gl-head"><h3>Glossary</h3><button class="gl-close" type="button" aria-label="Close glossary">&times;</button></div>
+  <input class="gl-search" type="text" placeholder="Filter terms&hellip;" aria-label="Filter glossary terms">
+  <div class="gl-body"></div>
+</div>
+<div class="gl-backdrop" id="glBackdrop"></div>
 
 <div class="strip">
   <div class="cell glass"><div class="k">Need index (live)</div><div class="v" id="needV">&mdash;</div><div class="n" id="needN">recalculating from live weather</div></div>
@@ -95,8 +110,14 @@
   </div>
 
   <div class="panel glass">
-    <h2>Sector deep-dive</h2>
-    <div class="src-grid"><div class="src"><b>Livestock economy</b><span>Borana cattle heartland with growing camel herds. Isiolo livestock market and the export abattoir anchor offtake; in drought, herds converge on the Ewaso riverine strip and Meru NP border, driving disease transmission and human-wildlife conflict.</span></div><div class="src"><b>Water & WASH</b><span>The Ewaso Ng'iro's flow is falling from upstream highland abstraction — the county's central climate-security issue. Flagship response: Merti–Korbesa water supply project (NDMA/EU/NWWDA/County). Elsewhere: boreholes, pans; Sericho and Cherab wards face the longest dry-season distances.</span></div><div class="src"><b>Nutrition & health</b><span>2026 drought reporting documented severe acute malnutrition cases in Isiolo; NDMA lists the county in Alert with worsening food access. GAM typically 12–18% in bad years, concentrated in Merti and Sericho.</span></div><div class="src"><b>Floods & multi-hazard</b><span>Isiolo is the textbook twin-disaster county: among the worst affected by the 2023 El Niño floods (Ewaso burst its banks, displacing riverine villages) followed directly by failed rains. Preparedness must cover both extremes.</span></div><div class="src"><b>Conflict & peace</b><span>Grazing pressure funnels Borana, Somali, Samburu and Turkana herds into the same riverine reserves; flashpoints on the Isiolo–Samburu (Oldonyiro) and Isiolo–Garissa (Modogashe–Sericho) axes. Land speculation along LAPSSET adds a new conflict layer.</span></div></div>
+    <h2>12-month rainfall history <span class="tag">at Isiolo town &middot; loaded once per visit</span></h2>
+    <div id="histChart"><div class="loading">Loading 12-month rainfall history&hellip;</div></div>
+    <p class="hist-cap">Monthly totals from Open-Meteo's historical archive. Compare against the seasonal calendar above: a healthy year shows two clear peaks (Ganna/long rains, Hagayya/short rains) separated by dry troughs &mdash; a missing or flattened peak is the drought signal households actually live through.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sector deep-dive <span class="tag">click a heading to expand</span></h2>
+    <div class="acc-list"><details class="acc"><summary>Livestock economy</summary><div class="acc-body">Borana cattle heartland with growing camel herds. Isiolo livestock market and the export abattoir anchor offtake; in drought, herds converge on the Ewaso riverine strip and Meru NP border, driving disease transmission and human-wildlife conflict.</div></details><details class="acc"><summary>Water & WASH</summary><div class="acc-body">The Ewaso Ng'iro's flow is falling from upstream highland abstraction — the county's central climate-security issue. Flagship response: Merti–Korbesa water supply project (NDMA/EU/NWWDA/County). Elsewhere: boreholes, pans; Sericho and Cherab wards face the longest dry-season distances.</div></details><details class="acc"><summary>Nutrition & health</summary><div class="acc-body">2026 drought reporting documented severe acute malnutrition cases in Isiolo; NDMA lists the county in Alert with worsening food access. GAM typically 12–18% in bad years, concentrated in Merti and Sericho.</div></details><details class="acc"><summary>Floods & multi-hazard</summary><div class="acc-body">Isiolo is the textbook twin-disaster county: among the worst affected by the 2023 El Niño floods (Ewaso burst its banks, displacing riverine villages) followed directly by failed rains. Preparedness must cover both extremes.</div></details><details class="acc"><summary>Conflict & peace</summary><div class="acc-body">Grazing pressure funnels Borana, Somali, Samburu and Turkana herds into the same riverine reserves; flashpoints on the Isiolo–Samburu (Oldonyiro) and Isiolo–Garissa (Modogashe–Sericho) axes. Land speculation along LAPSSET adds a new conflict layer.</div></details></div>
   </div>
 
   <div class="panel glass">
@@ -149,6 +170,8 @@ if (BOUNDARIES[RID]) {
 
 const siteLayer = L.layerGroup().addTo(map);
 const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));
+const siteMarkers = {};
+let lastHQW = null;
 
 function drawSites(){
   siteLayer.clearLayers();
@@ -160,13 +183,14 @@ function drawSites(){
     m.bindPopup("<h4>"+s.name+"</h4>"
       +"<div class='pop-k'>"+s.note+"</div>"
       +(s.live? "<div><span class='pop-k'>Need:</span> <span class='pop-v'>"+need+" / 100 &middot; "+bandLabel(band)+"</span></div>"
-        +"<div><span class='pop-k'>Now:</span> <span class='pop-v'>"+s.live.temp.toFixed(1)+"&deg;C &middot; "+s.live.rh+"% RH</span></div>"
-        +"<div><span class='pop-k'>Rain 30 d:</span> <span class='pop-v'>"+s.live.rain30.toFixed(1)+" mm</span></div>"
+        +"<div><span class='pop-k'>Now:</span> <span class='pop-v'>"+fmtTemp(s.live.temp)+" &middot; "+s.live.rh+"% RH</span></div>"
+        +"<div><span class='pop-k'>Rain 30 d:</span> <span class='pop-v'>"+fmtRain(s.live.rain30)+"</span></div>"
         +"<div><span class='pop-k'>Soil:</span> <span class='pop-v'>"+(s.live.soil*100).toFixed(1)+"%</span></div>"
         : "<div class='pop-k'>loading&hellip;</div>"));
     const label = L.marker([s.lat,s.lon],{interactive:false,
       icon:L.divIcon({className:"",html:'<div class="site-label">'+s.name+'</div>',iconAnchor:[-10,7]})});
     siteLayer.addLayer(m); siteLayer.addLayer(label);
+    siteMarkers[s.name] = m;
   });
 }
 drawSites();
@@ -182,10 +206,10 @@ function renderSiteGrid(){
       +'<div class="sc-sub">'+s.note+'</div>'
       +(s.live?
          '<div class="site-row"><span>Need index</span><b>'+need+' &middot; '+bandLabel(band)+'</b></div>'
-        +'<div class="site-row"><span>Temp now</span><b>'+s.live.temp.toFixed(1)+'&deg;C</b></div>'
-        +'<div class="site-row"><span>Rain 30 d</span><b>'+s.live.rain30.toFixed(0)+' mm</b></div>'
+        +'<div class="site-row"><span>Temp now</span><b>'+fmtTemp(s.live.temp)+'</b></div>'
+        +'<div class="site-row"><span>Rain 30 d</span><b>'+fmtRain(s.live.rain30)+'</b></div>'
         +'<div class="site-row"><span>Soil 0&ndash;7 cm</span><b>'+(s.live.soil*100).toFixed(1)+'%</b></div>'
-        +'<div class="site-row"><span>7-d max avg</span><b>'+s.live.tmax7.toFixed(1)+'&deg;C</b></div>'
+        +'<div class="site-row"><span>7-d max avg</span><b>'+fmtTemp(s.live.tmax7)+'</b></div>'
         : '<div class="loading">loading&hellip;</div>')
       +'</div>';
   }).join("");
@@ -193,24 +217,59 @@ function renderSiteGrid(){
 renderSiteGrid();
 
 function renderHQ(w){
+  lastHQW = w;
   const need = w.need, band = needBand(need);
-  document.getElementById("hqBadge").textContent = bandLabel(band)+" &middot; "+need;
   document.getElementById("hqBadge").innerHTML = bandLabel(band)+" &middot; "+need;
   document.getElementById("hqBadge").style.background = PHASE_COLORS[band];
   document.getElementById("hqMarker").style.left = need+"%";
   document.getElementById("hqMetrics").innerHTML =
-     '<div class="m"><div class="mk">Now</div><div class="mv">'+w.temp.toFixed(1)+'<small>&deg;C</small></div></div>'
-    +'<div class="m"><div class="mk">Rain 30 d</div><div class="mv">'+w.rain30.toFixed(0)+'<small> mm</small></div></div>'
+     '<div class="m"><div class="mk">Now</div><div class="mv">'+fmtTemp(w.temp)+'</div></div>'
+    +'<div class="m"><div class="mk">Rain 30 d</div><div class="mv">'+fmtRain(w.rain30)+'</div></div>'
     +'<div class="m"><div class="mk">Soil 0&ndash;7 cm</div><div class="mv">'+(w.soil*100).toFixed(1)+'<small>%</small></div></div>'
-    +'<div class="m"><div class="mk">7-d max avg</div><div class="mv">'+w.tmax7.toFixed(1)+'<small>&deg;C</small></div></div>';
+    +'<div class="m"><div class="mk">7-d max avg</div><div class="mv">'+fmtTemp(w.tmax7)+'</div></div>';
   document.getElementById("hqSpark").innerHTML = sparkline(w.dailyRain, w.splitIdx);
   document.getElementById("needV").textContent = need;
   document.getElementById("needN").textContent = bandLabel(band)+" &mdash; blended NDMA/IPC-aligned score";
-  document.getElementById("tempV").textContent = w.temp.toFixed(1)+"°C";
+  document.getElementById("tempV").textContent = fmtTemp(w.temp);
   document.getElementById("tempN").textContent = w.rh+"% RH · wind "+w.wind.toFixed(0)+" km/h";
-  document.getElementById("rainV").textContent = w.rain30.toFixed(0)+" mm";
+  document.getElementById("rainV").textContent = fmtRain(w.rain30);
   document.getElementById("soilV").textContent = (w.soil*100).toFixed(1)+"%";
 }
+
+document.addEventListener("units-changed", ()=>{
+  if(lastHQW) renderHQ(lastHQW);
+  drawSites(); renderSiteGrid();
+});
+
+attachUnitToggle();
+attachGlossary();
+attachSearch(
+  ()=>siteState.map(s=>({id:s.name, label:s.name+" — "+s.note})),
+  m=>{
+    const s = siteState.find(x=>x.name===m.id);
+    if(!s) return;
+    map.flyTo([s.lat,s.lon],10,{duration:1});
+    const mk = siteMarkers[s.name]; if(mk) mk.openPopup();
+  }
+);
+
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const rows = [["Site","Lat","Lon","Note","Need index","Band","Temp C","RH %","Rain 30d mm","Soil 0-7cm %","7d max avg C"]];
+  siteState.forEach(s=>{
+    const w = s.live;
+    rows.push([s.name, s.lat, s.lon, s.note,
+      w?w.need:"", w?bandLabel(needBand(w.need)):"",
+      w?w.temp.toFixed(1):"", w?w.rh:"", w?w.rain30.toFixed(1):"", w?(w.soil*100).toFixed(1):"", w?w.tmax7.toFixed(1):""]);
+  });
+  downloadCSV("isiolo-live-readings.csv", rows);
+});
+
+fetchMonthlyRain(HQ.lat, HQ.lon).then(data=>{
+  document.getElementById("histChart").innerHTML = monthChart(data);
+}).catch(e=>{
+  console.error("history",e);
+  document.getElementById("histChart").innerHTML = '<div class="loading">History unavailable &mdash; check connection</div>';
+});
 
 async function refreshAll(){
   const st=document.getElementById("liveState"), dotEl=document.getElementById("liveDot");

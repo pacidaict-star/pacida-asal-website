@@ -175,7 +175,7 @@ def page(rid, r):
                        '<div class="lz-fill" style="width:%d%%;background:%s"></div></div>'
                        '<div class="lz-pct">%d%%</div></div>') % (n,p,c,p) for n,p,c in r["livelihoods"])
 
-    sect = "".join('<div class="src"><b>%s</b><span>%s</span></div>' % (t,x) for t,x in r["sectors"])
+    sect = "".join('<details class="acc"><summary>%s</summary><div class="acc-body">%s</div></details>' % (t,x) for t,x in r["sectors"])
 
     tl = ""
     for item in DROUGHT_TIMELINE:
@@ -219,6 +219,7 @@ TEMPLATE = """<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%%3E%%3Ctext y='.9em' font-size='90'%%3E%%F0%%9F%%90%%AA%%3C/text%%3E%%3C/svg%%3E">
 </head>
 <body>
 
@@ -233,11 +234,25 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
   <nav class="site">%(nav)s</nav>
   <div class="head-right">
+    <div class="search-wrap">
+      <input type="text" id="searchBox" placeholder="Jump to a site&hellip;" aria-label="Search monitoring sites">
+      <div class="search-results" id="searchResults"></div>
+    </div>
     <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
     <div class="clock mono" id="clock">--:--:-- EAT</div>
+    <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
+    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+    <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
     <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
   </div>
 </header>
+
+<div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
+  <div class="gl-head"><h3>Glossary</h3><button class="gl-close" type="button" aria-label="Close glossary">&times;</button></div>
+  <input class="gl-search" type="text" placeholder="Filter terms&hellip;" aria-label="Filter glossary terms">
+  <div class="gl-body"></div>
+</div>
+<div class="gl-backdrop" id="glBackdrop"></div>
 
 <div class="strip">
   <div class="cell glass"><div class="k">Need index (live)</div><div class="v" id="needV">&mdash;</div><div class="n" id="needN">recalculating from live weather</div></div>
@@ -305,8 +320,14 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
 
   <div class="panel glass">
-    <h2>Sector deep-dive</h2>
-    <div class="src-grid">%(sectors)s</div>
+    <h2>12-month rainfall history <span class="tag">at %(hqname)s &middot; loaded once per visit</span></h2>
+    <div id="histChart"><div class="loading">Loading 12-month rainfall history&hellip;</div></div>
+    <p class="hist-cap">Monthly totals from Open-Meteo's historical archive. Compare against the seasonal calendar above: a healthy year shows two clear peaks (Ganna/long rains, Hagayya/short rains) separated by dry troughs &mdash; a missing or flattened peak is the drought signal households actually live through.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sector deep-dive <span class="tag">click a heading to expand</span></h2>
+    <div class="acc-list">%(sectors)s</div>
   </div>
 
   <div class="panel glass">
@@ -359,6 +380,8 @@ if (BOUNDARIES[RID]) {
 
 const siteLayer = L.layerGroup().addTo(map);
 const siteState = SITES.map(s=>({name:s[0],lat:s[1],lon:s[2],note:s[3],live:null}));
+const siteMarkers = {};
+let lastHQW = null;
 
 function drawSites(){
   siteLayer.clearLayers();
@@ -370,13 +393,14 @@ function drawSites(){
     m.bindPopup("<h4>"+s.name+"</h4>"
       +"<div class='pop-k'>"+s.note+"</div>"
       +(s.live? "<div><span class='pop-k'>Need:</span> <span class='pop-v'>"+need+" / 100 &middot; "+bandLabel(band)+"</span></div>"
-        +"<div><span class='pop-k'>Now:</span> <span class='pop-v'>"+s.live.temp.toFixed(1)+"&deg;C &middot; "+s.live.rh+"%% RH</span></div>"
-        +"<div><span class='pop-k'>Rain 30 d:</span> <span class='pop-v'>"+s.live.rain30.toFixed(1)+" mm</span></div>"
+        +"<div><span class='pop-k'>Now:</span> <span class='pop-v'>"+fmtTemp(s.live.temp)+" &middot; "+s.live.rh+"%% RH</span></div>"
+        +"<div><span class='pop-k'>Rain 30 d:</span> <span class='pop-v'>"+fmtRain(s.live.rain30)+"</span></div>"
         +"<div><span class='pop-k'>Soil:</span> <span class='pop-v'>"+(s.live.soil*100).toFixed(1)+"%%</span></div>"
         : "<div class='pop-k'>loading&hellip;</div>"));
     const label = L.marker([s.lat,s.lon],{interactive:false,
       icon:L.divIcon({className:"",html:'<div class="site-label">'+s.name+'</div>',iconAnchor:[-10,7]})});
     siteLayer.addLayer(m); siteLayer.addLayer(label);
+    siteMarkers[s.name] = m;
   });
 }
 drawSites();
@@ -392,10 +416,10 @@ function renderSiteGrid(){
       +'<div class="sc-sub">'+s.note+'</div>'
       +(s.live?
          '<div class="site-row"><span>Need index</span><b>'+need+' &middot; '+bandLabel(band)+'</b></div>'
-        +'<div class="site-row"><span>Temp now</span><b>'+s.live.temp.toFixed(1)+'&deg;C</b></div>'
-        +'<div class="site-row"><span>Rain 30 d</span><b>'+s.live.rain30.toFixed(0)+' mm</b></div>'
+        +'<div class="site-row"><span>Temp now</span><b>'+fmtTemp(s.live.temp)+'</b></div>'
+        +'<div class="site-row"><span>Rain 30 d</span><b>'+fmtRain(s.live.rain30)+'</b></div>'
         +'<div class="site-row"><span>Soil 0&ndash;7 cm</span><b>'+(s.live.soil*100).toFixed(1)+'%%</b></div>'
-        +'<div class="site-row"><span>7-d max avg</span><b>'+s.live.tmax7.toFixed(1)+'&deg;C</b></div>'
+        +'<div class="site-row"><span>7-d max avg</span><b>'+fmtTemp(s.live.tmax7)+'</b></div>'
         : '<div class="loading">loading&hellip;</div>')
       +'</div>';
   }).join("");
@@ -403,24 +427,59 @@ function renderSiteGrid(){
 renderSiteGrid();
 
 function renderHQ(w){
+  lastHQW = w;
   const need = w.need, band = needBand(need);
-  document.getElementById("hqBadge").textContent = bandLabel(band)+" &middot; "+need;
   document.getElementById("hqBadge").innerHTML = bandLabel(band)+" &middot; "+need;
   document.getElementById("hqBadge").style.background = PHASE_COLORS[band];
   document.getElementById("hqMarker").style.left = need+"%%";
   document.getElementById("hqMetrics").innerHTML =
-     '<div class="m"><div class="mk">Now</div><div class="mv">'+w.temp.toFixed(1)+'<small>&deg;C</small></div></div>'
-    +'<div class="m"><div class="mk">Rain 30 d</div><div class="mv">'+w.rain30.toFixed(0)+'<small> mm</small></div></div>'
+     '<div class="m"><div class="mk">Now</div><div class="mv">'+fmtTemp(w.temp)+'</div></div>'
+    +'<div class="m"><div class="mk">Rain 30 d</div><div class="mv">'+fmtRain(w.rain30)+'</div></div>'
     +'<div class="m"><div class="mk">Soil 0&ndash;7 cm</div><div class="mv">'+(w.soil*100).toFixed(1)+'<small>%%</small></div></div>'
-    +'<div class="m"><div class="mk">7-d max avg</div><div class="mv">'+w.tmax7.toFixed(1)+'<small>&deg;C</small></div></div>';
+    +'<div class="m"><div class="mk">7-d max avg</div><div class="mv">'+fmtTemp(w.tmax7)+'</div></div>';
   document.getElementById("hqSpark").innerHTML = sparkline(w.dailyRain, w.splitIdx);
   document.getElementById("needV").textContent = need;
   document.getElementById("needN").textContent = bandLabel(band)+" &mdash; blended NDMA/IPC-aligned score";
-  document.getElementById("tempV").textContent = w.temp.toFixed(1)+"\u00b0C";
+  document.getElementById("tempV").textContent = fmtTemp(w.temp);
   document.getElementById("tempN").textContent = w.rh+"%% RH \u00b7 wind "+w.wind.toFixed(0)+" km/h";
-  document.getElementById("rainV").textContent = w.rain30.toFixed(0)+" mm";
+  document.getElementById("rainV").textContent = fmtRain(w.rain30);
   document.getElementById("soilV").textContent = (w.soil*100).toFixed(1)+"%%";
 }
+
+document.addEventListener("units-changed", ()=>{
+  if(lastHQW) renderHQ(lastHQW);
+  drawSites(); renderSiteGrid();
+});
+
+attachUnitToggle();
+attachGlossary();
+attachSearch(
+  ()=>siteState.map(s=>({id:s.name, label:s.name+" \u2014 "+s.note})),
+  m=>{
+    const s = siteState.find(x=>x.name===m.id);
+    if(!s) return;
+    map.flyTo([s.lat,s.lon],10,{duration:1});
+    const mk = siteMarkers[s.name]; if(mk) mk.openPopup();
+  }
+);
+
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const rows = [["Site","Lat","Lon","Note","Need index","Band","Temp C","RH %%","Rain 30d mm","Soil 0-7cm %%","7d max avg C"]];
+  siteState.forEach(s=>{
+    const w = s.live;
+    rows.push([s.name, s.lat, s.lon, s.note,
+      w?w.need:"", w?bandLabel(needBand(w.need)):"",
+      w?w.temp.toFixed(1):"", w?w.rh:"", w?w.rain30.toFixed(1):"", w?(w.soil*100).toFixed(1):"", w?w.tmax7.toFixed(1):""]);
+  });
+  downloadCSV("%(rid)s-live-readings.csv", rows);
+});
+
+fetchMonthlyRain(HQ.lat, HQ.lon).then(data=>{
+  document.getElementById("histChart").innerHTML = monthChart(data);
+}).catch(e=>{
+  console.error("history",e);
+  document.getElementById("histChart").innerHTML = '<div class="loading">History unavailable &mdash; check connection</div>';
+});
 
 async function refreshAll(){
   const st=document.getElementById("liveState"), dotEl=document.getElementById("liveDot");
@@ -457,5 +516,5 @@ if __name__ == "__main__":
     import io, os
     for rid, r in REGIONS.items():
         out = page(rid, r)
-        open(rid + ".html","w").write(out)
+        open(rid + ".html","w",encoding="utf-8").write(out)
         print(rid+".html", len(out), "bytes")

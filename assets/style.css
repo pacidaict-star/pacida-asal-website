@@ -165,4 +165,73 @@ footer{margin:22px;border-radius:12px;padding:16px 22px;color:var(--muted);font-
 .region-label{font-family:'Barlow Condensed';font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);text-shadow:0 1px 4px #000,0 0 10px #000;font-size:13px;white-space:nowrap}
 .site-label{font-family:'Barlow Condensed';font-weight:600;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000;font-size:11px;white-space:nowrap}
 
+/* header search box */
+.search-wrap{position:relative;pointer-events:auto}
+.search-wrap input{
+  background:rgba(38,33,21,.7);color:var(--text);border:1px solid var(--line);border-radius:6px;
+  padding:7px 12px;font-family:'Archivo';font-size:13px;width:190px;outline:none;transition:border-color .2s;
+}
+.search-wrap input::placeholder{color:var(--faint)}
+.search-wrap input:focus{border-color:var(--alert)}
+.search-results{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:1300;display:none;
+  background:rgba(23,19,12,.97);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.sr-item{padding:8px 12px;font-size:12.5px;cursor:pointer;border-bottom:1px solid var(--line)}
+.sr-item:last-child{border-bottom:none}
+.sr-item:hover{background:rgba(224,162,27,.15);color:var(--text)}
+
+/* glossary panel */
+.gl-panel{
+  position:fixed;top:0;right:0;height:100vh;width:min(360px,90vw);z-index:1400;
+  background:rgba(23,19,12,.97);border-left:1px solid var(--line);
+  transform:translateX(100%);transition:transform .25s ease;pointer-events:auto;
+  display:flex;flex-direction:column;
+}
+.gl-panel.open{transform:translateX(0)}
+.gl-head{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.gl-head h3{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.08em;font-size:16px;flex:1}
+.gl-close{background:none;border:1px solid var(--line);color:var(--text);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1}
+.gl-close:hover{border-color:var(--alert)}
+.gl-search{margin:12px 18px;background:rgba(38,33,21,.7);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:8px 12px;font-size:13px;font-family:'Archivo'}
+.gl-body{overflow-y:auto;padding:0 18px 18px;flex:1}
+.gl-item{padding:10px 0;border-bottom:1px solid var(--line)}
+.gl-item b{display:block;font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--alert);margin-bottom:3px}
+.gl-item span{font-size:12.5px;color:var(--muted)}
+.gl-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1390;display:none;pointer-events:auto}
+.gl-panel.open ~ .gl-backdrop, .gl-panel.open + .gl-backdrop{display:block}
+
+/* header icon buttons (unit toggle, glossary, export) */
+button.iconbtn{
+  background:rgba(38,33,21,.7);color:var(--text);border:1px solid var(--line);
+  padding:7px 12px;border-radius:6px;font-family:'IBM Plex Mono';font-weight:500;
+  font-size:12.5px;cursor:pointer;transition:border-color .2s;pointer-events:auto;
+}
+button.iconbtn:hover{border-color:var(--alert)}
+button.iconbtn:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+
+/* sortable compare table */
+.ptable th.sortable{cursor:pointer;user-select:none}
+.ptable th.sortable:hover{color:var(--text)}
+.ptable th.sortable .arrow{display:inline-block;margin-left:4px;opacity:.6;font-size:10px}
+.ptable th.sortable.active .arrow{opacity:1;color:var(--alert)}
+
+/* accordions (sector deep-dive) */
+.acc-list{margin-top:10px}
+details.acc{border:1px solid rgba(237,227,204,.12);border-radius:8px;background:rgba(38,33,21,.5);margin-bottom:10px;overflow:hidden}
+details.acc summary{
+  padding:12px 14px;cursor:pointer;list-style:none;font-family:'Barlow Condensed';
+  text-transform:uppercase;letter-spacing:.08em;font-size:13px;display:flex;align-items:center;gap:8px;
+}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary:before{content:"+";color:var(--alert);font-family:'IBM Plex Mono';width:14px;flex:none}
+details.acc[open] summary:before{content:"–"}
+details.acc summary:hover{color:var(--text)}
+details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
+
+/* history chart panel */
+.hist-cap{font-size:12px;color:var(--faint);margin-top:6px}
+
+@media(max-width:640px){.search-wrap input{width:130px}}
 @media(prefers-reduced-motion:reduce){.dot,.tl.now:before{animation:none}.gauge-marker{transition:none}.halo-pulse{animation:none !important}}
