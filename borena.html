@@ -101,7 +101,7 @@
 
   <div class="panel glass">
     <h2>Livelihood zones <span class="tag">FEWS NET livelihood zoning, indicative shares</span></h2>
-    <div class="lz"><div class="lz-row"><div>Pastoral (cattle-centred Borana system)</div><div class="lz-bar"><div class="lz-fill" style="width:75%;background:#D96C2B"></div></div><div class="lz-pct">75%</div></div><div class="lz-row"><div>Agro-pastoral (maize, haricot, teff pockets)</div><div class="lz-bar"><div class="lz-fill" style="width:20%;background:#7FA653"></div></div><div class="lz-pct">20%</div></div><div class="lz-row"><div>Trade & town economies (Moyale, Yabelo)</div><div class="lz-bar"><div class="lz-fill" style="width:5%;background:#E0A21B"></div></div><div class="lz-pct">5%</div></div></div>
+    <div class="lz"><div class="lz-row"><div>Pastoral (cattle-centred Borana system)</div><div class="lz-bar"><div class="lz-fill" style="width:75%;background:#E8834A"></div></div><div class="lz-pct">75%</div></div><div class="lz-row"><div>Agro-pastoral (maize, haricot, teff pockets)</div><div class="lz-bar"><div class="lz-fill" style="width:20%;background:#8FBB5F"></div></div><div class="lz-pct">20%</div></div><div class="lz-row"><div>Trade & town economies (Moyale, Yabelo)</div><div class="lz-bar"><div class="lz-fill" style="width:5%;background:#F0B22E"></div></div><div class="lz-pct">5%</div></div></div>
   </div>
 
   <div class="panel glass">
@@ -163,7 +163,7 @@ const {map} = makeGlassMap([4.6, 38.4], 8);
 /* region outline */
 if (BOUNDARIES[RID]) {
   L.geoJSON({type:"Feature",geometry:BOUNDARIES[RID]},{
-    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#E0A21B",fillOpacity:.06,
+    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#F0B22E",fillOpacity:.06,
            dashArray:RID==="borena"?"6 5":null}
   }).addTo(map);
 }

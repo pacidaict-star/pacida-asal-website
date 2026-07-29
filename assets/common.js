@@ -1,7 +1,7 @@
 /* PACIDA ASAL Climate Watch — shared engine
    Live data: Open-Meteo API (no key). Need index aligned to NDMA / IPC / WHO frameworks. */
 
-const PHASE_COLORS = { critical:"#C93A20", high:"#D96C2B", elevated:"#E0A21B", watch:"#7FA653" };
+const PHASE_COLORS = { critical:"#E64A2E", high:"#E8834A", elevated:"#F0B22E", watch:"#8FBB5F" };
 function needBand(v){ return v>=75?"critical":v>=60?"high":v>=45?"elevated":"watch"; }
 function bandLabel(b){ return {critical:"Critical",high:"High",elevated:"Elevated",watch:"Watch"}[b]; }
 const fmt = n => n.toLocaleString("en-KE");
@@ -49,11 +49,11 @@ function sparkline(vals, splitIdx){
   vals.forEach((v,i)=>{
     const h=Math.max(1,(v/max)*(H-6));
     const isFc=i>=splitIdx;
-    bars+='<rect x="'+(i*bw+1).toFixed(1)+'" y="'+(H-h).toFixed(1)+'" width="'+(bw-2).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1.5" fill="'+(isFc?'#4E7C8A':'#E0A21B')+'" opacity="'+(isFc?0.85:0.9)+'"/>';
+    bars+='<rect x="'+(i*bw+1).toFixed(1)+'" y="'+(H-h).toFixed(1)+'" width="'+(bw-2).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="1.5" fill="'+(isFc?'#6FA3B4':'#F0B22E')+'" opacity="'+(isFc?0.9:0.95)+'"/>';
   });
   const sx=(splitIdx*bw).toFixed(1);
   return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+bars
-    +'<line x1="'+sx+'" y1="0" x2="'+sx+'" y2="'+H+'" stroke="#9C9077" stroke-width="1" stroke-dasharray="3 3"/></svg>';
+    +'<line x1="'+sx+'" y1="0" x2="'+sx+'" y2="'+H+'" stroke="#C6BB9A" stroke-width="1" stroke-dasharray="3 3"/></svg>';
 }
 
 /* Clock (East Africa Time) */
@@ -191,8 +191,8 @@ function monthChart(data){
     const x = i*bw+4, w = Math.max(1,bw-8);
     const isLast = i===data.length-1;
     const mIdx = parseInt(d.month.slice(5,7),10)-1;
-    bars += `<rect x="${x.toFixed(1)}" y="${(H-20-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isLast?'#E0A21B':'#4E7C8A'}" opacity="${isLast?1:0.85}"><title>${d.month}: ${d.total.toFixed(0)} mm</title></rect>`;
-    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-6}" font-size="9" fill="#9C9077" text-anchor="middle">${names[mIdx]}</text>`;
+    bars += `<rect x="${x.toFixed(1)}" y="${(H-20-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isLast?'#F0B22E':'#6FA3B4'}" opacity="${isLast?1:0.9}"><title>${d.month}: ${d.total.toFixed(0)} mm</title></rect>`;
+    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-6}" font-size="9" fill="#C6BB9A" text-anchor="middle">${names[mIdx]}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:112px;display:block" role="img" aria-label="12 month rainfall history">${bars}${labels}</svg>`;
 }

@@ -101,7 +101,7 @@
 
   <div class="panel glass">
     <h2>Livelihood zones <span class="tag">FEWS NET livelihood zoning, indicative shares</span></h2>
-    <div class="lz"><div class="lz-row"><div>Pastoral (cattle, small stock)</div><div class="lz-bar"><div class="lz-fill" style="width:68%;background:#D96C2B"></div></div><div class="lz-pct">68%</div></div><div class="lz-row"><div>Agro-pastoral (Lorroki plateau)</div><div class="lz-bar"><div class="lz-fill" style="width:20%;background:#7FA653"></div></div><div class="lz-pct">20%</div></div><div class="lz-row"><div>Tourism, conservancies & trade</div><div class="lz-bar"><div class="lz-fill" style="width:8%;background:#4E7C8A"></div></div><div class="lz-pct">8%</div></div><div class="lz-row"><div>Formal employment & other</div><div class="lz-bar"><div class="lz-fill" style="width:4%;background:#E0A21B"></div></div><div class="lz-pct">4%</div></div></div>
+    <div class="lz"><div class="lz-row"><div>Pastoral (cattle, small stock)</div><div class="lz-bar"><div class="lz-fill" style="width:68%;background:#E8834A"></div></div><div class="lz-pct">68%</div></div><div class="lz-row"><div>Agro-pastoral (Lorroki plateau)</div><div class="lz-bar"><div class="lz-fill" style="width:20%;background:#8FBB5F"></div></div><div class="lz-pct">20%</div></div><div class="lz-row"><div>Tourism, conservancies & trade</div><div class="lz-bar"><div class="lz-fill" style="width:8%;background:#6FA3B4"></div></div><div class="lz-pct">8%</div></div><div class="lz-row"><div>Formal employment & other</div><div class="lz-bar"><div class="lz-fill" style="width:4%;background:#F0B22E"></div></div><div class="lz-pct">4%</div></div></div>
   </div>
 
   <div class="panel glass">
@@ -163,7 +163,7 @@ const {map} = makeGlassMap([1.25, 36.95], 8);
 /* region outline */
 if (BOUNDARIES[RID]) {
   L.geoJSON({type:"Feature",geometry:BOUNDARIES[RID]},{
-    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#E0A21B",fillOpacity:.06,
+    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#F0B22E",fillOpacity:.06,
            dashArray:RID==="borena"?"6 5":null}
   }).addTo(map);
 }

@@ -30,7 +30,7 @@ REGIONS = {
     ["Sololo",3.5560,38.6560,"Escarpment agro-pastoral"],
     ["Turbi",3.4500,38.2500,"Dida Galgalu plains"]
   ],
-  "livelihoods":[["Pastoral (camel, goat, small stock)",81,"#D96C2B"],["Agro-pastoral (Saku highlands, Sololo)",10,"#7FA653"],["Fisheries (Lake Turkana)",4,"#4E7C8A"],["Trade, employment & other",5,"#E0A21B"]],
+  "livelihoods":[["Pastoral (camel, goat, small stock)",81,"#E8834A"],["Agro-pastoral (Saku highlands, Sololo)",10,"#8FBB5F"],["Fisheries (Lake Turkana)",4,"#6FA3B4"],["Trade, employment & other",5,"#F0B22E"]],
   "sectors":[
     ["Livestock economy","≈80% of household income is livestock-based. Camels are the drought-critical species (milk through dry seasons); Merille and Moyale are the key livestock markets. 2019 census recorded well over 2 million goats and sheep, ~420,000 cattle and ~240,000 camels in the county (indicative)."],
     ["Water & WASH","Household water is from boreholes, shallow wells (Chalbi springs at Kalacha/Maikona), pans and rock catchments. In drought, trekking distances exceed 15–25 km in North Horr and Laisamis; NDMA's Jan 2026 bulletin flagged Marsabit among counties with the longest grazing-to-water distances. Badassa dam and desalination pilots serve the highlands."],
@@ -61,7 +61,7 @@ REGIONS = {
     ["Suguta Marmar",0.8800,36.6800,"Agro-pastoral plateau"],
     ["Sereolipi",1.1200,37.6300,"Eastern pastoral rangelands"]
   ],
-  "livelihoods":[["Pastoral (cattle, small stock)",68,"#D96C2B"],["Agro-pastoral (Lorroki plateau)",20,"#7FA653"],["Tourism, conservancies & trade",8,"#4E7C8A"],["Formal employment & other",4,"#E0A21B"]],
+  "livelihoods":[["Pastoral (cattle, small stock)",68,"#E8834A"],["Agro-pastoral (Lorroki plateau)",20,"#8FBB5F"],["Tourism, conservancies & trade",8,"#6FA3B4"],["Formal employment & other",4,"#F0B22E"]],
   "sectors":[
     ["Livestock economy","Cattle-dominant with rapid small-stock growth as a drought adaptation; camels are being adopted in the north. Key markets: Maralal, Baragoi, Archer's Post; trekking routes to Rumuruti/Nyahururu. Livestock body condition and milk yields collapse fastest in Samburu East lowlands."],
     ["Water & WASH","Only ~14% of households have piped water (2019 census). Sources: seasonal rivers (Ewaso Ng'iro), sand dams, boreholes, springs on the plateau. Dry-season water distances in Samburu East and North commonly exceed 10 km for households and 20 km for herds."],
@@ -91,7 +91,7 @@ REGIONS = {
     ["Sericho",0.1100,39.1000,"Eastern rangelands, Garissa border"],
     ["Ngare Mara",0.4800,37.6300,"A2 corridor settlement"]
   ],
-  "livelihoods":[["Pastoral (cattle, goats, camels)",70,"#D96C2B"],["Agro-pastoral & irrigation (Burat, Kinna, Rapsu, Merti)",15,"#7FA653"],["Urban trade, casual labour & employment",12,"#E0A21B"],["Other (firewood/charcoal, remittances)",3,"#4E7C8A"]],
+  "livelihoods":[["Pastoral (cattle, goats, camels)",70,"#E8834A"],["Agro-pastoral & irrigation (Burat, Kinna, Rapsu, Merti)",15,"#8FBB5F"],["Urban trade, casual labour & employment",12,"#F0B22E"],["Other (firewood/charcoal, remittances)",3,"#6FA3B4"]],
   "sectors":[
     ["Livestock economy","Borana cattle heartland with growing camel herds. Isiolo livestock market and the export abattoir anchor offtake; in drought, herds converge on the Ewaso riverine strip and Meru NP border, driving disease transmission and human-wildlife conflict."],
     ["Water & WASH","The Ewaso Ng'iro's flow is falling from upstream highland abstraction — the county's central climate-security issue. Flagship response: Merti–Korbesa water supply project (NDMA/EU/NWWDA/County). Elsewhere: boreholes, pans; Sericho and Cherab wards face the longest dry-season distances."],
@@ -130,7 +130,7 @@ REGIONS = {
     ["Arero",4.7500,38.8000,"Eastern forest fringe"],
     ["Hidi Lola",3.8500,38.9500,"Miyo woreda, border trade"]
   ],
-  "livelihoods":[["Pastoral (cattle-centred Borana system)",75,"#D96C2B"],["Agro-pastoral (maize, haricot, teff pockets)",20,"#7FA653"],["Trade & town economies (Moyale, Yabelo)",5,"#E0A21B"]],
+  "livelihoods":[["Pastoral (cattle-centred Borana system)",75,"#E8834A"],["Agro-pastoral (maize, haricot, teff pockets)",20,"#8FBB5F"],["Trade & town economies (Moyale, Yabelo)",5,"#F0B22E"]],
   "sectors":[
     ["Livestock economy","Cattle are wealth, identity and food security; the 2020–23 drought killed an estimated 3.3+ million livestock across Borena and neighbouring zones, collapsing herd capital. Restocking, fodder value-chains and shifting toward camels/small stock are the recovery frontier. Moyale is the region's cross-border trade artery."],
     ["Water & the tula system","The nine tula deep-well clusters (Dubluk, Mega, Web among them) are communally governed and drought-proof but labour-intensive; motorised boreholes and ponds (haro) supplement them. Water governance through Gadaa institutions is a resilience asset most interventions should build on, not replace."],
@@ -373,7 +373,7 @@ const {map} = makeGlassMap(%(center)s, %(zoom)s);
 /* region outline */
 if (BOUNDARIES[RID]) {
   L.geoJSON({type:"Feature",geometry:BOUNDARIES[RID]},{
-    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#E0A21B",fillOpacity:.06,
+    style:{color:"#FFFFFF",weight:1.8,opacity:.9,fillColor:"#F0B22E",fillOpacity:.06,
            dashArray:RID==="borena"?"6 5":null}
   }).addTo(map);
 }
