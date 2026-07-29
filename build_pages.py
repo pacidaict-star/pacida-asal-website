@@ -3,17 +3,6 @@ import json, math, os
 
 SITE = os.path.dirname(os.path.abspath(__file__))
 
-# The 47 official Kenya counties (slugs). "borena" is PACIDA's cross-border
-# Ethiopia zone — real, but not one of the 47, so it's counted separately.
-KE47_SLUGS = [
- "baringo","bomet","bungoma","busia","elgeyo-marakwet","embu","garissa","homa-bay",
- "isiolo","kajiado","kakamega","kericho","kiambu","kilifi","kirinyaga","kisii",
- "kisumu","kitui","kwale","laikipia","lamu","machakos","makueni","mandera",
- "marsabit","meru","migori","mombasa","muranga","nairobi","nakuru","nandi",
- "narok","nyamira","nyandarua","nyeri","samburu","siaya","taita-taveta",
- "tana-river","tharaka-nithi","trans-nzoia","turkana","uasin-gishu","vihiga",
- "wajir","west-pokot"
-]
 PACIDA_SLUGS = {"marsabit", "samburu", "isiolo", "borena"}
 
 COUNTIES = json.load(open(os.path.join(SITE, "counties.json"), encoding="utf-8"))
@@ -68,19 +57,12 @@ DROUGHT_TIMELINE = [
 ]
 
 
-def seasoncal(asal):
-    if asal:
-        mo = [("J","Jilaal dry","dry"),("F","dry","dry"),("M","Long rains / Ganna","rain"),("A","Long rains","rain"),("M","Long rains","rain"),
-              ("J","Adolessa dry","dry"),("J","dry","dry"),("A","dry","dry"),("S","dry","dry"),
-              ("O","Short rains / Hagayya","rain"),("N","Short rains","rain"),("D","Bona dry","dry")]
-        note = ("Bimodal ASAL calendar: long rains Mar&ndash;May (Ganna in Borana), short rains Oct&ndash;Dec (Hagayya). Both seasons "
-                "must perform for pasture recovery; a single failed season triggers Alert, consecutive failures cascade to Alarm/Emergency.")
-    else:
-        mo = [("J","Dry season","dry"),("F","Dry season","dry"),("M","Long rains","rain"),("A","Long rains","rain"),("M","Long rains","rain"),
-              ("J","Dry season","dry"),("J","Dry season","dry"),("A","Dry season","dry"),("S","Dry season","dry"),
-              ("O","Short rains","rain"),("N","Short rains","rain"),("D","Short rains","rain")]
-        note = ("Kenya's general bimodal calendar: long rains Mar&ndash;May, short rains Oct&ndash;Dec. Actual timing and intensity vary "
-                "regionally &mdash; western Kenya trends more unimodal/extended, and the coast follows its own monsoon-driven pattern.")
+def seasoncal():
+    mo = [("J","Jilaal dry","dry"),("F","dry","dry"),("M","Long rains / Ganna","rain"),("A","Long rains","rain"),("M","Long rains","rain"),
+          ("J","Adolessa dry","dry"),("J","dry","dry"),("A","dry","dry"),("S","dry","dry"),
+          ("O","Short rains / Hagayya","rain"),("N","Short rains","rain"),("D","Bona dry","dry")]
+    note = ("Bimodal ASAL calendar: long rains Mar&ndash;May (Ganna in Borana), short rains Oct&ndash;Dec (Hagayya). Both seasons "
+            "must perform for pasture recovery; a single failed season triggers Alert, consecutive failures cascade to Alarm/Emergency.")
     cells = "".join('<div class="mo %s">%s<small>%s</small></div>' % (c, m, l) for m, l, c in mo)
     return '<div class="season">%s</div><div class="season-note">%s</div>' % (cells, note)
 
@@ -93,7 +75,7 @@ def fmtnum(v):
 
 def navbar(rid):
     home_active = ' class="active"' if rid == "home" else ""
-    return '<a href="index.html"%s>&larr; All 47 counties</a>' % home_active
+    return '<a href="index.html"%s>&larr; All ASAL counties</a>' % home_active
 
 
 def page(rid, r):
@@ -112,20 +94,12 @@ def page(rid, r):
 
     sect = "".join('<details class="acc"><summary>%s</summary><div class="acc-body">%s</div></details>' % (t, x) for t, x in r["sectors"])
 
-    asal = bool(r.get("asal"))
-
-    if asal:
-        tl_items = "".join(
-            '<div class="tl%s"><div class="yr">%s</div><div class="tx">%s</div></div>' % ((" now" if len(item) > 2 else ""), item[0], item[1])
-            for item in DROUGHT_TIMELINE
-        )
-        timeline_panel = ('<div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2>'
-                           '<div class="timeline">%s</div></div>') % tl_items
-    else:
-        timeline_panel = ('<div class="panel glass"><h2>Climate risk context</h2>'
-                           '<p>%(title)s is not one of the counties on NDMA\'s official ASAL/drought early-warning list, so it does not receive a monthly '
-                           'drought-phase bulletin the way Kenya\'s 23 arid and semi-arid counties do. The live weather and Need Index above still update in '
-                           'real time &mdash; they simply carry less weight from structural drought vulnerability and more from the raw climate signal.</p></div>') % r
+    tl_items = "".join(
+        '<div class="tl%s"><div class="yr">%s</div><div class="tx">%s</div></div>' % ((" now" if len(item) > 2 else ""), item[0], item[1])
+        for item in DROUGHT_TIMELINE
+    )
+    timeline_panel = ('<div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2>'
+                       '<div class="timeline">%s</div></div>') % tl_items
 
     if r.get("pacida"):
         pacida_panel = '<div class="panel glass"><h2>PACIDA in %(title)s</h2><p>%(pacida)s</p></div>' % r
@@ -148,7 +122,7 @@ def page(rid, r):
         area=r["area"], density=r["density"], hhsize=r["hhsize"],
         poverty=r["poverty"], staticVuln=r["staticVuln"], phase=r["phase"], gam=r["gam"],
         sub_rows=sub_rows, subnote=subnote, lz_rows=lz_rows, sectors=sect,
-        seasoncal=seasoncal(asal), timeline_panel=timeline_panel, pacida_panel=pacida_panel,
+        seasoncal=seasoncal(), timeline_panel=timeline_panel, pacida_panel=pacida_panel,
         sources_pacida=sources_pacida, sites_json=sites_json
     )
 
@@ -158,7 +132,7 @@ TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>%(title)s — Kenya Climate &amp; Drought Watch</title>
+<title>%(title)s — Kenya ASAL Climate Watch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -174,7 +148,7 @@ TEMPLATE = """<!DOCTYPE html>
 
 <header class="glass">
   <div class="brand">
-    <h1><a href="index.html">Kenya <span>&middot;</span> Climate &amp; Drought Watch</a></h1>
+    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">%(title)s &middot; %(country)s</div>
   </div>
   <nav class="site">%(nav)s</nav>
@@ -292,7 +266,7 @@ TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <footer class="glass">
-  <div>Kenya Climate &amp; Drought Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</div>
+  <div>Kenya ASAL Climate Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -482,7 +456,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kenya Climate &amp; Drought Watch — Live County Dashboard</title>
+<title>Kenya ASAL Climate Watch — Live County Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -492,18 +466,18 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 
-<div id="map" role="application" aria-label="Map of Kenya's 47 counties"></div>
+<div id="map" role="application" aria-label="Map of Kenya's ASAL counties"></div>
 
 <div class="overlay">
 
 <header class="glass">
   <div class="brand">
-    <h1>Kenya <span>·</span> Climate &amp; Drought Watch</h1>
-    <div class="sub">All 47 counties + PACIDA's cross-border Borena zone · live intervention monitor</div>
+    <h1>Kenya <span>·</span> ASAL Climate Watch</h1>
+    <div class="sub">Kenya's 23 arid &amp; semi-arid counties + PACIDA's cross-border Borena zone · live intervention monitor</div>
   </div>
   <nav class="site">
     <a href="#pacida-section">PACIDA counties</a>
-    <a href="#all-section">All 47 counties</a>
+    <a href="#all-section">All ASAL counties</a>
     <a href="#about-section">About</a>
   </nav>
   <div class="head-right">
@@ -528,10 +502,10 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <div class="gl-backdrop" id="glBackdrop"></div>
 
 <div class="strip" id="strip">
-  <div class="cell glass"><div class="k">Counties monitored</div><div class="v">47<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">All Kenya counties, plus PACIDA's Ethiopia cross-border zone</div></div>
-  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, all 47 counties</div></div>
-  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, all 47 counties</div></div>
-  <div class="cell glass"><div class="k">ASAL zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored ASAL zones</div></div>
+  <div class="cell glass"><div class="k">ASAL counties monitored</div><div class="v">23<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">Kenya's NDMA-designated arid &amp; semi-arid counties, plus PACIDA's Ethiopia cross-border zone</div></div>
+  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, 23 ASAL counties</div></div>
+  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, 23 ASAL counties</div></div>
+  <div class="cell glass"><div class="k">Zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored ASAL zones</div></div>
   <div class="cell glass"><div class="k">Avg. need index (live)</div><div class="v" id="avgNeed">—</div><div class="n">0–100 · recalculated from live weather</div></div>
   <div class="cell glass"><div class="k">Last data refresh</div><div class="v mono" id="lastRef" style="font-size:16px">—</div><div class="n">Auto-refreshes every 10 min</div></div>
 </div>
@@ -544,7 +518,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
       <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60–74)</div>
       <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45–59)</div>
       <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0–44)</div>
-      <div class="lg-note">Shaded = county intervention level. Circle size = households. Non-ASAL counties are shaded from live weather + low structural vulnerability only — not an official NDMA phase. Borena boundary is approximate (dashed). Zoom in for place labels.</div>
+      <div class="lg-note">Shaded = county intervention level (NDMA + IPC aligned). Circle size = households. Borena boundary is approximate (dashed). Zoom in for place labels.</div>
     </div>
   </div>
 </div>
@@ -552,23 +526,20 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <div class="wide">
   <div class="panel glass" id="pacida-section">
     <h2>PACIDA focus counties <span class="tag">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia)</span></h2>
-    <p>PACIDA is a Northern-Kenya/Southern-Ethiopia NGO — its actual programmes run in these four areas. They get the deepest live monitoring on this site; the other 43 counties (below) are shown for national context.</p>
+    <p>PACIDA is a Northern-Kenya/Southern-Ethiopia NGO — its actual programmes run in these four areas. They get the deepest live monitoring on this site; the other 20 ASAL counties (below) are shown for national context.</p>
     <div class="cards-grid" id="pacidaCards"></div>
   </div>
 
   <div class="panel glass" id="all-section">
-    <h2>All 47 counties <span class="tag">click a county to open its full profile · live</span></h2>
+    <h2>All ASAL counties <span class="tag">click a county to open its full profile · live</span></h2>
     <div class="chip-row" id="filterChips">
-      <button class="chip-filter active" data-filter="all">All 47</button>
-      <button class="chip-filter" data-filter="asal">ASAL (23)</button>
-      <button class="chip-filter" data-filter="nonasal">Non-ASAL</button>
+      <button class="chip-filter active" data-filter="all">All 23 + Borena</button>
       <button class="chip-filter" data-filter="pacida">PACIDA counties</button>
     </div>
     <div class="table-scroll">
     <table class="ptable" id="allTable">
       <thead><tr>
         <th class="sortable" data-key="name">County <span class="arrow">▾</span></th>
-        <th class="sortable" data-key="asal">ASAL <span class="arrow">▾</span></th>
         <th class="sortable" data-key="need">Need index <span class="arrow">▾</span></th>
         <th class="sortable" data-key="band">Band <span class="arrow">▾</span></th>
         <th class="sortable" data-key="temp">Temp <span class="arrow">▾</span></th>
@@ -578,7 +549,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
         <th class="sortable" data-key="poverty">Poverty <span class="arrow">▾</span></th>
         <th>Drought phase</th>
       </tr></thead>
-      <tbody id="allBody"><tr><td colspan="10" class="loading">Fetching live weather for 48 zones…</td></tr></tbody>
+      <tbody id="allBody"><tr><td colspan="9" class="loading">Fetching live weather for 24 zones…</td></tr></tbody>
     </table>
     </div>
   </div>
@@ -587,11 +558,10 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <h2>Rating framework — how intervention level is decided</h2>
     <p style="margin-bottom:14px">
       The Intervention Need Index (0–100) is aligned with the frameworks used by the world's main drought and
-      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (23 ASAL counties), the <b>IPC</b>
-      (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
+      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (all 23 ASAL counties covered here), the
+      <b>IPC</b> (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
       <b>WHO/UNICEF</b> acute-malnutrition thresholds. Live climate signals are re-scored on every refresh; structural
-      indicators come from the latest published assessments. Non-ASAL counties still get a live weather-driven score,
-      but carry a lower structural-vulnerability weight since they fall outside NDMA's drought early-warning system.
+      indicators come from the latest published NDMA/IPC assessments.
       Unfamiliar term? Open the <b>Glossary</b> in the header.
     </p>
     <h2 style="font-size:15px;margin-top:6px">Index bands mapped to official phases</h2>
@@ -611,22 +581,21 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <p>This dashboard began as a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
     Northern-Kenya/Southern-Ethiopia NGO working across Marsabit, Samburu and Isiolo counties and the Borena Zone of southern
     Ethiopia — drought emergency response, WASH, livestock health, education access, and cross-border peace &amp; governance.
-    It has since grown into a national county-level climate and drought watch; PACIDA's own operational area remains the
-    most deeply monitored (settlement-level live weather, full sector deep-dives) and is highlighted above. The other 43
-    counties are shown for national context using the same live-data engine, KNBS census baselines, and — where applicable —
-    NDMA's ASAL/drought classification.</p>
+    It now covers all 23 of Kenya's NDMA-designated arid and semi-arid (ASAL) counties, the areas where drought is the
+    dominant climate risk; PACIDA's own operational counties remain the most deeply featured and are highlighted above.
+    The other 20 ASAL counties use the same live-data engine, KNBS census baselines, and NDMA/IPC drought classification.</p>
     <div class="src-grid">
       <div class="src"><b>Live weather &amp; soil</b><span>Open-Meteo API — temperature, humidity, wind, rainfall (past 30 d + 7-d forecast), soil moisture. Refreshed every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
       <div class="src"><b>County boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source, 2023 release). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
       <div class="src"><b>Households &amp; population</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). Borena Zone figures are CSA-based projections. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
-      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins (23 ASAL counties) and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for all 23 ASAL counties, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
       <div class="src"><b>PACIDA</b><span>Pastoralist Community Initiative and Development Assistance — programme areas, annual reports. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
     </div>
   </div>
 </div>
 
 <footer class="glass">
-  <div>Kenya Climate &amp; Drought Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</div>
+  <div>Kenya ASAL Climate Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -754,12 +723,10 @@ let tableFilter = "all", sortKey="need", sortDir=-1;
 function renderTable(){
   const tbody = document.getElementById("allBody");
   let rows = REGIONS.filter(r=>{
-    if(tableFilter==="asal") return r.asal;
-    if(tableFilter==="nonasal") return !r.asal;
     if(tableFilter==="pacida") return r.pacida;
     return true;
   }).map(r=>({
-    id:r.id, name:r.name, asal:r.asal?1:0,
+    id:r.id, name:r.name,
     need: r.live? r.live.need : -1,
     band: r.live? bandLabel(needBand(r.live.need)) : "…",
     temp: r.live? r.live.temp : null, rain: r.live? r.live.rain30 : null,
@@ -772,7 +739,6 @@ function renderTable(){
   });
   tbody.innerHTML = rows.map(r=>`<tr class="row-link" data-id="${r.id}">
     <td><b>${r.name}</b>${r.pacida?'<span class="pacida-tag">PACIDA</span>':''}</td>
-    <td class="${r.asal?'asal-yes':'asal-no'}">${r.asal?'ASAL':'—'}</td>
     <td class="mono">${r.need>=0?r.need:"…"}</td>
     <td>${r.band}</td>
     <td class="mono">${r.temp!=null?fmtTemp(r.temp):"…"}</td>

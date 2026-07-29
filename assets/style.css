@@ -245,8 +245,6 @@ button.chip-filter:hover{color:var(--text);border-color:var(--muted)}
 button.chip-filter.active{background:var(--alert);color:#0A0805;border-color:var(--alert)}
 .ptable tr.row-link{cursor:pointer}
 .ptable tr.row-link:hover td{background:rgba(240,178,46,.08)}
-.asal-yes{color:var(--alert);font-family:'IBM Plex Mono'}
-.asal-no{color:var(--faint);font-family:'IBM Plex Mono'}
 .pacida-tag{display:inline-block;margin-left:6px;font-size:9.5px;padding:1px 6px;border-radius:3px;background:var(--water);color:#0A0805;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.06em;vertical-align:1px}
 
 @media(max-width:640px){.search-wrap input{width:130px}}
