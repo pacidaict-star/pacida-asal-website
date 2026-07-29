@@ -1,146 +1,60 @@
 #!/usr/bin/env python3
-import json, html as H
+import json, math, os
 
-REGIONS = {
-"marsabit": {
-  "title":"Marsabit County", "country":"Kenya", "center":[2.6,37.9], "zoom":7,
-  "hq":{"name":"Marsabit town","lat":2.3346,"lon":37.9891},
-  "households":77495,"population":459785,"area":"70,961 km²","density":"6.5 / km²","hhsize":5.8,
-  "poverty":83.2,"staticVuln":88,"phase":"NDMA Alert (worsening)","gam":"18–26% (North Horr & Laisamis highest, recent SMART surveys)",
-  "intro":"Kenya's second-largest county and PACIDA's home base. A vast basalt-and-desert landscape running from the shores of Lake Turkana across the Chalbi Desert — Kenya's only true desert — to the Ethiopian border at Moyale. Mt. Marsabit's forested volcanic massif (1,700&nbsp;m) is a green island whose mist-fed highlands support the county's only rain-fed agriculture; everything around it is camel, goat and small-stock country of the Gabra, Rendille, Borana, Burji, Turkana, Samburu, Dassanach and El Molo peoples. Annual rainfall spans 200&nbsp;mm on the Chalbi floor to 800+&nbsp;mm on the mountain. Poverty (83.2%) is among the highest in Kenya and 80% of livelihoods depend directly on livestock.",
-  "subcounties":[
-    ["Moyale","Moyale town",108949,17709,"Agro-pastoral / cross-border trade","Butiye, Somare, Odda, Uran, Golbo plains, Godoma"],
-    ["Marsabit Central (Saku)","Marsabit town",79181,15849,"Highland agro-pastoral","Karare, Sagante, Jaldesa, Dirib Gombo, Songa, Badassa, Kituruni"],
-    ["North Horr","North Horr",71447,9789,"Pure pastoral (camel) — Chalbi desert","Dukana, Balesa, El Gade, Darade, Illeret, Malabot"],
-    ["Marsabit South (Laisamis)","Laisamis",65376,11615,"Rendille pastoral","Korr, Kargi, Ngurunit, Logologo, Merille, Ilaut"],
-    ["Marsabit North","Maikona",54297,7521,"Gabra pastoral — Chalbi fringe","Maikona, Kalacha, Bubisa, Turbi, Hurri Hills, Forolle"],
-    ["Sololo","Sololo",44822,7238,"Agro-pastoral escarpment","Sololo Makutano, Ambalo, Dambala Fachana, Uran, Walda"],
-    ["Loiyangalani","Loiyangalani",35713,7774,"Fisher-pastoral — Lake Turkana shore","El Molo Bay, Moite, Gatab (Mt Kulal), Arapal, Sarima, South Horr road"]
-  ],
-  "sites":[
-    ["Marsabit town",2.3346,37.9891,"Saku — county HQ, highland"],
-    ["Moyale",3.5270,39.0560,"Border town — cross-border trade hub"],
-    ["North Horr",3.3190,37.0680,"Chalbi — Gabra pastoral"],
-    ["Kalacha",3.1300,37.4250,"Chalbi oasis settlement"],
-    ["Maikona",2.9400,37.5450,"Marsabit North HQ"],
-    ["Loiyangalani",2.7560,36.7220,"Lake Turkana — fisher-pastoral"],
-    ["Laisamis",1.5980,37.8070,"Rendille country, A2 corridor"],
-    ["Korr",2.0000,37.5000,"Rendille pastoral settlement"],
-    ["Illeret",4.3100,36.2300,"Dassanach, far north-west"],
-    ["Sololo",3.5560,38.6560,"Escarpment agro-pastoral"],
-    ["Turbi",3.4500,38.2500,"Dida Galgalu plains"]
-  ],
-  "livelihoods":[["Pastoral (camel, goat, small stock)",81,"#E8834A"],["Agro-pastoral (Saku highlands, Sololo)",10,"#8FBB5F"],["Fisheries (Lake Turkana)",4,"#6FA3B4"],["Trade, employment & other",5,"#F0B22E"]],
-  "sectors":[
-    ["Livestock economy","≈80% of household income is livestock-based. Camels are the drought-critical species (milk through dry seasons); Merille and Moyale are the key livestock markets. 2019 census recorded well over 2 million goats and sheep, ~420,000 cattle and ~240,000 camels in the county (indicative)."],
-    ["Water & WASH","Household water is from boreholes, shallow wells (Chalbi springs at Kalacha/Maikona), pans and rock catchments. In drought, trekking distances exceed 15–25 km in North Horr and Laisamis; NDMA's Jan 2026 bulletin flagged Marsabit among counties with the longest grazing-to-water distances. Badassa dam and desalination pilots serve the highlands."],
-    ["Nutrition & health","GAM has repeatedly breached the WHO 15% 'critical' emergency threshold in North Horr and Laisamis during droughts (SMART surveys 18–26%). PPR, CCPP and FMD livestock disease outbreaks were reported county-wide in early 2026, cutting milk availability for children."],
-    ["Education","Low enrolment and high dropout track drought cycles as families migrate with herds; school-meals programmes and low-cost boarding ('lchekuti' model) are the main retention tools. PACIDA runs education access programmes across the county."],
-    ["Conflict & peace","Resource-based and political flashpoints: Moyale corridor, Turbi–Forolle, and the Marsabit mountain belt (Borana–Gabra dynamics). Peace dividends directly determine access to dry-season grazing reserves. PACIDA facilitates inter-community resource-sharing dialogues and SMS Voices early warning."]
-  ],
-  "pacida":"County HQ of PACIDA. Programmes: emergency drought response (water trucking, relief food, cash transfers), mass livestock deworming & treatment (480,000+ animals reached), WASH infrastructure, Ward Climate Change Planning Committees & County Climate Change Fund support, women's climate-resilience projects (Caritas Austria), education access, and peace &amp; governance including the SMS Voices project with the County Government."
-},
-"samburu": {
-  "title":"Samburu County","country":"Kenya","center":[1.25,36.95],"zoom":8,
-  "hq":{"name":"Maralal","lat":1.0966,"lon":36.6980},
-  "households":65910,"population":310327,"area":"21,065 km²","density":"15 / km²","hhsize":4.7,
-  "poverty":71.0,"staticVuln":72,"phase":"NDMA Alert","gam":"13–20% in drought years (Samburu North highest)",
-  "intro":"A transition county between the central highlands and the northern deserts — 92% classified ASAL. From the Lorroki plateau and Kirisia forests around Maralal (2,000&nbsp;m, agro-pastoral) the land falls north through Baragoi's Suguta corridor and east past the Mathews Range and Mt Ololokwe to the Ewaso Ng'iro lowlands at Archer's Post. The Samburu (Lokop) are cattle-culture pastoralists; drought forces herds into contested northern grazing where cattle rustling and armed conflict compound climate risk. Fewer than 15% of households have piped water.",
-  "subcounties":[
-    ["Samburu West (Central)","Maralal","≈134,000 *","≈29,000 *","Agro-pastoral — Lorroki plateau","Kisima, Suguta Marmar, Loosuk, Poro, Morijo, Lodokejek"],
-    ["Samburu North","Baragoi","≈97,000 *","≈20,000 *","Pastoral — cattle & small stock","South Horr, Tuum, Marti, Nachola, Latakweny, Bendera"],
-    ["Samburu East","Wamba","≈79,000 *","≈17,000 *","Pastoral + conservancies & tourism","Archer's Post, Sereolipi, Lodungokwe, Ngilai, Lerata, Lpus"]
-  ],
-  "subnote":"* 2019 census county totals are exact (310,327 people / 65,910 households); sub-county splits shown are indicative estimates pending ward-level tabulation.",
-  "sites":[
-    ["Maralal",1.0966,36.6980,"County HQ — Lorroki plateau"],
-    ["Baragoi",1.7830,36.7860,"Samburu North HQ"],
-    ["Wamba",0.9820,37.3200,"Samburu East HQ, Mathews Range"],
-    ["Archer's Post",0.6400,37.6690,"Ewaso Ng'iro lowlands"],
-    ["South Horr",2.0880,36.9210,"Nyiro valley, route to L. Turkana"],
-    ["Suguta Marmar",0.8800,36.6800,"Agro-pastoral plateau"],
-    ["Sereolipi",1.1200,37.6300,"Eastern pastoral rangelands"]
-  ],
-  "livelihoods":[["Pastoral (cattle, small stock)",68,"#E8834A"],["Agro-pastoral (Lorroki plateau)",20,"#8FBB5F"],["Tourism, conservancies & trade",8,"#6FA3B4"],["Formal employment & other",4,"#F0B22E"]],
-  "sectors":[
-    ["Livestock economy","Cattle-dominant with rapid small-stock growth as a drought adaptation; camels are being adopted in the north. Key markets: Maralal, Baragoi, Archer's Post; trekking routes to Rumuruti/Nyahururu. Livestock body condition and milk yields collapse fastest in Samburu East lowlands."],
-    ["Water & WASH","Only ~14% of households have piped water (2019 census). Sources: seasonal rivers (Ewaso Ng'iro), sand dams, boreholes, springs on the plateau. Dry-season water distances in Samburu East and North commonly exceed 10 km for households and 20 km for herds."],
-    ["Nutrition & health","Acute malnutrition remains high in Samburu North (Tiaty-adjacent belt): NDMA lists Samburu among counties with significant numbers of children 6–59 months needing urgent treatment (Jan 2026). Milk deficit during dry seasons is the primary driver."],
-    ["Education","Secondary attainment 6.4% — about a quarter of the national rate (2019 census). Morans' herding duties and early marriage suppress enrolment; conservancy bursaries and school feeding are key levers."],
-    ["Conflict & peace","Cattle-rustling corridors: Baragoi–Suguta valley (Samburu–Turkana), and Samburu East–Isiolo boundary over Ewaso grazing. Disarmament cycles and peace committees shape whether drought reserves (Kirisia forest, Mathews Range) can be shared safely."]
-  ],
-  "pacida":"PACIDA implements resilience and emergency programming in Samburu: drought response (water, cash and fodder), WASH, livestock health campaigns, and cross-county peace dialogues linking Samburu, Marsabit and Isiolo grazing communities under the Humanitarian-Development-Peace nexus approach."
-},
-"isiolo": {
-  "title":"Isiolo County","country":"Kenya","center":[0.75,38.4],"zoom":8,
-  "hq":{"name":"Isiolo town","lat":0.3546,"lon":37.5822},
-  "households":58072,"population":268002,"area":"25,336 km²","density":"11 / km²","hhsize":4.6,
-  "poverty":65.0,"staticVuln":76,"phase":"NDMA Alert (worsening)","gam":"12–18%; severe acute malnutrition cases documented in 2026 drought reporting",
-  "intro":"The gateway to northern Kenya and a melting pot of Borana, Turkana, Somali, Meru and Samburu communities. The county straddles the Ewaso Ng'iro river — the lifeline that carries highland water into the drylands and around which people, livestock and wildlife concentrate in every drought. Isiolo town is booming (A2 tarmac, abattoir, planned resort city under LAPSSET) while Merti and Garbatulla remain deep pastoral country. Isiolo was among the worst-hit counties in the 2023 floods and slid back into drought Alert through 2025–26 — the classic ASAL whiplash of failed rains and flash floods.",
-  "subcounties":[
-    ["Isiolo (Central)","Isiolo town",121066,29853,"Urban / peri-urban agro-pastoral","Kambi Garba, Kiwanjani, Checheles, Burat, Ngare Mara, Gambella, Oldonyiro, Kipsing"],
-    ["Garbatulla","Garbatulla",99730,18661,"Borana pastoral + Kinna/Rapsu irrigation","Kinna, Rapsu, Kulamawe, Belgesh, Sericho, Boji, Duse"],
-    ["Merti","Merti",47206,9558,"Riverine Ewaso pastoral","Korbesa, Bulesa, Biliqo, Malkadaka, Dadacha Basa, Mata Arba"]
-  ],
-  "sites":[
-    ["Isiolo town",0.3546,37.5822,"County HQ, A2 corridor"],
-    ["Merti",1.0500,38.6560,"Ewaso riverine — Merti-Korbesa pipeline"],
-    ["Garbatulla",0.5300,38.5100,"Borana pastoral HQ"],
-    ["Kinna",0.2900,38.2000,"Irrigation scheme, Meru NP border"],
-    ["Oldonyiro",0.6200,36.9300,"Western pastoral, Samburu border"],
-    ["Sericho",0.1100,39.1000,"Eastern rangelands, Garissa border"],
-    ["Ngare Mara",0.4800,37.6300,"A2 corridor settlement"]
-  ],
-  "livelihoods":[["Pastoral (cattle, goats, camels)",70,"#E8834A"],["Agro-pastoral & irrigation (Burat, Kinna, Rapsu, Merti)",15,"#8FBB5F"],["Urban trade, casual labour & employment",12,"#F0B22E"],["Other (firewood/charcoal, remittances)",3,"#6FA3B4"]],
-  "sectors":[
-    ["Livestock economy","Borana cattle heartland with growing camel herds. Isiolo livestock market and the export abattoir anchor offtake; in drought, herds converge on the Ewaso riverine strip and Meru NP border, driving disease transmission and human-wildlife conflict."],
-    ["Water & WASH","The Ewaso Ng'iro's flow is falling from upstream highland abstraction — the county's central climate-security issue. Flagship response: Merti–Korbesa water supply project (NDMA/EU/NWWDA/County). Elsewhere: boreholes, pans; Sericho and Cherab wards face the longest dry-season distances."],
-    ["Nutrition & health","2026 drought reporting documented severe acute malnutrition cases in Isiolo; NDMA lists the county in Alert with worsening food access. GAM typically 12–18% in bad years, concentrated in Merti and Sericho."],
-    ["Floods & multi-hazard","Isiolo is the textbook twin-disaster county: among the worst affected by the 2023 El Niño floods (Ewaso burst its banks, displacing riverine villages) followed directly by failed rains. Preparedness must cover both extremes."],
-    ["Conflict & peace","Grazing pressure funnels Borana, Somali, Samburu and Turkana herds into the same riverine reserves; flashpoints on the Isiolo–Samburu (Oldonyiro) and Isiolo–Garissa (Modogashe–Sericho) axes. Land speculation along LAPSSET adds a new conflict layer."]
-  ],
-  "pacida":"PACIDA scaled up in Isiolo after the 2023 floods put the organisation on the response frontline. Programmes: flood and drought emergency response, WASH, resilience building with Ward Climate Change Planning Committees, livestock health, and peace dialogues on shared Ewaso grazing."
-},
-"borena": {
-  "title":"Borena Zone","country":"Southern Ethiopia (Oromia)","center":[4.6,38.4],"zoom":8,
-  "hq":{"name":"Yabelo","lat":4.8850,"lon":38.0830},
-  "households":232000,"population":1210000,"area":"≈45,000 km²","density":"≈27 / km²","hhsize":5.2,
-  "poverty":78.0,"staticVuln":82,"phase":"IPC Phase 2–3 (Stressed–Crisis)","gam":"Persistently elevated; SAM admissions surged in 2022–23 drought and remain above pre-drought baselines",
-  "intro":"The Ethiopian half of PACIDA's cross-border footprint and the cultural heartland of the Borana Oromo, whose Gadaa governance system (UNESCO-listed) and deep-well 'tula' system — the famous singing wells — have managed these rangelands for five centuries. The zone lost an estimated 60%+ of cattle in the catastrophic 2020–23 drought (five consecutive failed seasons), a livelihood shock from which herds have not recovered. Rainfall is bimodal: Ganna long rains (Mar–May) and Hagayya short rains (Oct–Nov). Cross-border movement with Marsabit County (Moyale, Dukana–Dillo, Forolle) is constant — grazing, trade, kinship and conflict all flow across the line, which is why single-country programming fails here.",
-  "subcounties":[
-    ["Yabelo","Yabelo town","≈120,000 †","≈23,000 †","Pastoral / zone capital","Dida Hara, Surupa, Dharito, Elwaye road"],
-    ["Moyale (ET)","Moyale","≈95,000 †","≈18,000 †","Cross-border trade + pastoral","Bede, Lagasure, Chamuk, border kebeles"],
-    ["Dire","Mega","≈100,000 †","≈19,000 †","Pastoral — tula deep wells","Mega, Dubluk road, Magado crater"],
-    ["Teltele","Teltele","≈95,000 †","≈18,000 †","Pastoral / agro-pastoral west","Sarite, El Gof, Konso border kebeles"],
-    ["Arero","Arero","≈90,000 †","≈17,000 †","Pastoral — forest fringe","Web, Melbana, Mata Gafarsa"],
-    ["Dubluk","Dubluk","≈55,000 †","≈11,000 †","Pastoral — wells cluster","Dubluk town, Tula wells kebeles"],
-    ["Miyo","Miyo (Hidi Lola)","≈60,000 †","≈12,000 †","Pastoral border woreda","Hidi Lola, Tuka, border kebeles"],
-    ["Dillo","Dillo","≈50,000 †","≈10,000 †","Pastoral — Kenya border (Dukana axis)","Dillo town, Mado, border kebeles"],
-    ["Dhas","Dhas","≈45,000 †","≈9,000 †","Pastoral","Dhas town, Gorile"],
-    ["Gomole / Elwaye / Guchi / Wachile","various","≈220,000 †","≈42,000 †","Pastoral (newer woredas)","Elwaye, Wachile, Guchi, Gomole kebeles"]
-  ],
-  "subnote":"† Woreda figures are indicative projections from the 2007 CSA census pending a new national census; zone totals (~1.21 M people, ~232,000 households) are population-projection based. Boundary on the map is approximate.",
-  "sites":[
-    ["Yabelo",4.8850,38.0830,"Zone capital"],
-    ["Moyale (ET)",3.5540,39.0520,"Border twin-town with Kenya"],
-    ["Mega",4.0700,38.3000,"Dire woreda — tula wells"],
-    ["Dubluk",4.3500,38.2400,"Deep-well cluster"],
-    ["Teltele",4.8000,37.4000,"Western woreda"],
-    ["Dillo",4.2000,37.7300,"Kenya border, Dukana axis"],
-    ["Arero",4.7500,38.8000,"Eastern forest fringe"],
-    ["Hidi Lola",3.8500,38.9500,"Miyo woreda, border trade"]
-  ],
-  "livelihoods":[["Pastoral (cattle-centred Borana system)",75,"#E8834A"],["Agro-pastoral (maize, haricot, teff pockets)",20,"#8FBB5F"],["Trade & town economies (Moyale, Yabelo)",5,"#F0B22E"]],
-  "sectors":[
-    ["Livestock economy","Cattle are wealth, identity and food security; the 2020–23 drought killed an estimated 3.3+ million livestock across Borena and neighbouring zones, collapsing herd capital. Restocking, fodder value-chains and shifting toward camels/small stock are the recovery frontier. Moyale is the region's cross-border trade artery."],
-    ["Water & the tula system","The nine tula deep-well clusters (Dubluk, Mega, Web among them) are communally governed and drought-proof but labour-intensive; motorised boreholes and ponds (haro) supplement them. Water governance through Gadaa institutions is a resilience asset most interventions should build on, not replace."],
-    ["Nutrition & health","SAM admissions surged through 2022–23 and stabilisation-centre caseloads remain above pre-drought baselines; measles and cholera outbreaks tracked displacement into IDP sites around Dubluk and Yabelo during the drought peak."],
-    ["Rangelands & bush encroachment","Decades of fire suppression drove acacia/commiphora bush encroachment over prime grasslands — a slow-onset crisis reducing carrying capacity independent of rainfall. Participatory rangeland management and controlled clearing are priority interventions."],
-    ["Conflict & cross-border dynamics","Borana–Gabra and Borana–Garre dynamics span the Kenya line; Moyale town has repeatedly split along it. Peace here is a precondition for drought-cycle mobility — closed borders during conflict episodes have trapped herds away from reserve grazing with fatal results."]
-  ],
-  "pacida":"PACIDA's Ethiopian office anchors cross-border programming: drought emergency response, WASH around the tula clusters, livestock health, education support, and Borana-led peace and resource-sharing dialogues that keep the Marsabit–Borena grazing corridors open. Funded partners include Welthungerhilfe and BMZ programmes."
-}
-}
+SITE = os.path.dirname(os.path.abspath(__file__))
+
+# The 47 official Kenya counties (slugs). "borena" is PACIDA's cross-border
+# Ethiopia zone — real, but not one of the 47, so it's counted separately.
+KE47_SLUGS = [
+ "baringo","bomet","bungoma","busia","elgeyo-marakwet","embu","garissa","homa-bay",
+ "isiolo","kajiado","kakamega","kericho","kiambu","kilifi","kirinyaga","kisii",
+ "kisumu","kitui","kwale","laikipia","lamu","machakos","makueni","mandera",
+ "marsabit","meru","migori","mombasa","muranga","nairobi","nakuru","nandi",
+ "narok","nyamira","nyandarua","nyeri","samburu","siaya","taita-taveta",
+ "tana-river","tharaka-nithi","trans-nzoia","turkana","uasin-gishu","vihiga",
+ "wajir","west-pokot"
+]
+PACIDA_SLUGS = {"marsabit", "samburu", "isiolo", "borena"}
+
+COUNTIES = json.load(open(os.path.join(SITE, "counties.json"), encoding="utf-8"))
+BOUNDARIES = json.load(open(os.path.join(SITE, "assets", "boundaries.json"), encoding="utf-8"))
+
+# boundaries.js is a generated artifact — keep it in sync with boundaries.json
+open(os.path.join(SITE, "assets", "boundaries.js"), "w", encoding="utf-8").write(
+    "const BOUNDARIES = " + json.dumps(BOUNDARIES, separators=(",", ":")) + ";\n"
+)
+
+# county_index.js powers the cross-page "jump to a county" search on every page
+county_index = []
+for slug, r in COUNTIES.items():
+    county_index.append({"slug": slug, "name": r["title"], "asal": bool(r.get("asal"))})
+county_index.sort(key=lambda c: c["name"])
+open(os.path.join(SITE, "assets", "county_index.js"), "w", encoding="utf-8").write(
+    "const COUNTY_INDEX = " + json.dumps(county_index, separators=(",", ":")) + ";\n"
+)
+
+
+def bbox_center_zoom(geom):
+    """Derive a sensible map center + zoom from a county's boundary geometry."""
+    pts = []
+
+    def walk(c):
+        if isinstance(c[0], (int, float)):
+            pts.append(c)
+        else:
+            for x in c:
+                walk(x)
+
+    walk(geom["coordinates"])
+    lons = [p[0] for p in pts]
+    lats = [p[1] for p in pts]
+    cx = (min(lons) + max(lons)) / 2
+    cy = (min(lats) + max(lats)) / 2
+    span = max(max(lons) - min(lons), max(lats) - min(lats))
+    zoom = round(9.2 - math.log2(max(span, 0.1)))
+    zoom = max(6, min(11, zoom))
+    return [round(cy, 3), round(cx, 3)], zoom
+
 
 DROUGHT_TIMELINE = [
  ["1999–2000","Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia."],
@@ -153,73 +67,104 @@ DROUGHT_TIMELINE = [
  ["2025–26","Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.","now"]
 ]
 
-def seasoncal():
-    mo = [("J","Jilaal dry","dry"),("F","dry","dry"),("M","Long rains / Ganna","rain"),("A","Long rains","rain"),("M","Long rains","rain"),
-          ("J","Adolessa dry","dry"),("J","dry","dry"),("A","dry","dry"),("S","dry","dry"),
-          ("O","Short rains / Hagayya","rain"),("N","Short rains","rain"),("D","Bona dry","dry")]
-    cells = "".join('<div class="mo %s">%s<small>%s</small></div>' % (c,m,l) for m,l,c in mo)
-    return ('<div class="season">%s</div><div class="season-note">Bimodal ASAL calendar: long rains Mar–May '
-            '(Ganna in Borana), short rains Oct–Dec (Hagayya). Both seasons must perform for pasture recovery; '
-            'a single failed season triggers Alert, consecutive failures cascade to Alarm/Emergency.</div>') % cells
+
+def seasoncal(asal):
+    if asal:
+        mo = [("J","Jilaal dry","dry"),("F","dry","dry"),("M","Long rains / Ganna","rain"),("A","Long rains","rain"),("M","Long rains","rain"),
+              ("J","Adolessa dry","dry"),("J","dry","dry"),("A","dry","dry"),("S","dry","dry"),
+              ("O","Short rains / Hagayya","rain"),("N","Short rains","rain"),("D","Bona dry","dry")]
+        note = ("Bimodal ASAL calendar: long rains Mar&ndash;May (Ganna in Borana), short rains Oct&ndash;Dec (Hagayya). Both seasons "
+                "must perform for pasture recovery; a single failed season triggers Alert, consecutive failures cascade to Alarm/Emergency.")
+    else:
+        mo = [("J","Dry season","dry"),("F","Dry season","dry"),("M","Long rains","rain"),("A","Long rains","rain"),("M","Long rains","rain"),
+              ("J","Dry season","dry"),("J","Dry season","dry"),("A","Dry season","dry"),("S","Dry season","dry"),
+              ("O","Short rains","rain"),("N","Short rains","rain"),("D","Short rains","rain")]
+        note = ("Kenya's general bimodal calendar: long rains Mar&ndash;May, short rains Oct&ndash;Dec. Actual timing and intensity vary "
+                "regionally &mdash; western Kenya trends more unimodal/extended, and the coast follows its own monsoon-driven pattern.")
+    cells = "".join('<div class="mo %s">%s<small>%s</small></div>' % (c, m, l) for m, l, c in mo)
+    return '<div class="season">%s</div><div class="season-note">%s</div>' % (cells, note)
+
+
+def fmtnum(v):
+    if isinstance(v, int):
+        return "{:,}".format(v)
+    return str(v)
+
+
+def navbar(rid):
+    home_active = ' class="active"' if rid == "home" else ""
+    return '<a href="index.html"%s>&larr; All 47 counties</a>' % home_active
+
 
 def page(rid, r):
     sub_rows = ""
     for row in r["subcounties"]:
-        name,hq,pop,hh,lz,vill = row
-        pops = fmtnum(pop); hhs = fmtnum(hh)
+        name, hq, pop, hh, lz, vill = row
+        pops = fmtnum(pop)
+        hhs = fmtnum(hh)
         sub_rows += ("<tr><td><b>%s</b><br><small>HQ: %s</small></td><td class='mono'>%s</td>"
-                     "<td class='mono'>%s</td><td>%s</td><td>%s</td></tr>") % (name,hq,pops,hhs,lz,vill)
+                     "<td class='mono'>%s</td><td>%s</td><td>%s</td></tr>") % (name, hq, pops, hhs, lz, vill)
     subnote = ('<p style="font-size:12px;color:var(--faint);margin-top:8px">%s</p>' % r["subnote"]) if r.get("subnote") else ""
 
     lz_rows = "".join(('<div class="lz-row"><div>%s</div><div class="lz-bar">'
                        '<div class="lz-fill" style="width:%d%%;background:%s"></div></div>'
-                       '<div class="lz-pct">%d%%</div></div>') % (n,p,c,p) for n,p,c in r["livelihoods"])
+                       '<div class="lz-pct">%d%%</div></div>') % (n, p, c, p) for n, p, c in r["livelihoods"])
 
-    sect = "".join('<details class="acc"><summary>%s</summary><div class="acc-body">%s</div></details>' % (t,x) for t,x in r["sectors"])
+    sect = "".join('<details class="acc"><summary>%s</summary><div class="acc-body">%s</div></details>' % (t, x) for t, x in r["sectors"])
 
-    tl = ""
-    for item in DROUGHT_TIMELINE:
-        yr, tx = item[0], item[1]
-        cls = " now" if len(item)>2 else ""
-        tl += '<div class="tl%s"><div class="yr">%s</div><div class="tx">%s</div></div>' % (cls,yr,tx)
+    asal = bool(r.get("asal"))
+
+    if asal:
+        tl_items = "".join(
+            '<div class="tl%s"><div class="yr">%s</div><div class="tx">%s</div></div>' % ((" now" if len(item) > 2 else ""), item[0], item[1])
+            for item in DROUGHT_TIMELINE
+        )
+        timeline_panel = ('<div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2>'
+                           '<div class="timeline">%s</div></div>') % tl_items
+    else:
+        timeline_panel = ('<div class="panel glass"><h2>Climate risk context</h2>'
+                           '<p>%(title)s is not one of the counties on NDMA\'s official ASAL/drought early-warning list, so it does not receive a monthly '
+                           'drought-phase bulletin the way Kenya\'s 23 arid and semi-arid counties do. The live weather and Need Index above still update in '
+                           'real time &mdash; they simply carry less weight from structural drought vulnerability and more from the raw climate signal.</p></div>') % r
+
+    if r.get("pacida"):
+        pacida_panel = '<div class="panel glass"><h2>PACIDA in %(title)s</h2><p>%(pacida)s</p></div>' % r
+        sources_pacida = ('<div class="src"><b>Programmes</b><span>PACIDA annual reports and programme pages. </span>'
+                           '<a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>')
+    else:
+        pacida_panel = ""
+        sources_pacida = ""
 
     sites_json = json.dumps(r["sites"])
     nav = navbar(rid)
+    center, zoom = bbox_center_zoom(BOUNDARIES[rid]) if rid in BOUNDARIES else ([r["hq"]["lat"], r["hq"]["lon"]], 8)
 
     return TEMPLATE % dict(
         rid=rid, title=r["title"], country=r["country"],
         nav=nav, intro=r["intro"],
-        center=json.dumps(r["center"]), zoom=r["zoom"],
+        center=json.dumps(center), zoom=zoom,
         hqname=r["hq"]["name"], hqlat=r["hq"]["lat"], hqlon=r["hq"]["lon"],
         households=fmtnum(r["households"]), population=fmtnum(r["population"]),
         area=r["area"], density=r["density"], hhsize=r["hhsize"],
         poverty=r["poverty"], staticVuln=r["staticVuln"], phase=r["phase"], gam=r["gam"],
         sub_rows=sub_rows, subnote=subnote, lz_rows=lz_rows, sectors=sect,
-        seasoncal=seasoncal(), timeline=tl, pacida=r["pacida"], sites_json=sites_json
+        seasoncal=seasoncal(asal), timeline_panel=timeline_panel, pacida_panel=pacida_panel,
+        sources_pacida=sources_pacida, sites_json=sites_json
     )
 
-def fmtnum(v):
-    if isinstance(v,int): return "{:,}".format(v)
-    return str(v)
-
-def navbar(active):
-    links = [("index.html","Home","home"),("marsabit.html","Marsabit","marsabit"),
-             ("samburu.html","Samburu","samburu"),("isiolo.html","Isiolo","isiolo"),
-             ("borena.html","Borena · S. Ethiopia","borena")]
-    return "".join('<a href="%s"%s>%s</a>' % (h, ' class="active"' if k==active else "", t) for h,t,k in links)
 
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>%(title)s — PACIDA ASAL Climate Watch</title>
+<title>%(title)s — Kenya Climate &amp; Drought Watch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%%3E%%3Ctext y='.9em' font-size='90'%%3E%%F0%%9F%%90%%AA%%3C/text%%3E%%3C/svg%%3E">
+<link rel="icon" href="data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%%3E%%3Ctext y='.9em' font-size='90'%%3E%%F0%%9F%%87%%B0%%F0%%9F%%87%%AA%%3C/text%%3E%%3C/svg%%3E">
 </head>
 <body>
 
@@ -229,13 +174,13 @@ TEMPLATE = """<!DOCTYPE html>
 
 <header class="glass">
   <div class="brand">
-    <h1><a href="index.html">PACIDA <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <h1><a href="index.html">Kenya <span>&middot;</span> Climate &amp; Drought Watch</a></h1>
     <div class="sub">%(title)s &middot; %(country)s</div>
   </div>
   <nav class="site">%(nav)s</nav>
   <div class="head-right">
     <div class="search-wrap">
-      <input type="text" id="searchBox" placeholder="Jump to a site&hellip;" aria-label="Search monitoring sites">
+      <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
       <div class="search-results" id="searchResults"></div>
     </div>
     <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
@@ -299,7 +244,7 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
 
   <div class="panel glass">
-    <h2>Sub-units, households &amp; key settlements <span class="tag">KNBS 2019 census / CSA projections</span></h2>
+    <h2>Sub-units, households &amp; key settlements <span class="tag">KNBS 2019 census / indicative estimates</span></h2>
     <div class="table-scroll">
     <table class="ptable">
       <thead><tr><th>Sub-county / woreda</th><th>Population</th><th>Households</th><th>Livelihood zone</th><th>Key settlements &amp; villages (indicative)</th></tr></thead>
@@ -310,7 +255,7 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
 
   <div class="panel glass">
-    <h2>Livelihood zones <span class="tag">FEWS NET livelihood zoning, indicative shares</span></h2>
+    <h2>Livelihood zones <span class="tag">FEWS NET-style livelihood zoning, indicative shares</span></h2>
     <div class="lz">%(lz_rows)s</div>
   </div>
 
@@ -322,7 +267,7 @@ TEMPLATE = """<!DOCTYPE html>
   <div class="panel glass">
     <h2>12-month rainfall history <span class="tag">at %(hqname)s &middot; loaded once per visit</span></h2>
     <div id="histChart"><div class="loading">Loading 12-month rainfall history&hellip;</div></div>
-    <p class="hist-cap">Monthly totals from Open-Meteo's historical archive. Compare against the seasonal calendar above: a healthy year shows two clear peaks (Ganna/long rains, Hagayya/short rains) separated by dry troughs &mdash; a missing or flattened peak is the drought signal households actually live through.</p>
+    <p class="hist-cap">Monthly totals from Open-Meteo's historical archive &mdash; shows whether this year's rains actually arrived on schedule.</p>
   </div>
 
   <div class="panel glass">
@@ -330,29 +275,24 @@ TEMPLATE = """<!DOCTYPE html>
     <div class="acc-list">%(sectors)s</div>
   </div>
 
-  <div class="panel glass">
-    <h2>Drought history &mdash; the recurrence the index is built for</h2>
-    <div class="timeline">%(timeline)s</div>
-  </div>
+  %(timeline_panel)s
 
-  <div class="panel glass">
-    <h2>PACIDA in %(title)s</h2>
-    <p>%(pacida)s</p>
-  </div>
+  %(pacida_panel)s
 
   <div class="panel glass">
     <h2>Sources</h2>
     <div class="src-grid">
       <div class="src"><b>Live weather</b><span>Open-Meteo API per settlement point; auto-refresh every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
-      <div class="src"><b>Population &amp; households</b><span>Kenya 2019 Population &amp; Housing Census Vol. I &amp; II (KNBS); Ethiopia CSA projections for Borena. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
-      <div class="src"><b>Drought &amp; food security</b><span>NDMA monthly bulletins &amp; county early-warning; IPC analyses; FEWS NET East Africa. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
-      <div class="src"><b>Programmes</b><span>PACIDA annual reports and programme pages. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+      <div class="src"><b>Boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
+      <div class="src"><b>Population &amp; households</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
+      <div class="src"><b>Drought &amp; food security</b><span>NDMA monthly bulletins &amp; county early-warning (23 ASAL counties); IPC analyses; FEWS NET East Africa. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      %(sources_pacida)s
     </div>
   </div>
 </div>
 
 <footer class="glass">
-  <div>PACIDA ASAL Climate Watch &middot; %(title)s detail &middot; monitoring prototype &mdash; deployment decisions require ground-truthing</div>
+  <div>Kenya Climate &amp; Drought Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -360,6 +300,7 @@ TEMPLATE = """<!DOCTYPE html>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/boundaries.js"></script>
+<script src="assets/county_index.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const RID = "%(rid)s";
@@ -441,7 +382,7 @@ function renderHQ(w){
   document.getElementById("needV").textContent = need;
   document.getElementById("needN").textContent = bandLabel(band)+" &mdash; blended NDMA/IPC-aligned score";
   document.getElementById("tempV").textContent = fmtTemp(w.temp);
-  document.getElementById("tempN").textContent = w.rh+"%% RH \u00b7 wind "+w.wind.toFixed(0)+" km/h";
+  document.getElementById("tempN").textContent = w.rh+"%% RH · wind "+w.wind.toFixed(0)+" km/h";
   document.getElementById("rainV").textContent = fmtRain(w.rain30);
   document.getElementById("soilV").textContent = (w.soil*100).toFixed(1)+"%%";
 }
@@ -454,8 +395,12 @@ document.addEventListener("units-changed", ()=>{
 attachUnitToggle();
 attachGlossary();
 attachSearch(
-  ()=>siteState.map(s=>({id:s.name, label:s.name+" \u2014 "+s.note})),
+  ()=>[
+    ...COUNTY_INDEX.filter(c=>c.slug!==RID).map(c=>({id:c.slug, label:c.name, kind:"county"})),
+    ...siteState.map(s=>({id:s.name, label:s.name+" — "+s.note, kind:"site"}))
+  ],
   m=>{
+    if(m.kind==="county"){ window.location.href = m.id + ".html"; return; }
     const s = siteState.find(x=>x.name===m.id);
     if(!s) return;
     map.flyTo([s.lat,s.lon],10,{duration:1});
@@ -483,7 +428,7 @@ fetchMonthlyRain(HQ.lat, HQ.lon).then(data=>{
 
 async function refreshAll(){
   const st=document.getElementById("liveState"), dotEl=document.getElementById("liveDot");
-  st.textContent="Updating\u2026";
+  st.textContent="Updating…";
   try{
     const hqW = await fetchPoint(HQ.lat, HQ.lon);
     hqW.need = computeNeed(STATIC_VULN, hqW);
@@ -496,14 +441,15 @@ async function refreshAll(){
       }catch(e){ console.error(s.name, e); }
     }));
     drawSites(); renderSiteGrid();
-    st.textContent="Live \u00b7 Open-Meteo";
+    st.textContent="Live · Open-Meteo";
     dotEl.style.background="var(--normal)";
   }catch(e){
     console.error(e);
-    st.textContent="Feed unavailable \u2014 check connection";
+    st.textContent="Feed unavailable — check connection";
     dotEl.style.background="var(--emergency)";
   }
 }
+
 document.getElementById("refreshBtn").addEventListener("click",refreshAll);
 refreshAll();
 setInterval(refreshAll, 10*60*1000);
@@ -512,9 +458,422 @@ setInterval(refreshAll, 10*60*1000);
 </html>
 """
 
+def build_index():
+    lean = []
+    for slug, r in COUNTIES.items():
+        site_names = [s[0] for s in r["sites"][:4]]
+        lean.append(dict(
+            id=slug, name=r["title"], country=r["country"],
+            zone=r["country"] + " · " + ", ".join(site_names),
+            lat=r["hq"]["lat"], lon=r["hq"]["lon"],
+            households=r["households"], population=r["population"],
+            povertyRate=r["poverty"], droughtPhase=r["phase"], staticVuln=r["staticVuln"],
+            asal=bool(r.get("asal")), pacida=slug in PACIDA_SLUGS,
+            sites=[s[0] for s in r["sites"]]
+        ))
+    lean.sort(key=lambda r: r["name"])
+    out = INDEX_TEMPLATE % dict(regions_json=json.dumps(lean, separators=(",", ":")))
+    open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
+    print("index.html", len(out), "bytes")
+
+
+INDEX_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenya Climate &amp; Drought Watch — Live County Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%%3E%%3Ctext y='.9em' font-size='90'%%3E%%F0%%9F%%87%%B0%%F0%%9F%%87%%AA%%3C/text%%3E%%3C/svg%%3E">
+</head>
+<body>
+
+<div id="map" role="application" aria-label="Map of Kenya's 47 counties"></div>
+
+<div class="overlay">
+
+<header class="glass">
+  <div class="brand">
+    <h1>Kenya <span>·</span> Climate &amp; Drought Watch</h1>
+    <div class="sub">All 47 counties + PACIDA's cross-border Borena zone · live intervention monitor</div>
+  </div>
+  <nav class="site">
+    <a href="#pacida-section">PACIDA counties</a>
+    <a href="#all-section">All 47 counties</a>
+    <a href="#about-section">About</a>
+  </nav>
+  <div class="head-right">
+    <div class="search-wrap">
+      <input type="text" id="searchBox" placeholder="Jump to a county…" aria-label="Search counties">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live · Open-Meteo feed</span></div>
+    <div class="clock mono" id="clock">--:--:-- EAT</div>
+    <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">°C · mm</button>
+    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+    <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
+    <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
+  </div>
+</header>
+
+<div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
+  <div class="gl-head"><h3>Glossary</h3><button class="gl-close" type="button" aria-label="Close glossary">&times;</button></div>
+  <input class="gl-search" type="text" placeholder="Filter terms…" aria-label="Filter glossary terms">
+  <div class="gl-body"></div>
+</div>
+<div class="gl-backdrop" id="glBackdrop"></div>
+
+<div class="strip" id="strip">
+  <div class="cell glass"><div class="k">Counties monitored</div><div class="v">47<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">All Kenya counties, plus PACIDA's Ethiopia cross-border zone</div></div>
+  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, all 47 counties</div></div>
+  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, all 47 counties</div></div>
+  <div class="cell glass"><div class="k">ASAL zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored ASAL zones</div></div>
+  <div class="cell glass"><div class="k">Avg. need index (live)</div><div class="v" id="avgNeed">—</div><div class="n">0–100 · recalculated from live weather</div></div>
+  <div class="cell glass"><div class="k">Last data refresh</div><div class="v mono" id="lastRef" style="font-size:16px">—</div><div class="n">Auto-refreshes every 10 min</div></div>
+</div>
+
+<div class="wide" style="padding-top:0">
+  <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
+    <div class="map-legend glass">
+      <h4>Intervention need</h4>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75–100)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60–74)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45–59)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0–44)</div>
+      <div class="lg-note">Shaded = county intervention level. Circle size = households. Non-ASAL counties are shaded from live weather + low structural vulnerability only — not an official NDMA phase. Borena boundary is approximate (dashed). Zoom in for place labels.</div>
+    </div>
+  </div>
+</div>
+
+<div class="wide">
+  <div class="panel glass" id="pacida-section">
+    <h2>PACIDA focus counties <span class="tag">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia)</span></h2>
+    <p>PACIDA is a Northern-Kenya/Southern-Ethiopia NGO — its actual programmes run in these four areas. They get the deepest live monitoring on this site; the other 43 counties (below) are shown for national context.</p>
+    <div class="cards-grid" id="pacidaCards"></div>
+  </div>
+
+  <div class="panel glass" id="all-section">
+    <h2>All 47 counties <span class="tag">click a county to open its full profile · live</span></h2>
+    <div class="chip-row" id="filterChips">
+      <button class="chip-filter active" data-filter="all">All 47</button>
+      <button class="chip-filter" data-filter="asal">ASAL (23)</button>
+      <button class="chip-filter" data-filter="nonasal">Non-ASAL</button>
+      <button class="chip-filter" data-filter="pacida">PACIDA counties</button>
+    </div>
+    <div class="table-scroll">
+    <table class="ptable" id="allTable">
+      <thead><tr>
+        <th class="sortable" data-key="name">County <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="asal">ASAL <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="need">Need index <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="band">Band <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="temp">Temp <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="rain">Rain 30d <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="hh">Households <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="pop">Population <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="poverty">Poverty <span class="arrow">▾</span></th>
+        <th>Drought phase</th>
+      </tr></thead>
+      <tbody id="allBody"><tr><td colspan="10" class="loading">Fetching live weather for 48 zones…</td></tr></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Rating framework — how intervention level is decided</h2>
+    <p style="margin-bottom:14px">
+      The Intervention Need Index (0–100) is aligned with the frameworks used by the world's main drought and
+      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (23 ASAL counties), the <b>IPC</b>
+      (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
+      <b>WHO/UNICEF</b> acute-malnutrition thresholds. Live climate signals are re-scored on every refresh; structural
+      indicators come from the latest published assessments. Non-ASAL counties still get a live weather-driven score,
+      but carry a lower structural-vulnerability weight since they fall outside NDMA's drought early-warning system.
+      Unfamiliar term? Open the <b>Glossary</b> in the header.
+    </p>
+    <h2 style="font-size:15px;margin-top:6px">Index bands mapped to official phases</h2>
+    <table class="ptable">
+      <thead><tr><th>Dashboard band</th><th>Index</th><th>NDMA drought phase</th><th>IPC phase (FAO/WFP/FEWS NET)</th><th>Typical response</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip" style="background:var(--normal)"></span>Watch</td><td class="mono">0–44</td><td>Normal</td><td>Phase 1 · Minimal</td><td>Monitoring, preparedness, resilience building</td></tr>
+        <tr><td><span class="chip" style="background:var(--alert)"></span>Elevated</td><td class="mono">45–59</td><td>Alert</td><td>Phase 2 · Stressed</td><td>Early action: water trucking standby, livestock offtake planning, cash-transfer scale-up</td></tr>
+        <tr><td><span class="chip" style="background:var(--alarm)"></span>High</td><td class="mono">60–74</td><td>Alarm</td><td>Phase 3 · Crisis</td><td>Emergency WASH, supplementary feeding, food/cash assistance, fodder distribution</td></tr>
+        <tr><td><span class="chip" style="background:var(--emergency)"></span>Critical</td><td class="mono">75–100</td><td>Emergency</td><td>Phase 4 · Emergency</td><td>Full humanitarian response: relief food, therapeutic nutrition (SAM), emergency water, destocking</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel glass" id="about-section">
+    <h2>About this project &amp; PACIDA</h2>
+    <p>This dashboard began as a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
+    Northern-Kenya/Southern-Ethiopia NGO working across Marsabit, Samburu and Isiolo counties and the Borena Zone of southern
+    Ethiopia — drought emergency response, WASH, livestock health, education access, and cross-border peace &amp; governance.
+    It has since grown into a national county-level climate and drought watch; PACIDA's own operational area remains the
+    most deeply monitored (settlement-level live weather, full sector deep-dives) and is highlighted above. The other 43
+    counties are shown for national context using the same live-data engine, KNBS census baselines, and — where applicable —
+    NDMA's ASAL/drought classification.</p>
+    <div class="src-grid">
+      <div class="src"><b>Live weather &amp; soil</b><span>Open-Meteo API — temperature, humidity, wind, rainfall (past 30 d + 7-d forecast), soil moisture. Refreshed every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
+      <div class="src"><b>County boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source, 2023 release). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
+      <div class="src"><b>Households &amp; population</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). Borena Zone figures are CSA-based projections. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
+      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins (23 ASAL counties) and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>PACIDA</b><span>Pastoralist Community Initiative and Development Assistance — programme areas, annual reports. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+    </div>
+  </div>
+</div>
+
+<footer class="glass">
+  <div>Kenya Climate &amp; Drought Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</div>
+  <div class="mono" id="footTime"></div>
+</footer>
+
+</div><!-- /overlay -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/boundaries.js"></script>
+<script src="assets/common.js"></script>
+<script>
+const REGIONS = %(regions_json)s;
+
+startClock();
+
+/* ================= MAP ================= */
+const {map, layersControl} = makeGlassMap([0.4, 37.9], 6);
+const markerLayer = L.layerGroup().addTo(map);
+const labelLayer  = L.layerGroup().addTo(map);
+const shadeLayer  = L.layerGroup().addTo(map);
+const markers = {};
+
+function drawShading(){
+  shadeLayer.clearLayers();
+  REGIONS.forEach(r=>{
+    const geom = BOUNDARIES[r.id];
+    if(!geom) return;
+    const need = r.live ? r.live.need : null;
+    const band = need!=null ? needBand(need) : "elevated";
+    const color = PHASE_COLORS[band];
+    const approx = r.id==="borena";
+    const poly = L.geoJSON({type:"Feature",geometry:geom},{
+      style:{color:"#FFFFFF", weight:approx?1.2:1, opacity:.6, dashArray:approx?"6 5":null, fillColor:color, fillOpacity:.32}
+    });
+    poly.bindTooltip(
+      `<b>${r.name}</b><br>Intervention level: ${need!=null?bandLabel(band)+" ("+need+"/100)":"loading…"}`+
+      `<br>Phase: ${r.droughtPhase}`+(approx?"<br><i>Boundary approximate</i>":""),
+      {sticky:true, className:"shade-tip"}
+    );
+    poly.on("click",()=>{ if(markers[r.id]) markers[r.id].openPopup(); });
+    shadeLayer.addLayer(poly);
+  });
+}
+drawShading();
+layersControl.addOverlay(shadeLayer,"Intervention shading");
+layersControl.addOverlay(markerLayer,"Household markers");
+layersControl.addOverlay(labelLayer,"County labels");
+
+function hhRadius(hh){ return Math.max(5, Math.min(20, Math.sqrt(hh)/22)); }
+
+function drawMarkers(){
+  markerLayer.clearLayers(); labelLayer.clearLayers();
+  REGIONS.forEach(r=>{
+    const need = r.live ? r.live.need : null;
+    const band = need!=null ? needBand(need) : "elevated";
+    const color = PHASE_COLORS[band];
+    const core = L.circleMarker([r.lat,r.lon],{radius:hhRadius(r.households), color:"#FFFFFF", weight:1.3, fillColor:color, fillOpacity:.65});
+    const w = r.live;
+    core.bindPopup(`
+      <h4>${r.name}${r.pacida?' <span class="pacida-tag">PACIDA</span>':''}</h4>
+      <div><span class="pop-k">Need index:</span> <span class="pop-v">${need!=null?need+" / 100 · "+bandLabel(band):"loading…"}</span></div>
+      <div><span class="pop-k">Households:</span> <span class="pop-v">${fmt(r.households)}</span></div>
+      <div><span class="pop-k">Population:</span> <span class="pop-v">${fmt(r.population)}</span></div>
+      <div><span class="pop-k">Phase:</span> <span class="pop-v">${r.droughtPhase}</span></div>
+      ${w?`
+      <div><span class="pop-k">Now:</span> <span class="pop-v">${fmtTemp(w.temp)} · ${w.rh}%% RH · wind ${w.wind.toFixed(0)} km/h</span></div>
+      <div><span class="pop-k">Rain, past 30 d:</span> <span class="pop-v">${fmtRain(w.rain30)}</span></div>
+      <div><span class="pop-k">Topsoil moisture:</span> <span class="pop-v">${(w.soil*100).toFixed(1)}%%</span></div>`:""}
+      <div style="margin-top:6px"><span class="pop-k">Key sites:</span> ${r.sites.slice(0,4).join(", ")}</div>
+      <div style="margin-top:6px"><a href="${r.id}.html" style="color:var(--alert)">Open detail page →</a></div>
+    `);
+    const label = L.marker([r.lat,r.lon],{interactive:false,
+      icon:L.divIcon({className:"", html:`<div class="region-label">${r.name.split(" County")[0]}</div>`, iconAnchor:[-hhRadius(r.households)-6, 8]})});
+    markerLayer.addLayer(core); labelLayer.addLayer(label);
+    markers[r.id]=core;
+  });
+  toggleLabels();
+}
+function toggleLabels(){
+  const show = map.getZoom() >= 7;
+  if(show && !map.hasLayer(labelLayer)) map.addLayer(labelLayer);
+  if(!show && map.hasLayer(labelLayer)) map.removeLayer(labelLayer);
+}
+map.on("zoomend", toggleLabels);
+drawMarkers();
+
+/* ================= PACIDA CARDS ================= */
+function renderPacidaCards(){
+  const el = document.getElementById("pacidaCards");
+  const order = REGIONS.filter(r=>r.pacida).sort((a,b)=>((b.live?b.live.need:-1)-(a.live?a.live.need:-1)));
+  el.innerHTML = order.map(r=>{
+    const w=r.live, need=w?w.need:null;
+    const band = need!=null?needBand(need):"elevated";
+    const color = PHASE_COLORS[band];
+    return `<div class="card glass clickable" tabindex="0" role="button" aria-label="Zoom map to ${r.name}" data-id="${r.id}">
+      <div class="card-top">
+        <div><h3>${r.name}</h3><div class="zone">${r.zone}</div></div>
+        <span class="badge" style="background:${color}">${need!=null?bandLabel(band)+" · "+need:"…"}</span>
+      </div>
+      <div class="gauge"><div class="gauge-track"><div class="gauge-marker" style="left:${need!=null?need:0}%%"></div></div>
+      <div class="gauge-labels"><span>Watch</span><span>Elevated</span><span>High</span><span>Critical</span></div></div>
+      ${w?`<div class="metrics">
+        <div class="m"><div class="mk">Now</div><div class="mv">${fmtTemp(w.temp)}</div></div>
+        <div class="m"><div class="mk">Rain 30 d</div><div class="mv">${fmtRain(w.rain30)}</div></div>
+        <div class="m"><div class="mk">Soil 0–7 cm</div><div class="mv">${(w.soil*100).toFixed(1)}<small>%%</small></div></div>
+        <div class="m"><div class="mk">7-d max avg</div><div class="mv">${fmtTemp(w.tmax7)}</div></div>
+      </div>`:`<div class="loading">Fetching live weather…</div>`}
+      <div class="hh-line">
+        <span>Households <b>${fmt(r.households)}</b></span><span>Population <b>${fmt(r.population)}</b></span><span>Poverty <b>${r.povertyRate}%%</b></span>
+      </div>
+      <div class="hh-line" style="border:0;padding-top:4px;margin-top:0"><span>Phase: <b style="font-family:'Archivo'">${r.droughtPhase}</b></span></div>
+      <a class="detail-link" href="${r.id}.html">Open ${r.name.split(" County")[0]} detail page →</a>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".card").forEach(card=>{
+    card.addEventListener("click",e=>{
+      if(e.target.closest("a")) return;
+      const r = REGIONS.find(x=>x.id===card.dataset.id);
+      map.flyTo([r.lat,r.lon],8,{duration:1}); if(markers[r.id]) markers[r.id].openPopup();
+    });
+    card.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();card.click();} });
+  });
+}
+
+/* ================= ALL-COUNTIES TABLE ================= */
+let tableFilter = "all", sortKey="need", sortDir=-1;
+function renderTable(){
+  const tbody = document.getElementById("allBody");
+  let rows = REGIONS.filter(r=>{
+    if(tableFilter==="asal") return r.asal;
+    if(tableFilter==="nonasal") return !r.asal;
+    if(tableFilter==="pacida") return r.pacida;
+    return true;
+  }).map(r=>({
+    id:r.id, name:r.name, asal:r.asal?1:0,
+    need: r.live? r.live.need : -1,
+    band: r.live? bandLabel(needBand(r.live.need)) : "…",
+    temp: r.live? r.live.temp : null, rain: r.live? r.live.rain30 : null,
+    hh:r.households, pop:r.population, poverty:r.povertyRate, phase:r.droughtPhase, pacida:r.pacida
+  }));
+  rows.sort((a,b)=>{
+    const av=a[sortKey], bv=b[sortKey];
+    if(typeof av === "string") return sortDir*av.localeCompare(bv);
+    return sortDir*((av??-1)-(bv??-1));
+  });
+  tbody.innerHTML = rows.map(r=>`<tr class="row-link" data-id="${r.id}">
+    <td><b>${r.name}</b>${r.pacida?'<span class="pacida-tag">PACIDA</span>':''}</td>
+    <td class="${r.asal?'asal-yes':'asal-no'}">${r.asal?'ASAL':'—'}</td>
+    <td class="mono">${r.need>=0?r.need:"…"}</td>
+    <td>${r.band}</td>
+    <td class="mono">${r.temp!=null?fmtTemp(r.temp):"…"}</td>
+    <td class="mono">${r.rain!=null?fmtRain(r.rain):"…"}</td>
+    <td class="mono">${fmt(r.hh)}</td>
+    <td class="mono">${fmt(r.pop)}</td>
+    <td class="mono">${r.poverty}%%</td>
+    <td>${r.phase}</td>
+  </tr>`).join("");
+  tbody.querySelectorAll("tr.row-link").forEach(tr=>{
+    tr.addEventListener("click", ()=>{ window.location.href = tr.dataset.id + ".html"; });
+  });
+  document.querySelectorAll("#allTable th.sortable").forEach(th=>{
+    th.classList.toggle("active", th.dataset.key===sortKey);
+    th.querySelector(".arrow").textContent = th.dataset.key===sortKey ? (sortDir===1?"▴":"▾") : "▾";
+  });
+}
+document.querySelectorAll("#allTable th.sortable").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const key = th.dataset.key;
+    if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
+    renderTable();
+  });
+});
+document.querySelectorAll("#filterChips .chip-filter").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("#filterChips .chip-filter").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    tableFilter = btn.dataset.filter;
+    renderTable();
+  });
+});
+
+/* ================= UNITS, GLOSSARY, SEARCH, EXPORT ================= */
+document.addEventListener("units-changed", ()=>{ renderPacidaCards(); drawMarkers(); renderTable(); });
+attachUnitToggle();
+attachGlossary();
+attachSearch(
+  ()=>REGIONS.map(r=>({id:r.id, label:r.name+" — "+r.zone})),
+  m=>{
+    const r = REGIONS.find(x=>x.id===m.id);
+    if(!r) return;
+    map.flyTo([r.lat,r.lon],8,{duration:1});
+    if(markers[r.id]) markers[r.id].openPopup();
+  }
+);
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const rows = [["County","ASAL","Need index","Band","Temp C","RH %%","Rain 30d mm","Soil 0-7cm %%","7d max avg C","Households","Population","Poverty %%","Phase"]];
+  REGIONS.forEach(r=>{
+    const w = r.live;
+    rows.push([r.name, r.asal?"yes":"no", w?w.need:"", w?bandLabel(needBand(w.need)):"",
+      w?w.temp.toFixed(1):"", w?w.rh:"", w?w.rain30.toFixed(1):"", w?(w.soil*100).toFixed(1):"", w?w.tmax7.toFixed(1):"",
+      r.households, r.population, r.povertyRate, r.droughtPhase]);
+  });
+  downloadCSV("kenya-climate-watch-live-readings.csv", rows);
+});
+
+/* ================= LIVE WEATHER ================= */
+async function fetchRegion(r){
+  const w = await fetchPoint(r.lat, r.lon);
+  w.need = computeNeed(r.staticVuln, w);
+  r.live = w;
+}
+
+async function refreshAll(){
+  const dotEl=document.getElementById("liveDot"), st=document.getElementById("liveState");
+  st.textContent="Updating…";
+  try{
+    await Promise.all(REGIONS.map(r=>fetchRegion(r).catch(e=>{console.error(r.id,e); r.error=String(e);})));
+    const ok = REGIONS.filter(r=>r.live);
+    if(!ok.length) throw new Error("No data returned");
+    const kenyaOnly = REGIONS.filter(r=>r.country==="Kenya");
+    document.getElementById("totHH").textContent = fmt(kenyaOnly.reduce((a,r)=>a+r.households,0));
+    document.getElementById("totPop").textContent = fmt(kenyaOnly.reduce((a,r)=>a+r.population,0));
+    const asalZones = REGIONS.filter(r=>r.asal);
+    document.getElementById("zonesAlert").textContent = asalZones.filter(r=>/alert|alarm|crisis|emergency/i.test(r.droughtPhase)).length + " / " + asalZones.length;
+    const avg = Math.round(ok.reduce((a,r)=>a+r.live.need,0)/ok.length);
+    document.getElementById("avgNeed").textContent = avg;
+    document.getElementById("lastRef").textContent = new Date().toLocaleTimeString("en-GB",{timeZone:"Africa/Nairobi",hour12:false})+" EAT";
+    st.textContent="Live · Open-Meteo feed";
+    dotEl.style.background="var(--normal)";
+    renderPacidaCards(); drawMarkers(); drawShading(); renderTable();
+  }catch(e){
+    console.error(e);
+    st.textContent="Feed unavailable — check connection";
+    dotEl.style.background="var(--emergency)";
+  }
+}
+
+document.getElementById("refreshBtn").addEventListener("click",refreshAll);
+refreshAll();
+setInterval(refreshAll, 10*60*1000);
+</script>
+</body>
+</html>
+"""
+
+
 if __name__ == "__main__":
-    import io, os
-    for rid, r in REGIONS.items():
+    for rid, r in COUNTIES.items():
         out = page(rid, r)
-        open(rid + ".html","w",encoding="utf-8").write(out)
-        print(rid+".html", len(out), "bytes")
+        open(os.path.join(SITE, rid + ".html"), "w", encoding="utf-8").write(out)
+        print(rid + ".html", len(out), "bytes")
+    build_index()
