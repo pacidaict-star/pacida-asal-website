@@ -6,7 +6,7 @@ outside the repo (Downloads/UNICEF) — only this derived, public-appropriate JS
 gets committed. No per-project grant amounts are published (those read as internal
 financial detail, not something in the externally-shared @Glance deck).
 """
-import json, re, os, datetime
+import json, re, os, datetime, random
 
 SITE = os.path.dirname(os.path.abspath(__file__))
 SRC = r"C:\Users\l.muchemi\Downloads\UNICEF\PACIDA Project Summary.xlsx"
@@ -121,6 +121,7 @@ def find_locations(title):
     return by_slug  # {slug: (kind, name)}
 
 counties = json.load(open(os.path.join(SITE, "counties.json"), encoding="utf-8"))
+boundaries = json.load(open(os.path.join(SITE, "assets", "boundaries.json"), encoding="utf-8"))
 SITE_COORDS = {}
 for slug, r in counties.items():
     for s in r["sites"]:
@@ -133,15 +134,79 @@ MANUAL_COORDS = {
     "Turmi": (4.95, 36.50), "Omorate": (4.83, 36.05), "Dilo": (4.20, 37.73),
 }
 
-def coords_for(slug, kind, name):
-    if kind == "site" and (slug, name) in SITE_COORDS:
-        return SITE_COORDS[(slug, name)]
-    if name in MANUAL_COORDS:
-        return MANUAL_COORDS[name]
-    # site name variants that don't exactly match the sites list (e.g. "Dilo" vs "Dillo", "Isiolo" vs "Isiolo town")
-    for (s2, n2), (lat, lon) in SITE_COORDS.items():
-        if s2 == slug and n2.lower().startswith(name.lower()[:5]):
+
+def point_in_ring(lon, lat, ring):
+    inside = False
+    n = len(ring)
+    for i in range(n):
+        x1, y1 = ring[i]
+        x2, y2 = ring[(i + 1) % n]
+        if ((y1 > lat) != (y2 > lat)) and (lon < (x2 - x1) * (lat - y1) / (y2 - y1 + 1e-12) + x1):
+            inside = not inside
+    return inside
+
+
+def point_in_geom(lon, lat, geom):
+    if geom["type"] == "Polygon":
+        return point_in_ring(lon, lat, geom["coordinates"][0])
+    else:  # MultiPolygon
+        return any(point_in_ring(lon, lat, poly[0]) for poly in geom["coordinates"])
+
+
+def county_bbox(slug):
+    geom = boundaries.get(slug)
+    if not geom:
+        return None
+    pts = []
+
+    def walk(c):
+        if isinstance(c[0], (int, float)):
+            pts.append(c)
+        else:
+            for x in c:
+                walk(x)
+    walk(geom["coordinates"])
+    lons = [p[0] for p in pts]
+    lats = [p[1] for p in pts]
+    return min(lons), max(lons), min(lats), max(lats)
+
+
+_BBOX_CACHE = {}
+
+def scattered_county_point(slug, seed_key):
+    """A real, plausible point somewhere inside the county's actual boundary — used for
+    projects whose title only names the county, not a specific site, so they don't all
+    stack on the exact same HQ pixel on the map."""
+    geom = boundaries.get(slug)
+    if not geom:
+        return COUNTY_HQ.get(slug)
+    if slug not in _BBOX_CACHE:
+        _BBOX_CACHE[slug] = county_bbox(slug)
+    bbox = _BBOX_CACHE[slug]
+    if not bbox:
+        return COUNTY_HQ.get(slug)
+    minlon, maxlon, minlat, maxlat = bbox
+    rnd = random.Random(seed_key)
+    for _ in range(40):
+        lon = rnd.uniform(minlon, maxlon)
+        lat = rnd.uniform(minlat, maxlat)
+        if point_in_geom(lon, lat, geom):
             return (lat, lon)
+    return COUNTY_HQ.get(slug)
+
+
+def coords_for(slug, kind, name, seed_key=None):
+    if kind == "site":
+        if (slug, name) in SITE_COORDS:
+            return SITE_COORDS[(slug, name)]
+        if name in MANUAL_COORDS:
+            return MANUAL_COORDS[name]
+        # site name variants that don't exactly match the sites list (e.g. "Dilo" vs "Dillo", "Isiolo" vs "Isiolo town")
+        for (s2, n2), (lat, lon) in SITE_COORDS.items():
+            if s2 == slug and n2.lower().startswith(name.lower()[:5]):
+                return (lat, lon)
+    if kind == "county" and seed_key is not None:
+        return scattered_county_point(slug, seed_key)
     return COUNTY_HQ.get(slug)
 
 projects = []
@@ -157,7 +222,7 @@ for i, p in enumerate(raw):
         no_loc += 1
     loc_list = []
     for s, (k, n) in locs.items():
-        c = coords_for(s, k, n)
+        c = coords_for(s, k, n, seed_key=f"proj-{i}-{s}")
         if c:
             loc_list.append({"slug": s, "kind": k, "name": n, "lat": c[0], "lon": c[1]})
     projects.append(dict(

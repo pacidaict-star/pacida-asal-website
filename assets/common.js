@@ -182,19 +182,21 @@ async function fetchMonthlyRain(lat, lon){
 }
 function monthChart(data){
   if(!data || !data.length) return "";
-  const W=560,H=112,names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const W=560,H=240,names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const max = Math.max(20, ...data.map(d=>d.total));
   const bw = W/data.length;
-  let bars="", labels="";
+  let bars="", labels="", vals="";
   data.forEach((d,i)=>{
-    const h = Math.max(1,(d.total/max)*(H-30));
-    const x = i*bw+4, w = Math.max(1,bw-8);
+    const h = Math.max(2,(d.total/max)*(H-56));
+    const x = i*bw+5, w = Math.max(1,bw-10);
     const isLast = i===data.length-1;
     const mIdx = parseInt(d.month.slice(5,7),10)-1;
-    bars += `<rect x="${x.toFixed(1)}" y="${(H-20-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isLast?'#F0B22E':'#6FA3B4'}" opacity="${isLast?1:0.9}"><title>${d.month}: ${d.total.toFixed(0)} mm</title></rect>`;
-    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-6}" font-size="9" fill="#C6BB9A" text-anchor="middle">${names[mIdx]}</text>`;
+    const barTop = H-34-h;
+    bars += `<rect x="${x.toFixed(1)}" y="${barTop.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${isLast?'#F0B22E':'#6FA3B4'}" opacity="${isLast?1:0.9}"><title>${d.month}: ${d.total.toFixed(0)} mm</title></rect>`;
+    vals += `<text x="${(x+w/2).toFixed(1)}" y="${(barTop-6).toFixed(1)}" font-size="12" fill="${isLast?'#F0B22E':'#9AB6C0'}" font-family="IBM Plex Mono" text-anchor="middle">${d.total.toFixed(0)}</text>`;
+    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-14}" font-size="13" fill="#C6BB9A" font-family="Barlow Condensed" font-weight="600" text-anchor="middle">${names[mIdx]}</text>`;
   });
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:112px;display:block" role="img" aria-label="12 month rainfall history">${bars}${labels}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:240px;display:block" role="img" aria-label="12 month rainfall history">${bars}${vals}${labels}</svg>`;
 }
 
 /* ---------- village tags (OpenStreetMap-geocoded, see assets/villages.js), shown when zoomed in ---------- */
@@ -261,16 +263,16 @@ function drawInterventionHeat(slugs){
   if(typeof INTERVENTIONS !== "undefined"){
     INTERVENTIONS.projects.forEach(p=>{
       p.locations.forEach(loc=>{
-        if(slugs.includes(loc.slug)) pts.push([loc.lat, loc.lon, 0.55]);
+        if(slugs.includes(loc.slug)) pts.push([loc.lat, loc.lon, 1]);
       });
     });
     INTERVENTIONS.offices.forEach(o=>{
-      if(slugs.includes(o.slug) && o.lat != null) pts.push([o.lat, o.lon, 0.35]);
+      if(slugs.includes(o.slug) && o.lat != null) pts.push([o.lat, o.lon, 0.6]);
     });
   }
   return L.heatLayer(pts, {
-    radius: 34, blur: 28, maxZoom: 12, minOpacity: 0.35,
-    gradient: {0.1:"#2A6F63", 0.35:"#6FA3B4", 0.55:"#8FBB5F", 0.75:"#F0B22E", 1.0:"#E64A2E"}
+    radius: 70, blur: 55, max: 6, minOpacity: 0.42,
+    gradient: {0.05:"#1F5E52", 0.25:"#2A6F63", 0.45:"#6FA3B4", 0.65:"#8FBB5F", 0.82:"#F0B22E", 1.0:"#E64A2E"}
   });
 }
 function renderInterventionList(containerId, slug){
