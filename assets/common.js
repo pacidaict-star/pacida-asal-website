@@ -254,6 +254,25 @@ function drawInterventionLayer(map, slug){
   });
   return layer;
 }
+/* "ground surface" colour by intervention density — the ask: see the level of an
+   area by colour, not just individual pins. Uses Leaflet.heat (L.heatLayer). */
+function drawInterventionHeat(slugs){
+  const pts = [];
+  if(typeof INTERVENTIONS !== "undefined"){
+    INTERVENTIONS.projects.forEach(p=>{
+      p.locations.forEach(loc=>{
+        if(slugs.includes(loc.slug)) pts.push([loc.lat, loc.lon, 0.55]);
+      });
+    });
+    INTERVENTIONS.offices.forEach(o=>{
+      if(slugs.includes(o.slug) && o.lat != null) pts.push([o.lat, o.lon, 0.35]);
+    });
+  }
+  return L.heatLayer(pts, {
+    radius: 34, blur: 28, maxZoom: 12, minOpacity: 0.35,
+    gradient: {0.1:"#2A6F63", 0.35:"#6FA3B4", 0.55:"#8FBB5F", 0.75:"#F0B22E", 1.0:"#E64A2E"}
+  });
+}
 function renderInterventionList(containerId, slug){
   const el = document.getElementById(containerId);
   if(!el) return;

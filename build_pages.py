@@ -6,11 +6,18 @@ SITE = os.path.dirname(os.path.abspath(__file__))
 PACIDA_SLUGS = {"marsabit", "samburu", "isiolo", "borena"}
 
 COUNTIES = json.load(open(os.path.join(SITE, "counties.json"), encoding="utf-8"))
-BOUNDARIES = json.load(open(os.path.join(SITE, "assets", "boundaries.json"), encoding="utf-8"))
+BOUNDARIES_ALL = json.load(open(os.path.join(SITE, "assets", "boundaries.json"), encoding="utf-8"))
+VILLAGES_ALL = json.load(open(os.path.join(SITE, "assets", "villages.json"), encoding="utf-8"))
 
-# boundaries.js is a generated artifact — keep it in sync with boundaries.json
+# boundaries.js / villages.js are generated artifacts — keep them in sync with the
+# full source JSON archives, but trimmed to only the regions actually on the site
+BOUNDARIES = {k: v for k, v in BOUNDARIES_ALL.items() if k in COUNTIES}
 open(os.path.join(SITE, "assets", "boundaries.js"), "w", encoding="utf-8").write(
     "const BOUNDARIES = " + json.dumps(BOUNDARIES, separators=(",", ":")) + ";\n"
+)
+VILLAGES = {k: v for k, v in VILLAGES_ALL.items() if k in COUNTIES}
+open(os.path.join(SITE, "assets", "villages.js"), "w", encoding="utf-8").write(
+    "const VILLAGES = " + json.dumps(VILLAGES, separators=(",", ":")) + ";\n"
 )
 
 # county_index.js powers the cross-page "jump to a county" search on every page
@@ -45,6 +52,30 @@ def bbox_center_zoom(geom):
     return [round(cy, 3), round(cx, 3)], zoom
 
 
+def combined_bbox_center_zoom(geoms, pad=1.15):
+    """Center/zoom that fits several boundary geometries at once (used for the
+    homepage/impact map so it opens framed on PACIDA's operational area)."""
+    pts = []
+
+    def walk(c):
+        if isinstance(c[0], (int, float)):
+            pts.append(c)
+        else:
+            for x in c:
+                walk(x)
+    for g in geoms:
+        walk(g["coordinates"])
+    lons = [p[0] for p in pts]
+    lats = [p[1] for p in pts]
+    cx, cy = (min(lons) + max(lons)) / 2, (min(lats) + max(lats)) / 2
+    span = max(max(lons) - min(lons), max(lats) - min(lats)) * pad
+    zoom = max(5, min(11, round(9.2 - math.log2(max(span, 0.1)))))
+    return [round(cy, 3), round(cx, 3)], zoom
+
+
+PACIDA_CENTER, PACIDA_ZOOM = combined_bbox_center_zoom([BOUNDARIES[s] for s in PACIDA_SLUGS if s in BOUNDARIES])
+
+
 DROUGHT_TIMELINE = [
  ["1999–2000","Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia."],
  ["2005–06","Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008)."],
@@ -75,7 +106,7 @@ def fmtnum(v):
 
 def navbar(rid):
     home_active = ' class="active"' if rid == "home" else ""
-    return ('<a href="index.html"%s>&larr; All ASAL counties</a>'
+    return ('<a href="index.html"%s>&larr; PACIDA\'s operational areas</a>'
             '<a href="impact.html">PACIDA Impact Dashboard</a>') % home_active
 
 
@@ -113,6 +144,8 @@ def page(rid, r):
                          '<div class="interv-list" id="intervList"></div></div>') % r
         interventions_js = ('const intervLayer = drawInterventionLayer(map, RID);\n'
                              'intervLayer.addTo(map);\n'
+                             'const heatLayer = drawInterventionHeat([RID]).addTo(map);\n'
+                             'layersControl.addOverlay(heatLayer, "Intervention density (heat)");\n'
                              'layersControl.addOverlay(intervLayer, "PACIDA interventions");\n'
                              'renderInterventionList("intervList", RID);')
     else:
@@ -288,6 +321,7 @@ TEMPLATE = """<!DOCTYPE html>
 </div><!-- /overlay -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="assets/boundaries.js"></script>
 <script src="assets/county_index.js"></script>
 <script src="assets/villages.js"></script>
@@ -465,7 +499,10 @@ def build_index():
             sites=[s[0] for s in r["sites"]]
         ))
     lean.sort(key=lambda r: r["name"])
-    out = INDEX_TEMPLATE % dict(regions_json=json.dumps(lean, separators=(",", ":")))
+    out = INDEX_TEMPLATE % dict(
+        regions_json=json.dumps(lean, separators=(",", ":")),
+        center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM
+    )
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
     print("index.html", len(out), "bytes")
 
@@ -485,18 +522,17 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 
-<div id="map" role="application" aria-label="Map of Kenya's ASAL counties"></div>
+<div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
 
 <div class="overlay">
 
 <header class="glass">
   <div class="brand">
     <h1>Kenya <span>·</span> ASAL Climate Watch</h1>
-    <div class="sub">Kenya's 23 arid &amp; semi-arid counties + PACIDA's cross-border Borena zone · live intervention monitor</div>
+    <div class="sub">PACIDA's operational area &middot; Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
   </div>
   <nav class="site">
-    <a href="#pacida-section">PACIDA counties</a>
-    <a href="#all-section">All ASAL counties</a>
+    <a href="#pacida-section">Operational areas</a>
     <a href="impact.html">PACIDA Impact Dashboard</a>
     <a href="#about-section">About</a>
   </nav>
@@ -522,10 +558,10 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <div class="gl-backdrop" id="glBackdrop"></div>
 
 <div class="strip" id="strip">
-  <div class="cell glass"><div class="k">ASAL counties monitored</div><div class="v">23<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">Kenya's NDMA-designated arid &amp; semi-arid counties, plus PACIDA's Ethiopia cross-border zone</div></div>
-  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, 23 ASAL counties</div></div>
-  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, 23 ASAL counties</div></div>
-  <div class="cell glass"><div class="k">Zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored ASAL zones</div></div>
+  <div class="cell glass"><div class="k">PACIDA operational areas</div><div class="v">3<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">Marsabit, Samburu, Isiolo counties &amp; the Borena cross-border zone</div></div>
+  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, 3 counties</div></div>
+  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, 3 counties</div></div>
+  <div class="cell glass"><div class="k">Zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored zones</div></div>
   <div class="cell glass"><div class="k">Avg. need index (live)</div><div class="v" id="avgNeed">—</div><div class="n">0–100 · recalculated from live weather</div></div>
   <div class="cell glass"><div class="k">Last data refresh</div><div class="v mono" id="lastRef" style="font-size:16px">—</div><div class="n">Auto-refreshes every 10 min</div></div>
 </div>
@@ -533,33 +569,29 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <div class="wide" style="padding-top:0">
   <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
     <div class="map-legend glass">
-      <h4>Intervention need</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75–100)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60–74)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45–59)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0–44)</div>
-      <div class="lg-note">Shaded = county intervention level (NDMA + IPC aligned). Circle size = households. Borena boundary is approximate (dashed). Zoom in for place labels.</div>
+      <h4>Map layers</h4>
+      <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
+      <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
     </div>
   </div>
 </div>
 
 <div class="wide">
   <div class="panel glass" id="pacida-section">
-    <h2>PACIDA focus counties <span class="tag">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia)</span></h2>
-    <p>PACIDA is a Northern-Kenya/Southern-Ethiopia NGO — its actual programmes run in these four areas. They get the deepest live monitoring on this site; the other 20 ASAL counties (below) are shown for national context.</p>
+    <h2>PACIDA's operational areas <span class="tag">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia)</span></h2>
+    <p>This dashboard is scoped to where PACIDA actually works. The map above centers on these four areas and shades the
+    ground surface by intervention density &mdash; where PACIDA has done the most, and where the gaps still are.</p>
     <div class="cards-grid" id="pacidaCards"></div>
   </div>
 
-  <div class="panel glass" id="all-section">
-    <h2>All ASAL counties <span class="tag">click a county to open its full profile · live</span></h2>
-    <div class="chip-row" id="filterChips">
-      <button class="chip-filter active" data-filter="all">All 23 + Borena</button>
-      <button class="chip-filter" data-filter="pacida">PACIDA counties</button>
-    </div>
+  <div class="panel glass">
+    <h2>Compare the four areas <span class="tag">click to open its full profile · live</span></h2>
     <div class="table-scroll">
     <table class="ptable" id="allTable">
       <thead><tr>
-        <th class="sortable" data-key="name">County <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="name">Area <span class="arrow">▾</span></th>
         <th class="sortable" data-key="need">Need index <span class="arrow">▾</span></th>
         <th class="sortable" data-key="band">Band <span class="arrow">▾</span></th>
         <th class="sortable" data-key="temp">Temp <span class="arrow">▾</span></th>
@@ -569,7 +601,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
         <th class="sortable" data-key="poverty">Poverty <span class="arrow">▾</span></th>
         <th>Drought phase</th>
       </tr></thead>
-      <tbody id="allBody"><tr><td colspan="9" class="loading">Fetching live weather for 24 zones…</td></tr></tbody>
+      <tbody id="allBody"><tr><td colspan="9" class="loading">Fetching live weather for 4 zones…</td></tr></tbody>
     </table>
     </div>
   </div>
@@ -578,7 +610,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <h2>Rating framework — how intervention level is decided</h2>
     <p style="margin-bottom:14px">
       The Intervention Need Index (0–100) is aligned with the frameworks used by the world's main drought and
-      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (all 23 ASAL counties covered here), the
+      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (Marsabit, Samburu and Isiolo), the
       <b>IPC</b> (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
       <b>WHO/UNICEF</b> acute-malnutrition thresholds. Live climate signals are re-scored on every refresh; structural
       indicators come from the latest published NDMA/IPC assessments.
@@ -598,18 +630,18 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 
   <div class="panel glass" id="about-section">
     <h2>About this project &amp; PACIDA</h2>
-    <p>This dashboard began as a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
+    <p>This dashboard is a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
     Northern-Kenya/Southern-Ethiopia NGO working across Marsabit, Samburu and Isiolo counties and the Borena Zone of southern
     Ethiopia — drought emergency response, WASH, livestock health, education access, and cross-border peace &amp; governance.
-    It now covers all 23 of Kenya's NDMA-designated arid and semi-arid (ASAL) counties, the areas where drought is the
-    dominant climate risk; PACIDA's own operational counties remain the most deeply featured and are highlighted above.
-    The other 20 ASAL counties use the same live-data engine, KNBS census baselines, and NDMA/IPC drought classification.</p>
+    Every area shown here is somewhere PACIDA actually operates; nothing on this map is national context or a county PACIDA
+    doesn't work in. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what's been delivered
+    on the ground, project by project.</p>
     <div class="src-grid">
       <div class="src"><b>Live weather &amp; soil</b><span>Open-Meteo API — temperature, humidity, wind, rainfall (past 30 d + 7-d forecast), soil moisture. Refreshed every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
       <div class="src"><b>County boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source, 2023 release). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
       <div class="src"><b>Households &amp; population</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). Borena Zone figures are CSA-based projections. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
-      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for all 23 ASAL counties, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
-      <div class="src"><b>PACIDA</b><span>Pastoralist Community Initiative and Development Assistance — programme areas, annual reports. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for Marsabit, Samburu and Isiolo, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>PACIDA interventions</b><span>PACIDA's own project register and "@ A Glance" briefing — see the Impact Dashboard for the full picture. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
     </div>
   </div>
 </div>
@@ -622,19 +654,34 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </div><!-- /overlay -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="assets/boundaries.js"></script>
+<script src="assets/villages.js"></script>
+<script src="assets/interventions.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const REGIONS = %(regions_json)s;
+const PACIDA_AREA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 
 startClock();
 
-/* ================= MAP ================= */
-const {map, layersControl} = makeGlassMap([0.4, 37.9], 6);
+/* ================= MAP — framed on PACIDA's operational area ================= */
+const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s);
 const markerLayer = L.layerGroup().addTo(map);
 const labelLayer  = L.layerGroup().addTo(map);
-const shadeLayer  = L.layerGroup().addTo(map);
+const shadeLayer  = L.layerGroup();
+const outlineLayer = L.layerGroup().addTo(map);
 const markers = {};
+
+/* county/zone outlines always shown for orientation; fill shading is opt-in via the layers control */
+PACIDA_AREA_SLUGS.forEach(slug=>{
+  const geom = BOUNDARIES[slug];
+  if(!geom) return;
+  const approx = slug==="borena";
+  L.geoJSON({type:"Feature",geometry:geom},{
+    style:{color:"#FFFFFF", weight:approx?1.3:1.6, opacity:.75, dashArray:approx?"6 5":null, fillOpacity:0}
+  }).addTo(outlineLayer);
+});
 
 function drawShading(){
   shadeLayer.clearLayers();
@@ -658,8 +705,19 @@ function drawShading(){
   });
 }
 drawShading();
-layersControl.addOverlay(shadeLayer,"Intervention shading");
+
+/* intervention-density heat: the "ground surface" colour the dashboard leads with */
+const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
+const interventionLayer = L.layerGroup().addTo(map);
+PACIDA_AREA_SLUGS.forEach(slug=>{
+  drawInterventionLayer(map, slug).eachLayer(l=>interventionLayer.addLayer(l));
+  attachVillageLayer(map, slug);
+});
+
+layersControl.addOverlay(heatLayer,"Intervention density (heat)");
+layersControl.addOverlay(shadeLayer,"Drought-need shading");
 layersControl.addOverlay(markerLayer,"Household markers");
+layersControl.addOverlay(interventionLayer,"PACIDA interventions &amp; offices");
 layersControl.addOverlay(labelLayer,"County labels");
 
 function hhRadius(hh){ return Math.max(5, Math.min(20, Math.sqrt(hh)/22)); }
@@ -738,14 +796,11 @@ function renderPacidaCards(){
   });
 }
 
-/* ================= ALL-COUNTIES TABLE ================= */
-let tableFilter = "all", sortKey="need", sortDir=-1;
+/* ================= AREA COMPARISON TABLE ================= */
+let sortKey="need", sortDir=-1;
 function renderTable(){
   const tbody = document.getElementById("allBody");
-  let rows = REGIONS.filter(r=>{
-    if(tableFilter==="pacida") return r.pacida;
-    return true;
-  }).map(r=>({
+  let rows = REGIONS.map(r=>({
     id:r.id, name:r.name,
     need: r.live? r.live.need : -1,
     band: r.live? bandLabel(needBand(r.live.need)) : "…",
@@ -780,14 +835,6 @@ document.querySelectorAll("#allTable th.sortable").forEach(th=>{
   th.addEventListener("click",()=>{
     const key = th.dataset.key;
     if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
-    renderTable();
-  });
-});
-document.querySelectorAll("#filterChips .chip-filter").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll("#filterChips .chip-filter").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    tableFilter = btn.dataset.filter;
     renderTable();
   });
 });

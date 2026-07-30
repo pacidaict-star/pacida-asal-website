@@ -74,7 +74,7 @@ HTML = """<!DOCTYPE html>
     <div class="sub">PACIDA Impact Dashboard &middot; real project data, FY2010&ndash;FY2026</div>
   </div>
   <nav class="site">
-    <a href="index.html">&larr; All ASAL counties</a>
+    <a href="index.html">&larr; PACIDA's operational areas</a>
     <a href="marsabit.html">Marsabit</a>
     <a href="samburu.html">Samburu</a>
     <a href="isiolo.html">Isiolo</a>
@@ -182,6 +182,7 @@ HTML = """<!DOCTYPE html>
 </div><!-- /overlay -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="assets/boundaries.js"></script>
 <script src="assets/county_index.js"></script>
 <script src="assets/interventions.js"></script>
@@ -220,6 +221,7 @@ PACIDA_SLUGS.forEach(slug=>{
            dashArray:slug==="borena"?"6 5":null}
   }).addTo(map);
 });
+drawInterventionHeat(PACIDA_SLUGS).addTo(map);
 let currentTheme = "all";
 let markerLayer = L.layerGroup().addTo(map);
 function drawImpactMarkers(){

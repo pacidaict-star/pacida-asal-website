@@ -13,18 +13,17 @@
 </head>
 <body>
 
-<div id="map" role="application" aria-label="Map of Kenya's ASAL counties"></div>
+<div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
 
 <div class="overlay">
 
 <header class="glass">
   <div class="brand">
     <h1>Kenya <span>·</span> ASAL Climate Watch</h1>
-    <div class="sub">Kenya's 23 arid &amp; semi-arid counties + PACIDA's cross-border Borena zone · live intervention monitor</div>
+    <div class="sub">PACIDA's operational area &middot; Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
   </div>
   <nav class="site">
-    <a href="#pacida-section">PACIDA counties</a>
-    <a href="#all-section">All ASAL counties</a>
+    <a href="#pacida-section">Operational areas</a>
     <a href="impact.html">PACIDA Impact Dashboard</a>
     <a href="#about-section">About</a>
   </nav>
@@ -50,10 +49,10 @@
 <div class="gl-backdrop" id="glBackdrop"></div>
 
 <div class="strip" id="strip">
-  <div class="cell glass"><div class="k">ASAL counties monitored</div><div class="v">23<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">Kenya's NDMA-designated arid &amp; semi-arid counties, plus PACIDA's Ethiopia cross-border zone</div></div>
-  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, 23 ASAL counties</div></div>
-  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, 23 ASAL counties</div></div>
-  <div class="cell glass"><div class="k">Zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored ASAL zones</div></div>
+  <div class="cell glass"><div class="k">PACIDA operational areas</div><div class="v">3<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">Marsabit, Samburu, Isiolo counties &amp; the Borena cross-border zone</div></div>
+  <div class="cell glass"><div class="k">Kenya households</div><div class="v" id="totHH">—</div><div class="n">KNBS 2019 census, 3 counties</div></div>
+  <div class="cell glass"><div class="k">Kenya population</div><div class="v" id="totPop">—</div><div class="n">KNBS 2019 census, 3 counties</div></div>
+  <div class="cell glass"><div class="k">Zones at Alert+</div><div class="v" id="zonesAlert">—</div><div class="n">Of NDMA/IPC-monitored zones</div></div>
   <div class="cell glass"><div class="k">Avg. need index (live)</div><div class="v" id="avgNeed">—</div><div class="n">0–100 · recalculated from live weather</div></div>
   <div class="cell glass"><div class="k">Last data refresh</div><div class="v mono" id="lastRef" style="font-size:16px">—</div><div class="n">Auto-refreshes every 10 min</div></div>
 </div>
@@ -61,33 +60,29 @@
 <div class="wide" style="padding-top:0">
   <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
     <div class="map-legend glass">
-      <h4>Intervention need</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75–100)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60–74)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45–59)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0–44)</div>
-      <div class="lg-note">Shaded = county intervention level (NDMA + IPC aligned). Circle size = households. Borena boundary is approximate (dashed). Zoom in for place labels.</div>
+      <h4>Map layers</h4>
+      <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
+      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
+      <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
     </div>
   </div>
 </div>
 
 <div class="wide">
   <div class="panel glass" id="pacida-section">
-    <h2>PACIDA focus counties <span class="tag">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia)</span></h2>
-    <p>PACIDA is a Northern-Kenya/Southern-Ethiopia NGO — its actual programmes run in these four areas. They get the deepest live monitoring on this site; the other 20 ASAL counties (below) are shown for national context.</p>
+    <h2>PACIDA's operational areas <span class="tag">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia)</span></h2>
+    <p>This dashboard is scoped to where PACIDA actually works. The map above centers on these four areas and shades the
+    ground surface by intervention density &mdash; where PACIDA has done the most, and where the gaps still are.</p>
     <div class="cards-grid" id="pacidaCards"></div>
   </div>
 
-  <div class="panel glass" id="all-section">
-    <h2>All ASAL counties <span class="tag">click a county to open its full profile · live</span></h2>
-    <div class="chip-row" id="filterChips">
-      <button class="chip-filter active" data-filter="all">All 23 + Borena</button>
-      <button class="chip-filter" data-filter="pacida">PACIDA counties</button>
-    </div>
+  <div class="panel glass">
+    <h2>Compare the four areas <span class="tag">click to open its full profile · live</span></h2>
     <div class="table-scroll">
     <table class="ptable" id="allTable">
       <thead><tr>
-        <th class="sortable" data-key="name">County <span class="arrow">▾</span></th>
+        <th class="sortable" data-key="name">Area <span class="arrow">▾</span></th>
         <th class="sortable" data-key="need">Need index <span class="arrow">▾</span></th>
         <th class="sortable" data-key="band">Band <span class="arrow">▾</span></th>
         <th class="sortable" data-key="temp">Temp <span class="arrow">▾</span></th>
@@ -97,7 +92,7 @@
         <th class="sortable" data-key="poverty">Poverty <span class="arrow">▾</span></th>
         <th>Drought phase</th>
       </tr></thead>
-      <tbody id="allBody"><tr><td colspan="9" class="loading">Fetching live weather for 24 zones…</td></tr></tbody>
+      <tbody id="allBody"><tr><td colspan="9" class="loading">Fetching live weather for 4 zones…</td></tr></tbody>
     </table>
     </div>
   </div>
@@ -106,7 +101,7 @@
     <h2>Rating framework — how intervention level is decided</h2>
     <p style="margin-bottom:14px">
       The Intervention Need Index (0–100) is aligned with the frameworks used by the world's main drought and
-      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (all 23 ASAL counties covered here), the
+      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (Marsabit, Samburu and Isiolo), the
       <b>IPC</b> (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
       <b>WHO/UNICEF</b> acute-malnutrition thresholds. Live climate signals are re-scored on every refresh; structural
       indicators come from the latest published NDMA/IPC assessments.
@@ -126,18 +121,18 @@
 
   <div class="panel glass" id="about-section">
     <h2>About this project &amp; PACIDA</h2>
-    <p>This dashboard began as a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
+    <p>This dashboard is a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
     Northern-Kenya/Southern-Ethiopia NGO working across Marsabit, Samburu and Isiolo counties and the Borena Zone of southern
     Ethiopia — drought emergency response, WASH, livestock health, education access, and cross-border peace &amp; governance.
-    It now covers all 23 of Kenya's NDMA-designated arid and semi-arid (ASAL) counties, the areas where drought is the
-    dominant climate risk; PACIDA's own operational counties remain the most deeply featured and are highlighted above.
-    The other 20 ASAL counties use the same live-data engine, KNBS census baselines, and NDMA/IPC drought classification.</p>
+    Every area shown here is somewhere PACIDA actually operates; nothing on this map is national context or a county PACIDA
+    doesn't work in. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what's been delivered
+    on the ground, project by project.</p>
     <div class="src-grid">
       <div class="src"><b>Live weather &amp; soil</b><span>Open-Meteo API — temperature, humidity, wind, rainfall (past 30 d + 7-d forecast), soil moisture. Refreshed every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
       <div class="src"><b>County boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source, 2023 release). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
       <div class="src"><b>Households &amp; population</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). Borena Zone figures are CSA-based projections. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
-      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for all 23 ASAL counties, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
-      <div class="src"><b>PACIDA</b><span>Pastoralist Community Initiative and Development Assistance — programme areas, annual reports. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for Marsabit, Samburu and Isiolo, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>PACIDA interventions</b><span>PACIDA's own project register and "@ A Glance" briefing — see the Impact Dashboard for the full picture. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
     </div>
   </div>
 </div>
@@ -150,19 +145,34 @@
 </div><!-- /overlay -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="assets/boundaries.js"></script>
+<script src="assets/villages.js"></script>
+<script src="assets/interventions.js"></script>
 <script src="assets/common.js"></script>
 <script>
-const REGIONS = [{"id":"baringo","name":"Baringo County","country":"Kenya","zone":"Kenya \u00b7 Kabarnet, Marigat, Chemolingot, Kabartonjo","lat":0.4919,"lon":35.742,"households":138701,"population":666763,"povertyRate":39.6,"droughtPhase":"NDMA Alarm (localized \u2013 Tiaty/East Pokot)","staticVuln":65,"asal":true,"pacida":false,"sites":["Kabarnet","Marigat","Chemolingot","Kabartonjo","Eldama Ravine","Mogotio","Lake Bogoria"]},{"id":"borena","name":"Borena Zone","country":"Southern Ethiopia (Oromia)","zone":"Southern Ethiopia (Oromia) \u00b7 Yabelo, Moyale (ET), Mega, Dubluk","lat":4.885,"lon":38.083,"households":232000,"population":1210000,"povertyRate":78.0,"droughtPhase":"IPC Phase 2\u20133 (Stressed\u2013Crisis)","staticVuln":82,"asal":true,"pacida":true,"sites":["Yabelo","Moyale (ET)","Mega","Dubluk","Teltele","Dillo","Arero","Hidi Lola"]},{"id":"embu","name":"Embu County","country":"Kenya","zone":"Kenya \u00b7 Embu town, Runyenjes, Siakago, Kiritiri","lat":-0.531,"lon":37.45,"households":174750,"population":608599,"povertyRate":34.9,"droughtPhase":"NDMA Normal (Mbeere sub-counties only)","staticVuln":58,"asal":true,"pacida":false,"sites":["Embu town","Runyenjes","Siakago","Kiritiri","Machanga","Kiambere Dam"]},{"id":"garissa","name":"Garissa County","country":"Kenya","zone":"Kenya \u00b7 Garissa town, Dadaab, Modogashe, Balambala","lat":-0.4569,"lon":39.6583,"households":116204,"population":841353,"povertyRate":74.7,"droughtPhase":"NDMA Alarm (worsening)","staticVuln":80,"asal":true,"pacida":false,"sites":["Garissa town","Dadaab","Modogashe","Balambala","Masalani","Bura (Fafi)","Hulugho"]},{"id":"isiolo","name":"Isiolo County","country":"Kenya","zone":"Kenya \u00b7 Isiolo town, Merti, Garbatulla, Kinna","lat":0.3546,"lon":37.5822,"households":58072,"population":268002,"povertyRate":65.0,"droughtPhase":"NDMA Alert (worsening)","staticVuln":76,"asal":true,"pacida":true,"sites":["Isiolo town","Merti","Garbatulla","Kinna","Oldonyiro","Sericho","Ngare Mara"]},{"id":"kajiado","name":"Kajiado County","country":"Kenya","zone":"Kenya \u00b7 Kajiado town, Kitengela, Ongata Rongai, Namanga","lat":-1.85,"lon":36.7833,"households":313433,"population":1117840,"povertyRate":27.2,"droughtPhase":"NDMA Normal (recovering)","staticVuln":58,"asal":true,"pacida":false,"sites":["Kajiado town","Kitengela","Ongata Rongai","Namanga","Loitokitok","Magadi","Amboseli National Park"]},{"id":"kilifi","name":"Kilifi County","country":"Kenya","zone":"Kenya \u00b7 Kilifi town, Malindi, Watamu, Mtwapa","lat":-3.6305,"lon":39.8499,"households":300392,"population":1453787,"povertyRate":65.9,"droughtPhase":"NDMA Alert (hinterland wards)","staticVuln":62,"asal":true,"pacida":false,"sites":["Kilifi town","Malindi","Watamu","Mtwapa","Mariakani","Ganze","Arabuko-Sokoke Forest","Marafa"]},{"id":"kitui","name":"Kitui County","country":"Kenya","zone":"Kenya \u00b7 Kitui town, Mwingi town, Mutomo, Kyuso","lat":-1.3667,"lon":38.0167,"households":288591,"population":1136187,"povertyRate":61.4,"droughtPhase":"NDMA Alarm (localized \u2014 Mwingi North & Kitui South)","staticVuln":66,"asal":true,"pacida":false,"sites":["Kitui town","Mwingi town","Mutomo","Kyuso","Migwani","Ikutha","Zombe","Tseikuru"]},{"id":"kwale","name":"Kwale County","country":"Kenya","zone":"Kenya \u00b7 Kwale town, Diani Beach, Ukunda, Msambweni","lat":-4.1747,"lon":39.4522,"households":190554,"population":866820,"povertyRate":68.9,"droughtPhase":"NDMA Normal (coastal strip)","staticVuln":60,"asal":true,"pacida":false,"sites":["Kwale town","Diani Beach","Ukunda","Msambweni","Lunga Lunga","Kinango","Shimba Hills","Mackinnon Road"]},{"id":"laikipia","name":"Laikipia County","country":"Kenya","zone":"Kenya \u00b7 Nanyuki, Rumuruti, Nyahururu, Dol Dol","lat":0.017,"lon":37.067,"households":147347,"population":518560,"povertyRate":27.8,"droughtPhase":"NDMA Normal (localized concern in Laikipia North)","staticVuln":58,"asal":true,"pacida":false,"sites":["Nanyuki","Rumuruti","Nyahururu","Dol Dol","Ol Pejeta Conservancy","Lewa Wildlife Conservancy","Segera","Il Ngwesi"]},{"id":"lamu","name":"Lamu County","country":"Kenya","zone":"Kenya \u00b7 Lamu town, Mokowe, Mpeketoni, Hindi","lat":-2.272,"lon":40.902,"households":39554,"population":143920,"povertyRate":45.6,"droughtPhase":"NDMA Alert","staticVuln":62,"asal":true,"pacida":false,"sites":["Lamu town","Mokowe","Mpeketoni","Hindi","Faza","Kiunga","Witu","Shela"]},{"id":"makueni","name":"Makueni County","country":"Kenya","zone":"Kenya \u00b7 Wote, Kibwezi, Makindu, Sultan Hamud","lat":-1.783,"lon":37.633,"households":251391,"population":987653,"povertyRate":44.9,"droughtPhase":"NDMA Alert","staticVuln":63,"asal":true,"pacida":false,"sites":["Wote","Kibwezi","Makindu","Sultan Hamud","Kikima","Kasikeu","Kathonzweni","Nzaui"]},{"id":"mandera","name":"Mandera County","country":"Kenya","zone":"Kenya \u00b7 Mandera town, Takaba, Rhamu, El Wak","lat":3.937,"lon":41.857,"households":111809,"population":867457,"povertyRate":79.7,"droughtPhase":"NDMA Alert (worsening)","staticVuln":87,"asal":true,"pacida":false,"sites":["Mandera town","Takaba","Rhamu","El Wak","Lafey","Banissa","Border Point One"]},{"id":"marsabit","name":"Marsabit County","country":"Kenya","zone":"Kenya \u00b7 Marsabit town, Moyale, North Horr, Kalacha","lat":2.3346,"lon":37.9891,"households":77495,"population":459785,"povertyRate":83.2,"droughtPhase":"NDMA Alert (worsening)","staticVuln":88,"asal":true,"pacida":true,"sites":["Marsabit town","Moyale","North Horr","Kalacha","Maikona","Loiyangalani","Laisamis","Korr","Illeret","Sololo","Turbi"]},{"id":"meru","name":"Meru County","country":"Kenya","zone":"Kenya \u00b7 Meru town, Maua, Nkubu, Timau","lat":0.05,"lon":37.65,"households":384180,"population":1545714,"povertyRate":27.0,"droughtPhase":"NDMA Alert (localized \u2014 northern Igembe North/Tigania East belt only)","staticVuln":55,"asal":true,"pacida":false,"sites":["Meru town","Maua","Nkubu","Timau","Laare","Muthara","Kianjai"]},{"id":"narok","name":"Narok County","country":"Kenya","zone":"Kenya \u00b7 Narok town, Sekenani (Maasai Mara), Kilgoris, Ololulunga","lat":-1.0833,"lon":35.8711,"households":251834,"population":1157873,"povertyRate":44.0,"droughtPhase":"NDMA Alert (localized \u2014 Narok South & Trans Mara pastoral wards)","staticVuln":58,"asal":true,"pacida":false,"sites":["Narok town","Sekenani (Maasai Mara)","Kilgoris","Ololulunga","Ewaso Ngiro","Lolgorian","Suswa"]},{"id":"nyeri","name":"Nyeri County","country":"Kenya","zone":"Kenya \u00b7 Nyeri town, Karatina, Othaya, Naromoru","lat":-0.4197,"lon":36.9489,"households":237239,"population":759164,"povertyRate":29.1,"droughtPhase":"NDMA Normal (Kieni sub-county only classified ASAL)","staticVuln":40,"asal":true,"pacida":false,"sites":["Nyeri town","Karatina","Othaya","Naromoru","Mweiga","Mukurweini","Wamagana"]},{"id":"samburu","name":"Samburu County","country":"Kenya","zone":"Kenya \u00b7 Maralal, Baragoi, Wamba, Archer's Post","lat":1.0966,"lon":36.698,"households":65910,"population":310327,"povertyRate":71.0,"droughtPhase":"NDMA Alert","staticVuln":72,"asal":true,"pacida":true,"sites":["Maralal","Baragoi","Wamba","Archer's Post","South Horr","Suguta Marmar","Sereolipi"]},{"id":"taita-taveta","name":"Taita Taveta County","country":"Kenya","zone":"Kenya \u00b7 Voi, Wundanyi, Mwatate, Taveta","lat":-3.396,"lon":38.5567,"households":100743,"population":340671,"povertyRate":27.0,"droughtPhase":"NDMA Normal (localized stress)","staticVuln":62,"asal":true,"pacida":false,"sites":["Voi","Wundanyi","Mwatate","Taveta","Mbololo","Bura","Manyani"]},{"id":"tana-river","name":"Tana River County","country":"Kenya","zone":"Kenya \u00b7 Hola, Garsen, Bura, Madogo","lat":-1.4975,"lon":40.0296,"households":59612,"population":315943,"povertyRate":71.0,"droughtPhase":"NDMA Alarm (localized)","staticVuln":80,"asal":true,"pacida":false,"sites":["Hola","Garsen","Bura","Madogo","Kipini","Wenje","Minjila"]},{"id":"tharaka-nithi","name":"Tharaka-Nithi County","country":"Kenya","zone":"Kenya \u00b7 Chuka, Marimanti, Chogoria, Kathwana","lat":-0.3333,"lon":37.6467,"households":106264,"population":393177,"povertyRate":32.0,"droughtPhase":"NDMA Alert (Tharaka sub-county only)","staticVuln":58,"asal":true,"pacida":false,"sites":["Chuka","Marimanti","Chogoria","Kathwana","Gatunga","Igambang'ombe","Chiakariga"]},{"id":"turkana","name":"Turkana County","country":"Kenya","zone":"Kenya \u00b7 Lodwar, Kakuma, Lokichoggio, Kalokol","lat":3.1167,"lon":35.6,"households":185395,"population":926976,"povertyRate":87.5,"droughtPhase":"NDMA Alarm (Turkana North & West worst-hit)","staticVuln":92,"asal":true,"pacida":false,"sites":["Lodwar","Kakuma","Lokichoggio","Kalokol","Lokitaung","Lokichar","Kapedo","Todonyang"]},{"id":"wajir","name":"Wajir County","country":"Kenya","zone":"Kenya \u00b7 Wajir town, Habaswein, Griftu, Bute","lat":1.7471,"lon":40.0629,"households":113227,"population":781263,"povertyRate":84.0,"droughtPhase":"NDMA Alarm","staticVuln":87,"asal":true,"pacida":false,"sites":["Wajir town","Habaswein","Griftu","Bute","Tarbaj","Eldas","Buna"]},{"id":"west-pokot","name":"West Pokot County","country":"Kenya","zone":"Kenya \u00b7 Kapenguria, Sigor, Kacheliba, Alale","lat":1.2412,"lon":35.1122,"households":117215,"population":621241,"povertyRate":66.0,"droughtPhase":"NDMA Alert","staticVuln":78,"asal":true,"pacida":false,"sites":["Kapenguria","Sigor","Kacheliba","Alale","Chepareria","Ortum","Lomut"]}];
+const REGIONS = [{"id":"borena","name":"Borena Zone","country":"Southern Ethiopia (Oromia)","zone":"Southern Ethiopia (Oromia) \u00b7 Yabelo, Moyale (ET), Mega, Dubluk","lat":4.885,"lon":38.083,"households":232000,"population":1210000,"povertyRate":78.0,"droughtPhase":"IPC Phase 2\u20133 (Stressed\u2013Crisis)","staticVuln":82,"asal":true,"pacida":true,"sites":["Yabelo","Moyale (ET)","Mega","Dubluk","Teltele","Dillo","Arero","Hidi Lola"]},{"id":"isiolo","name":"Isiolo County","country":"Kenya","zone":"Kenya \u00b7 Isiolo town, Merti, Garbatulla, Kinna","lat":0.3546,"lon":37.5822,"households":58072,"population":268002,"povertyRate":65.0,"droughtPhase":"NDMA Alert (worsening)","staticVuln":76,"asal":true,"pacida":true,"sites":["Isiolo town","Merti","Garbatulla","Kinna","Oldonyiro","Sericho","Ngare Mara"]},{"id":"marsabit","name":"Marsabit County","country":"Kenya","zone":"Kenya \u00b7 Marsabit town, Moyale, North Horr, Kalacha","lat":2.3346,"lon":37.9891,"households":77495,"population":459785,"povertyRate":83.2,"droughtPhase":"NDMA Alert (worsening)","staticVuln":88,"asal":true,"pacida":true,"sites":["Marsabit town","Moyale","North Horr","Kalacha","Maikona","Loiyangalani","Laisamis","Korr","Illeret","Sololo","Turbi"]},{"id":"samburu","name":"Samburu County","country":"Kenya","zone":"Kenya \u00b7 Maralal, Baragoi, Wamba, Archer's Post","lat":1.0966,"lon":36.698,"households":65910,"population":310327,"povertyRate":71.0,"droughtPhase":"NDMA Alert","staticVuln":72,"asal":true,"pacida":true,"sites":["Maralal","Baragoi","Wamba","Archer's Post","South Horr","Suguta Marmar","Sereolipi"]}];
+const PACIDA_AREA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 
 startClock();
 
-/* ================= MAP ================= */
-const {map, layersControl} = makeGlassMap([0.4, 37.9], 6);
+/* ================= MAP — framed on PACIDA's operational area ================= */
+const {map, layersControl} = makeGlassMap([2.733, 37.8], 7);
 const markerLayer = L.layerGroup().addTo(map);
 const labelLayer  = L.layerGroup().addTo(map);
-const shadeLayer  = L.layerGroup().addTo(map);
+const shadeLayer  = L.layerGroup();
+const outlineLayer = L.layerGroup().addTo(map);
 const markers = {};
+
+/* county/zone outlines always shown for orientation; fill shading is opt-in via the layers control */
+PACIDA_AREA_SLUGS.forEach(slug=>{
+  const geom = BOUNDARIES[slug];
+  if(!geom) return;
+  const approx = slug==="borena";
+  L.geoJSON({type:"Feature",geometry:geom},{
+    style:{color:"#FFFFFF", weight:approx?1.3:1.6, opacity:.75, dashArray:approx?"6 5":null, fillOpacity:0}
+  }).addTo(outlineLayer);
+});
 
 function drawShading(){
   shadeLayer.clearLayers();
@@ -186,8 +196,19 @@ function drawShading(){
   });
 }
 drawShading();
-layersControl.addOverlay(shadeLayer,"Intervention shading");
+
+/* intervention-density heat: the "ground surface" colour the dashboard leads with */
+const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
+const interventionLayer = L.layerGroup().addTo(map);
+PACIDA_AREA_SLUGS.forEach(slug=>{
+  drawInterventionLayer(map, slug).eachLayer(l=>interventionLayer.addLayer(l));
+  attachVillageLayer(map, slug);
+});
+
+layersControl.addOverlay(heatLayer,"Intervention density (heat)");
+layersControl.addOverlay(shadeLayer,"Drought-need shading");
 layersControl.addOverlay(markerLayer,"Household markers");
+layersControl.addOverlay(interventionLayer,"PACIDA interventions &amp; offices");
 layersControl.addOverlay(labelLayer,"County labels");
 
 function hhRadius(hh){ return Math.max(5, Math.min(20, Math.sqrt(hh)/22)); }
@@ -266,14 +287,11 @@ function renderPacidaCards(){
   });
 }
 
-/* ================= ALL-COUNTIES TABLE ================= */
-let tableFilter = "all", sortKey="need", sortDir=-1;
+/* ================= AREA COMPARISON TABLE ================= */
+let sortKey="need", sortDir=-1;
 function renderTable(){
   const tbody = document.getElementById("allBody");
-  let rows = REGIONS.filter(r=>{
-    if(tableFilter==="pacida") return r.pacida;
-    return true;
-  }).map(r=>({
+  let rows = REGIONS.map(r=>({
     id:r.id, name:r.name,
     need: r.live? r.live.need : -1,
     band: r.live? bandLabel(needBand(r.live.need)) : "…",
@@ -308,14 +326,6 @@ document.querySelectorAll("#allTable th.sortable").forEach(th=>{
   th.addEventListener("click",()=>{
     const key = th.dataset.key;
     if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
-    renderTable();
-  });
-});
-document.querySelectorAll("#filterChips .chip-filter").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll("#filterChips .chip-filter").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    tableFilter = btn.dataset.filter;
     renderTable();
   });
 });
