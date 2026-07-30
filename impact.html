@@ -17,6 +17,7 @@
 
 <header class="glass">
   <div class="brand">
+    <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">PACIDA Impact Dashboard &middot; real project data, FY2010&ndash;FY2026</div>
   </div>
@@ -46,10 +47,15 @@
 
 <div class="wide" style="padding-top:22px">
   <div class="panel glass">
-    <h2>PACIDA, at a glance</h2>
-    <p>Sixteen years of continuous humanitarian and development work across Marsabit, Samburu, Isiolo and the
-    cross-border Borena Zone of southern Ethiopia &mdash; drawn directly from PACIDA's own project register and its
-    externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
+    <div class="hero-logo-row">
+      <img class="hero-logo" src="assets/pacida-logo.png" alt="PACIDA — Pastoralist Community Initiative and Development Assistance">
+      <div>
+        <h2 style="margin-bottom:6px">PACIDA, at a glance</h2>
+        <p style="margin-bottom:0">Sixteen years of continuous humanitarian and development work across Marsabit, Samburu, Isiolo and the
+        cross-border Borena Zone of southern Ethiopia &mdash; drawn directly from PACIDA's own project register and its
+        externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
+      </div>
+    </div>
     <div class="hero-stats"><div class="hs"><div class="hn">236</div><div class="hl">Real projects, FY2010–FY2026</div></div><div class="hs"><div class="hn">16</div><div class="hl">Years of continuous operation</div></div><div class="hs"><div class="hn">18</div><div class="hl">Projects active right now</div></div><div class="hs"><div class="hn">68</div><div class="hl">Donor &amp; implementing partners</div></div></div>
   </div>
 
@@ -122,7 +128,7 @@
 </div>
 
 <footer class="glass">
-  <div>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -135,7 +141,7 @@
 <script src="assets/interventions.js"></script>
 <script src="assets/common.js"></script>
 <script>
-const DONUT_DATA = [{"label":"Emergency","value":64,"color":"#E64A2E"},{"label":"Livelihood","value":54,"color":"#8FBB5F"},{"label":"Disaster Risk Reduction","value":40,"color":"#E8834A"},{"label":"Education","value":26,"color":"#F0B22E"},{"label":"WASH","value":22,"color":"#6FA3B4"},{"label":"Peace & Governance","value":11,"color":"#9C87D9"},{"label":"Climate Change","value":9,"color":"#5FBF8F"},{"label":"Health & Nutrition","value":7,"color":"#D66FB0"},{"label":"Other","value":3,"color":"#9A8F70"}];
+const DONUT_DATA = [{"label":"Emergency","value":64,"color":"#ED1C24"},{"label":"Livelihood","value":54,"color":"#34B44B"},{"label":"Disaster Risk Reduction","value":40,"color":"#E8834A"},{"label":"Education","value":26,"color":"#F0B22E"},{"label":"WASH","value":22,"color":"#6FA3B4"},{"label":"Peace & Governance","value":11,"color":"#9C87D9"},{"label":"Climate Change","value":9,"color":"#5FBF8F"},{"label":"Health & Nutrition","value":7,"color":"#D66FB0"},{"label":"Other","value":3,"color":"#9A8F70"}];
 const YEAR_DATA = [{"year":2010,"completed":1,"ongoing":0},{"year":2011,"completed":13,"ongoing":0},{"year":2012,"completed":9,"ongoing":2},{"year":2013,"completed":15,"ongoing":0},{"year":2014,"completed":4,"ongoing":0},{"year":2015,"completed":13,"ongoing":1},{"year":2016,"completed":18,"ongoing":1},{"year":2017,"completed":12,"ongoing":1},{"year":2018,"completed":9,"ongoing":0},{"year":2019,"completed":8,"ongoing":0},{"year":2020,"completed":20,"ongoing":0},{"year":2021,"completed":26,"ongoing":0},{"year":2022,"completed":31,"ongoing":2},{"year":2023,"completed":25,"ongoing":5},{"year":2024,"completed":7,"ongoing":2},{"year":2025,"completed":6,"ongoing":1},{"year":2026,"completed":1,"ongoing":3}];
 const PACIDA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 
@@ -164,7 +170,7 @@ PACIDA_SLUGS.forEach(slug=>{
   const geom = BOUNDARIES[slug];
   if(!geom) return;
   L.geoJSON({type:"Feature",geometry:geom},{
-    style:{color:"#FFFFFF",weight:1.4,opacity:.6,fillColor:"#8FBB5F",fillOpacity:.05,
+    style:{color:"#FFFFFF",weight:1.4,opacity:.6,fillColor:"#34B44B",fillOpacity:.05,
            dashArray:slug==="borena"?"6 5":null}
   }).addTo(map);
 });
@@ -194,7 +200,7 @@ function drawImpactMarkers(){
   });
 }
 drawImpactMarkers();
-document.getElementById("themeChips").innerHTML = `<button class="chip-filter active" data-theme="all">All themes</button><button class="chip-filter" data-theme="Climate Change" style="border-color:#5FBF8F">Climate Change</button><button class="chip-filter" data-theme="Disaster Risk Reduction" style="border-color:#E8834A">Disaster Risk Reduction</button><button class="chip-filter" data-theme="Education" style="border-color:#F0B22E">Education</button><button class="chip-filter" data-theme="Emergency" style="border-color:#E64A2E">Emergency</button><button class="chip-filter" data-theme="Health & Nutrition" style="border-color:#D66FB0">Health & Nutrition</button><button class="chip-filter" data-theme="Livelihood" style="border-color:#8FBB5F">Livelihood</button><button class="chip-filter" data-theme="Other" style="border-color:#9A8F70">Other</button><button class="chip-filter" data-theme="Peace & Governance" style="border-color:#9C87D9">Peace & Governance</button><button class="chip-filter" data-theme="WASH" style="border-color:#6FA3B4">WASH</button>`;
+document.getElementById("themeChips").innerHTML = `<button class="chip-filter active" data-theme="all">All themes</button><button class="chip-filter" data-theme="Climate Change" style="border-color:#5FBF8F">Climate Change</button><button class="chip-filter" data-theme="Disaster Risk Reduction" style="border-color:#E8834A">Disaster Risk Reduction</button><button class="chip-filter" data-theme="Education" style="border-color:#F0B22E">Education</button><button class="chip-filter" data-theme="Emergency" style="border-color:#ED1C24">Emergency</button><button class="chip-filter" data-theme="Health & Nutrition" style="border-color:#D66FB0">Health & Nutrition</button><button class="chip-filter" data-theme="Livelihood" style="border-color:#34B44B">Livelihood</button><button class="chip-filter" data-theme="Other" style="border-color:#9A8F70">Other</button><button class="chip-filter" data-theme="Peace & Governance" style="border-color:#9C87D9">Peace & Governance</button><button class="chip-filter" data-theme="WASH" style="border-color:#6FA3B4">WASH</button>`;
 document.querySelectorAll("#themeChips .chip-filter").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll("#themeChips .chip-filter").forEach(b=>b.classList.remove("active"));

@@ -70,6 +70,7 @@ HTML = """<!DOCTYPE html>
 
 <header class="glass">
   <div class="brand">
+    <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">PACIDA Impact Dashboard &middot; real project data, FY2010&ndash;FY2026</div>
   </div>
@@ -99,10 +100,15 @@ HTML = """<!DOCTYPE html>
 
 <div class="wide" style="padding-top:22px">
   <div class="panel glass">
-    <h2>PACIDA, at a glance</h2>
-    <p>Sixteen years of continuous humanitarian and development work across Marsabit, Samburu, Isiolo and the
-    cross-border Borena Zone of southern Ethiopia &mdash; drawn directly from PACIDA's own project register and its
-    externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
+    <div class="hero-logo-row">
+      <img class="hero-logo" src="assets/pacida-logo.png" alt="PACIDA — Pastoralist Community Initiative and Development Assistance">
+      <div>
+        <h2 style="margin-bottom:6px">PACIDA, at a glance</h2>
+        <p style="margin-bottom:0">Sixteen years of continuous humanitarian and development work across Marsabit, Samburu, Isiolo and the
+        cross-border Borena Zone of southern Ethiopia &mdash; drawn directly from PACIDA's own project register and its
+        externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
+      </div>
+    </div>
     <div class="hero-stats">%(hero_stats)s</div>
   </div>
 
@@ -175,7 +181,7 @@ HTML = """<!DOCTYPE html>
 </div>
 
 <footer class="glass">
-  <div>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -217,7 +223,7 @@ PACIDA_SLUGS.forEach(slug=>{
   const geom = BOUNDARIES[slug];
   if(!geom) return;
   L.geoJSON({type:"Feature",geometry:geom},{
-    style:{color:"#FFFFFF",weight:1.4,opacity:.6,fillColor:"#8FBB5F",fillOpacity:.05,
+    style:{color:"#FFFFFF",weight:1.4,opacity:.6,fillColor:"#34B44B",fillOpacity:.05,
            dashArray:slug==="borena"?"6 5":null}
   }).addTo(map);
 });

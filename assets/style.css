@@ -1,8 +1,9 @@
 :root{
   --bg:#16130D; --panel:#1F1B12; --panel-2:#262115; --line:#4A4230;
   --text:#FBF7EC; --muted:#C6BB9A; --faint:#A0956F;
-  --normal:#8FBB5F; --alert:#F0B22E; --alarm:#E8834A; --emergency:#E64A2E;
+  --normal:#34B44B; --alert:#F0B22E; --alarm:#E8834A; --emergency:#ED1C24;
   --water:#6FA3B4; --radius:10px;
+  --pacida-green:#34B44B; --pacida-red:#ED1C24; --pacida-green-dark:#0C6B2E;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -26,7 +27,8 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
 
 /* header + nav */
 header{padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:1200;border-radius:0 0 14px 14px}
-.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand-logo{height:34px;width:auto;display:block;flex:none}
 .brand h1{font-family:'Barlow Condensed';font-weight:700;font-size:24px;letter-spacing:.08em;text-transform:uppercase}
 .brand h1 a{color:inherit;text-decoration:none}
 .brand h1 span{color:var(--alert)}
@@ -106,7 +108,9 @@ main{max-width:1440px;margin:0 auto;padding:22px;display:grid;grid-template-colu
 .src span{color:var(--muted)}
 .src a{color:var(--alert);text-decoration:none}
 .src a:hover{text-decoration:underline}
-footer{margin:22px;border-radius:12px;padding:16px 22px;color:var(--muted);font-size:12px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between}
+footer{margin:22px;border-radius:12px;padding:16px 22px;color:var(--muted);font-size:12px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+footer .foot-brand{display:flex;align-items:center;gap:10px}
+footer .brand-logo{height:24px}
 
 /* tables */
 .ptable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
@@ -236,7 +240,7 @@ details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
 .hist-cap{font-size:12px;color:var(--faint);margin-top:6px}
 
 /* PACIDA interventions */
-.office-pin{color:var(--alert);font-size:18px;text-shadow:0 0 4px #000,0 0 8px #000;line-height:1}
+.office-pin{color:var(--pacida-red);font-size:18px;text-shadow:0 0 3px #000,0 0 7px #000,0 0 2px #fff;line-height:1}
 .interv-list{display:flex;flex-direction:column;gap:2px;margin-top:10px;max-height:420px;overflow-y:auto}
 .interv-row{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}
 .interv-dot-sw{width:10px;height:10px;border-radius:50%;flex:none;margin-top:4px}
@@ -264,6 +268,8 @@ details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
 .legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
 .legend-sw{width:10px;height:10px;border-radius:50%;flex:none}
+.hero-logo-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.hero-logo{height:64px;width:auto;flex:none}
 .hero-stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:14px}
 .hero-stats .hs{text-align:left}
 .hero-stats .hn{font-family:'IBM Plex Mono';font-size:30px;font-weight:700;color:var(--text)}
@@ -282,7 +288,7 @@ button.chip-filter:hover{color:var(--text);border-color:var(--muted)}
 button.chip-filter.active{background:var(--alert);color:#0A0805;border-color:var(--alert)}
 .ptable tr.row-link{cursor:pointer}
 .ptable tr.row-link:hover td{background:rgba(240,178,46,.08)}
-.pacida-tag{display:inline-block;margin-left:6px;font-size:9.5px;padding:1px 6px;border-radius:3px;background:var(--water);color:#0A0805;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.06em;vertical-align:1px}
+.pacida-tag{display:inline-block;margin-left:6px;font-size:9.5px;padding:1px 6px;border-radius:3px;background:var(--pacida-green);color:#08210F;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.06em;vertical-align:1px}
 
 @media(max-width:640px){.search-wrap input{width:130px}}
 @media(prefers-reduced-motion:reduce){.dot,.tl.now:before{animation:none}.gauge-marker{transition:none}.halo-pulse{animation:none !important}}

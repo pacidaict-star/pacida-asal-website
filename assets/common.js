@@ -1,7 +1,7 @@
 /* Kenya ASAL Climate Watch — shared engine
    Live data: Open-Meteo API (no key). Need index aligned to NDMA / IPC / WHO frameworks. */
 
-const PHASE_COLORS = { critical:"#E64A2E", high:"#E8834A", elevated:"#F0B22E", watch:"#8FBB5F" };
+const PHASE_COLORS = { critical:"#ED1C24", high:"#E8834A", elevated:"#F0B22E", watch:"#34B44B" };
 function needBand(v){ return v>=75?"critical":v>=60?"high":v>=45?"elevated":"watch"; }
 function bandLabel(b){ return {critical:"Critical",high:"High",elevated:"Elevated",watch:"Watch"}[b]; }
 const fmt = n => n.toLocaleString("en-KE");
@@ -272,7 +272,7 @@ function drawInterventionHeat(slugs){
   }
   return L.heatLayer(pts, {
     radius: 70, blur: 55, max: 6, minOpacity: 0.42,
-    gradient: {0.05:"#1F5E52", 0.25:"#2A6F63", 0.45:"#6FA3B4", 0.65:"#8FBB5F", 0.82:"#F0B22E", 1.0:"#E64A2E"}
+    gradient: {0.05:"#1F5E52", 0.25:"#2A6F63", 0.45:"#6FA3B4", 0.65:"#34B44B", 0.82:"#F0B22E", 1.0:"#ED1C24"}
   });
 }
 function renderInterventionList(containerId, slug){

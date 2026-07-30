@@ -194,6 +194,7 @@ TEMPLATE = """<!DOCTYPE html>
 
 <header class="glass">
   <div class="brand">
+    <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">%(title)s &middot; %(country)s</div>
   </div>
@@ -314,7 +315,7 @@ TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <footer class="glass">
-  <div>Kenya ASAL Climate Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -528,6 +529,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 
 <header class="glass">
   <div class="brand">
+    <img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA">
     <h1>Kenya <span>·</span> ASAL Climate Watch</h1>
     <div class="sub">PACIDA's operational area &middot; Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
   </div>
@@ -647,7 +649,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <footer class="glass">
-  <div>Kenya ASAL Climate Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 

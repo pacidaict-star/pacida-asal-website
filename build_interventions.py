@@ -44,7 +44,7 @@ for name in wb.sheetnames:
 
 # ---------- 2. normalize thematic category ----------
 THEME_MAP = [
-    (r"emergency|humanitarian", "Emergency", "#E64A2E"),
+    (r"emergency|humanitarian", "Emergency", "#ED1C24"),
     (r"anticipatory", "Disaster Risk Reduction", "#E8834A"),
     (r"disaster risk|\bdrr\b", "Disaster Risk Reduction", "#E8834A"),
     (r"wash", "WASH", "#6FA3B4"),
@@ -52,7 +52,7 @@ THEME_MAP = [
     (r"education", "Education", "#F0B22E"),
     (r"climate", "Climate Change", "#5FBF8F"),
     (r"peace|governance|conflict", "Peace & Governance", "#9C87D9"),
-    (r"livelihood|livestock", "Livelihood", "#8FBB5F"),
+    (r"livelihood|livestock", "Livelihood", "#34B44B"),
 ]
 def normalize_theme(raw_theme):
     t = (raw_theme or "").lower()
