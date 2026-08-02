@@ -4,14 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Samburu County — Kenya ASAL Climate Watch</title>
+<meta name="description" content="A transition county between the central highlands and the northern deserts — 92% classified ASAL. From the Lorroki plateau and Kirisia forests around…">
+<meta name="theme-color" content="#34B44B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Samburu County — Kenya ASAL Climate Watch">
+<meta property="og:description" content="A transition county between the central highlands and the northern deserts — 92% classified ASAL. From the Lorroki plateau and Kirisia forests around…">
+<meta property="og:url" content="https://pacidaict-star.github.io/pacida-asal-website/samburu.html">
+<meta property="og:image" content="https://pacidaict-star.github.io/pacida-asal-website/assets/favicon-512.png">
+<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Samburu County — Kenya ASAL Climate Watch">
+<meta name="twitter:description" content="A transition county between the central highlands and the northern deserts — 92% classified ASAL. From the Lorroki plateau and Kirisia forests around…">
+<meta name="twitter:image" content="https://pacidaict-star.github.io/pacida-asal-website/assets/favicon-512.png">
+<link rel="canonical" href="https://pacidaict-star.github.io/pacida-asal-website/samburu.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%87%B0%F0%9F%87%AA%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div id="map" role="application" aria-label="Aerial map of Samburu County"></div>
 
@@ -29,7 +45,7 @@
       <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
       <div class="search-results" id="searchResults"></div>
     </div>
-    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
+    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live &middot; Open-Meteo</span></div>
     <div class="clock mono" id="clock">--:--:-- EAT</div>
     <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
     <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
@@ -54,7 +70,8 @@
   <div class="cell glass"><div class="k">Drought phase</div><div class="v" style="font-size:15px;font-family:'Archivo'">NDMA Alert</div><div class="n">Poverty 71.0%</div></div>
 </div>
 
-<main>
+<main id="main-content">
+<div class="hero-grid">
   <div class="map-window">
     <div class="map-legend glass">
       <h4>Monitoring sites</h4>
@@ -80,7 +97,7 @@
       <div class="spark"><div class="mk">Rainfall &mdash; past 14 d &amp; next 7 d forecast (mm/day)</div><div id="hqSpark"></div></div>
     </div>
   </div>
-</main>
+</div>
 
 <div class="wide">
 
@@ -138,6 +155,7 @@
     </div>
   </div>
 </div>
+</main>
 
 <footer class="glass">
   <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; Samburu County detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</span></div>

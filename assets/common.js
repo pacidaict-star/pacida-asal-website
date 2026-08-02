@@ -110,14 +110,45 @@ function attachGlossary(){
   const search = panel.querySelector(".gl-search");
   const closeBtn = panel.querySelector(".gl-close");
   const backdrop = document.getElementById("glBackdrop");
-  btn.addEventListener("click", ()=>{ panel.classList.toggle("open"); if(panel.classList.contains("open")) search.focus(); });
-  closeBtn.addEventListener("click", ()=>panel.classList.remove("open"));
-  if(backdrop) backdrop.addEventListener("click", ()=>panel.classList.remove("open"));
+  btn.setAttribute("aria-expanded","false");
+  panel.setAttribute("role","dialog");
+  panel.setAttribute("aria-modal","false");
+  panel.setAttribute("aria-label","Glossary of terms");
+  function open(){
+    panel.classList.add("open"); btn.setAttribute("aria-expanded","true");
+    search.focus();
+  }
+  function close(){
+    panel.classList.remove("open"); btn.setAttribute("aria-expanded","false");
+    btn.focus();
+  }
+  btn.addEventListener("click", ()=>{ panel.classList.contains("open") ? close() : open(); });
+  closeBtn.addEventListener("click", close);
+  if(backdrop) backdrop.addEventListener("click", close);
   search.addEventListener("input", ()=>{
     const q = search.value.toLowerCase();
     body.querySelectorAll(".gl-item").forEach(el=>{ el.style.display = el.textContent.toLowerCase().includes(q) ? "" : "none"; });
   });
-  document.addEventListener("keydown", e=>{ if(e.key==="Escape") panel.classList.remove("open"); });
+  panel.addEventListener("keydown", e=>{
+    if(e.key==="Escape"){ close(); return; }
+    if(e.key!=="Tab") return;
+    const focusables = panel.querySelectorAll('button, input, [href]');
+    const first = focusables[0], last = focusables[focusables.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
+}
+
+/* ---------- keyboard-accessible sortable table headers ---------- */
+function wireSortableHeaders(selector, onActivate){
+  document.querySelectorAll(selector).forEach(th=>{
+    th.setAttribute("tabindex","0");
+    th.setAttribute("aria-sort","none");
+    th.addEventListener("click", ()=>onActivate(th));
+    th.addEventListener("keydown", e=>{
+      if(e.key==="Enter" || e.key===" "){ e.preventDefault(); onActivate(th); }
+    });
+  });
 }
 
 /* ---------- CSV export ---------- */
@@ -134,31 +165,61 @@ function downloadCSV(filename, rows){
   URL.revokeObjectURL(url);
 }
 
-/* ---------- quick search / jump ---------- */
+/* ---------- quick search / jump — accessible combobox/listbox pattern ---------- */
 function attachSearch(getItems, onSelect){
   const input = document.getElementById("searchBox"), list = document.getElementById("searchResults");
   if(!input || !list) return;
+  input.setAttribute("role","combobox");
+  input.setAttribute("aria-autocomplete","list");
+  input.setAttribute("aria-expanded","false");
+  input.setAttribute("aria-controls","searchResults");
+  list.setAttribute("role","listbox");
+  let activeIndex = -1;
+
+  function paintActive(){
+    list.querySelectorAll(".sr-item").forEach((el,i)=>{
+      const on = i===activeIndex;
+      el.classList.toggle("active", on);
+      el.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    input.setAttribute("aria-activedescendant", activeIndex>=0 ? "sr-item-"+activeIndex : "");
+  }
+  function close(){
+    list.style.display = "none";
+    input.setAttribute("aria-expanded","false");
+    activeIndex = -1;
+  }
   function render(q){
     const ql = q.trim().toLowerCase();
     const matches = ql ? getItems().filter(it=>it.label.toLowerCase().includes(ql)).slice(0,8) : [];
-    list.innerHTML = matches.map((m,i)=>`<div class="sr-item" data-i="${i}">${m.label}</div>`).join("");
+    list.innerHTML = matches.map((m,i)=>
+      `<div class="sr-item" id="sr-item-${i}" role="option" aria-selected="false" data-i="${i}">${m.label}</div>`
+    ).join("");
     list._matches = matches;
+    activeIndex = matches.length ? 0 : -1;
+    paintActive();
     list.style.display = matches.length ? "block" : "none";
+    input.setAttribute("aria-expanded", matches.length ? "true" : "false");
+  }
+  function select(i){
+    const m = list._matches && list._matches[i];
+    if(!m) return;
+    onSelect(m); close(); input.value=""; input.blur();
   }
   input.addEventListener("input", ()=>render(input.value));
   input.addEventListener("focus", ()=>render(input.value));
   input.addEventListener("keydown", e=>{
-    if(e.key==="Enter"){
-      const m = list._matches && list._matches[0];
-      if(m){ onSelect(m); list.style.display="none"; input.value=""; input.blur(); }
-    } else if(e.key==="Escape"){ list.style.display="none"; input.blur(); }
+    const n = (list._matches||[]).length;
+    if(e.key==="ArrowDown"){ if(n){ e.preventDefault(); activeIndex=(activeIndex+1)%n; paintActive(); } }
+    else if(e.key==="ArrowUp"){ if(n){ e.preventDefault(); activeIndex=(activeIndex-1+n)%n; paintActive(); } }
+    else if(e.key==="Enter"){ if(activeIndex>=0){ e.preventDefault(); select(activeIndex); } }
+    else if(e.key==="Escape"){ close(); input.blur(); }
   });
   list.addEventListener("click", e=>{
     const row = e.target.closest(".sr-item"); if(!row) return;
-    const m = list._matches[+row.dataset.i];
-    onSelect(m); list.style.display="none"; input.value="";
+    select(+row.dataset.i);
   });
-  document.addEventListener("click", e=>{ if(!e.target.closest(".search-wrap")) list.style.display="none"; });
+  document.addEventListener("click", e=>{ if(!e.target.closest(".search-wrap")) close(); });
 }
 
 /* ---------- 12-month rainfall history (Open-Meteo archive, no key) ---------- */

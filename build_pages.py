@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
-import json, math, os
+import json, math, os, re
 
 SITE = os.path.dirname(os.path.abspath(__file__))
+BASE_URL = "https://pacidaict-star.github.io/pacida-asal-website/"
 
 PACIDA_SLUGS = {"marsabit", "samburu", "isiolo", "borena"}
+
+
+def meta_desc(text, limit=155):
+    text = re.sub(r"<[^>]+>", "", text).replace("&mdash;", "—").replace("&amp;", "&").replace("&nbsp;", " ")
+    text = re.sub(r"&\w+;", "", text)
+    if len(text) <= limit:
+        return text
+    cut = text[:limit].rsplit(" ", 1)[0]
+    return cut + "…"
 
 COUNTIES = json.load(open(os.path.join(SITE, "counties.json"), encoding="utf-8"))
 BOUNDARIES_ALL = json.load(open(os.path.join(SITE, "assets", "boundaries.json"), encoding="utf-8"))
@@ -169,7 +179,8 @@ def page(rid, r):
         sub_rows=sub_rows, subnote=subnote, lz_rows=lz_rows, sectors=sect,
         seasoncal=seasoncal(), timeline_panel=timeline_panel, pacida_panel=pacida_panel,
         sources_pacida=sources_pacida, sites_json=sites_json,
-        interv_panel=interv_panel, interventions_js=interventions_js
+        interv_panel=interv_panel, interventions_js=interventions_js,
+        meta_desc=meta_desc(r["intro"]), canonical_url=BASE_URL + rid + ".html", base_url=BASE_URL
     )
 
 
@@ -179,14 +190,30 @@ TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>%(title)s — Kenya ASAL Climate Watch</title>
+<meta name="description" content="%(meta_desc)s">
+<meta name="theme-color" content="#34B44B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="%(title)s — Kenya ASAL Climate Watch">
+<meta property="og:description" content="%(meta_desc)s">
+<meta property="og:url" content="%(canonical_url)s">
+<meta property="og:image" content="%(base_url)sassets/favicon-512.png">
+<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="%(title)s — Kenya ASAL Climate Watch">
+<meta name="twitter:description" content="%(meta_desc)s">
+<meta name="twitter:image" content="%(base_url)sassets/favicon-512.png">
+<link rel="canonical" href="%(canonical_url)s">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%%3E%%3Ctext y='.9em' font-size='90'%%3E%%F0%%9F%%87%%B0%%F0%%9F%%87%%AA%%3C/text%%3E%%3C/svg%%3E">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div id="map" role="application" aria-label="Aerial map of %(title)s"></div>
 
@@ -204,7 +231,7 @@ TEMPLATE = """<!DOCTYPE html>
       <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
       <div class="search-results" id="searchResults"></div>
     </div>
-    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live &middot; Open-Meteo</span></div>
+    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live &middot; Open-Meteo</span></div>
     <div class="clock mono" id="clock">--:--:-- EAT</div>
     <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
     <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
@@ -229,7 +256,8 @@ TEMPLATE = """<!DOCTYPE html>
   <div class="cell glass"><div class="k">Drought phase</div><div class="v" style="font-size:15px;font-family:'Archivo'">%(phase)s</div><div class="n">Poverty %(poverty)s%%</div></div>
 </div>
 
-<main>
+<main id="main-content">
+<div class="hero-grid">
   <div class="map-window">
     <div class="map-legend glass">
       <h4>Monitoring sites</h4>
@@ -255,7 +283,7 @@ TEMPLATE = """<!DOCTYPE html>
       <div class="spark"><div class="mk">Rainfall &mdash; past 14 d &amp; next 7 d forecast (mm/day)</div><div id="hqSpark"></div></div>
     </div>
   </div>
-</main>
+</div>
 
 <div class="wide">
 
@@ -313,6 +341,7 @@ TEMPLATE = """<!DOCTYPE html>
     </div>
   </div>
 </div>
+</main>
 
 <footer class="glass">
   <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</span></div>
@@ -502,7 +531,7 @@ def build_index():
     lean.sort(key=lambda r: r["name"])
     out = INDEX_TEMPLATE % dict(
         regions_json=json.dumps(lean, separators=(",", ":")),
-        center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM
+        center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM, base_url=BASE_URL
     )
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
     print("index.html", len(out), "bytes")
@@ -514,14 +543,30 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kenya ASAL Climate Watch — Live County Dashboard</title>
+<meta name="description" content="Live drought and climate intervention dashboard for PACIDA's operational area — Marsabit, Samburu and Isiolo counties in Kenya, and the cross-border Borena Zone of southern Ethiopia.">
+<meta name="theme-color" content="#34B44B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kenya ASAL Climate Watch — Live County Dashboard">
+<meta property="og:description" content="Live drought and climate intervention dashboard for PACIDA's operational area — Marsabit, Samburu and Isiolo counties in Kenya, and the cross-border Borena Zone of southern Ethiopia.">
+<meta property="og:url" content="%(base_url)s">
+<meta property="og:image" content="%(base_url)sassets/favicon-512.png">
+<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kenya ASAL Climate Watch — Live County Dashboard">
+<meta name="twitter:description" content="Live drought and climate intervention dashboard for PACIDA's operational area in northern Kenya and southern Ethiopia.">
+<meta name="twitter:image" content="%(base_url)sassets/favicon-512.png">
+<link rel="canonical" href="%(base_url)s">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,%%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%%3E%%3Ctext y='.9em' font-size='90'%%3E%%F0%%9F%%87%%B0%%F0%%9F%%87%%AA%%3C/text%%3E%%3C/svg%%3E">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
 
@@ -543,7 +588,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
       <input type="text" id="searchBox" placeholder="Jump to a county…" aria-label="Search counties">
       <div class="search-results" id="searchResults"></div>
     </div>
-    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState">Live · Open-Meteo feed</span></div>
+    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live · Open-Meteo feed</span></div>
     <div class="clock mono" id="clock">--:--:-- EAT</div>
     <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">°C · mm</button>
     <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
@@ -568,6 +613,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   <div class="cell glass"><div class="k">Last data refresh</div><div class="v mono" id="lastRef" style="font-size:16px">—</div><div class="n">Auto-refreshes every 10 min</div></div>
 </div>
 
+<main id="main-content">
 <div class="wide" style="padding-top:0">
   <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
     <div class="map-legend glass">
@@ -647,6 +693,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     </div>
   </div>
 </div>
+</main>
 
 <footer class="glass">
   <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</span></div>
@@ -815,7 +862,7 @@ function renderTable(){
     return sortDir*((av??-1)-(bv??-1));
   });
   tbody.innerHTML = rows.map(r=>`<tr class="row-link" data-id="${r.id}">
-    <td><b>${r.name}</b>${r.pacida?'<span class="pacida-tag">PACIDA</span>':''}</td>
+    <td><a class="row-name-link" href="${r.id}.html"><b>${r.name}</b></a>${r.pacida?'<span class="pacida-tag">PACIDA</span>':''}</td>
     <td class="mono">${r.need>=0?r.need:"…"}</td>
     <td>${r.band}</td>
     <td class="mono">${r.temp!=null?fmtTemp(r.temp):"…"}</td>
@@ -826,19 +873,19 @@ function renderTable(){
     <td>${r.phase}</td>
   </tr>`).join("");
   tbody.querySelectorAll("tr.row-link").forEach(tr=>{
-    tr.addEventListener("click", ()=>{ window.location.href = tr.dataset.id + ".html"; });
+    tr.addEventListener("click", e=>{ if(e.target.closest("a")) return; window.location.href = tr.dataset.id + ".html"; });
   });
   document.querySelectorAll("#allTable th.sortable").forEach(th=>{
-    th.classList.toggle("active", th.dataset.key===sortKey);
-    th.querySelector(".arrow").textContent = th.dataset.key===sortKey ? (sortDir===1?"▴":"▾") : "▾";
+    const active = th.dataset.key===sortKey;
+    th.classList.toggle("active", active);
+    th.querySelector(".arrow").textContent = active ? (sortDir===1?"▴":"▾") : "▾";
+    th.setAttribute("aria-sort", active ? (sortDir===1?"ascending":"descending") : "none");
   });
 }
-document.querySelectorAll("#allTable th.sortable").forEach(th=>{
-  th.addEventListener("click",()=>{
-    const key = th.dataset.key;
-    if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
-    renderTable();
-  });
+wireSortableHeaders("#allTable th.sortable", th=>{
+  const key = th.dataset.key;
+  if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
+  renderTable();
 });
 
 /* ================= UNITS, GLOSSARY, SEARCH, EXPORT ================= */

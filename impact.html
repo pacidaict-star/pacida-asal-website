@@ -4,14 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PACIDA Impact Dashboard — Kenya ASAL Climate Watch</title>
+<meta name="description" content="236 real PACIDA projects, FY2010–FY2026, across Marsabit, Samburu, Isiolo and the Borena Zone — drawn directly from PACIDA's own project register, not modelled or estimated.">
+<meta name="theme-color" content="#34B44B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PACIDA Impact Dashboard — Kenya ASAL Climate Watch">
+<meta property="og:description" content="236 real PACIDA projects, FY2010–FY2026, across Marsabit, Samburu, Isiolo and the Borena Zone — drawn directly from PACIDA's own project register, not modelled or estimated.">
+<meta property="og:url" content="https://pacidaict-star.github.io/pacida-asal-website/impact.html">
+<meta property="og:image" content="https://pacidaict-star.github.io/pacida-asal-website/assets/favicon-512.png">
+<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PACIDA Impact Dashboard">
+<meta name="twitter:description" content="236 real PACIDA projects, FY2010–FY2026, across Marsabit, Samburu, Isiolo and the Borena Zone.">
+<meta name="twitter:image" content="https://pacidaict-star.github.io/pacida-asal-website/assets/favicon-512.png">
+<link rel="canonical" href="https://pacidaict-star.github.io/pacida-asal-website/impact.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%87%B0%F0%9F%87%AA%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div class="overlay">
 
@@ -45,6 +61,7 @@
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
 
+<main id="main-content">
 <div class="wide" style="padding-top:22px">
   <div class="panel glass">
     <div class="hero-logo-row">
@@ -126,6 +143,7 @@
     </div>
   </div>
 </div>
+</main>
 
 <footer class="glass">
   <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</span></div>
@@ -226,16 +244,16 @@ function renderProjTable(){
     <td><span class="${p.status==='ongoing'?'status-ongoing':'status-done'}">${p.status==='ongoing'?'Ongoing':'Completed'}</span></td>
   </tr>`).join("");
   document.querySelectorAll("#projTable th.sortable").forEach(th=>{
-    th.classList.toggle("active", th.dataset.key===sortKey);
-    th.querySelector(".arrow").textContent = th.dataset.key===sortKey ? (sortDir===1?"▴":"▾") : "▾";
+    const active = th.dataset.key===sortKey;
+    th.classList.toggle("active", active);
+    th.querySelector(".arrow").textContent = active ? (sortDir===1?"▴":"▾") : "▾";
+    th.setAttribute("aria-sort", active ? (sortDir===1?"ascending":"descending") : "none");
   });
 }
-document.querySelectorAll("#projTable th.sortable").forEach(th=>{
-  th.addEventListener("click",()=>{
-    const key = th.dataset.key;
-    if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
-    renderProjTable();
-  });
+wireSortableHeaders("#projTable th.sortable", th=>{
+  const key = th.dataset.key;
+  if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
+  renderProjTable();
 });
 renderProjTable();
 
