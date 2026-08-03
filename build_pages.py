@@ -529,8 +529,10 @@ def build_index():
             sites=[s[0] for s in r["sites"]]
         ))
     lean.sort(key=lambda r: r["name"])
+    updates = [[yr, tx, len(item) > 2] for item in DROUGHT_TIMELINE for yr, tx in [item[:2]]]
     out = INDEX_TEMPLATE % dict(
         regions_json=json.dumps(lean, separators=(",", ":")),
+        updates_json=json.dumps(updates, separators=(",", ":")),
         center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM, base_url=BASE_URL
     )
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
@@ -614,6 +616,43 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <main id="main-content">
+
+<div class="entry-grid" style="padding-top:22px">
+  <div class="entry-card glass current">
+    <span class="entry-eyebrow">01 &middot; You are here</span>
+    <h3>Live Intervention Map</h3>
+    <p>Real-time weather, drought-need scoring and PACIDA's intervention footprint across all four operational areas.</p>
+  </div>
+  <a class="entry-card glass" href="impact.html">
+    <span class="entry-eyebrow">02</span>
+    <h3>PACIDA Impact Dashboard<span class="arrow-mark">&rarr;</span></h3>
+    <p>236 real projects, FY2010&ndash;FY2026 &mdash; donors, themes, achievements and where the work has actually happened.</p>
+  </a>
+  <a class="entry-card glass" href="#about-section">
+    <span class="entry-eyebrow">03</span>
+    <h3>About &amp; Methodology<span class="arrow-mark">&rarr;</span></h3>
+    <p>How the Need Index is calculated, where the data comes from, and PACIDA's role in this project.</p>
+  </a>
+</div>
+
+<div class="wide" style="padding-top:0">
+  <div class="panel glass">
+    <h2>Latest updates <span class="tag">drought &amp; recovery timeline</span></h2>
+    <div class="updates-carousel" id="updatesCarousel" role="region" aria-roledescription="carousel" aria-label="Latest updates" tabindex="0">
+      <button class="uc-nav uc-prev" type="button" aria-label="Previous update">&larr;</button>
+      <div class="uc-slide" id="ucSlide">
+        <div class="uc-year"></div>
+        <div class="uc-text"></div>
+      </div>
+      <button class="uc-nav uc-next" type="button" aria-label="Next update">&rarr;</button>
+    </div>
+    <div class="uc-foot">
+      <div class="uc-dots" id="ucDots"></div>
+      <button class="uc-pause" id="ucPause" type="button" aria-pressed="false">Pause auto-advance</button>
+    </div>
+  </div>
+</div>
+
 <div class="wide" style="padding-top:0">
   <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
     <div class="map-legend glass">
@@ -675,6 +714,16 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
         <tr><td><span class="chip" style="background:var(--emergency)"></span>Critical</td><td class="mono">75–100</td><td>Emergency</td><td>Phase 4 · Emergency</td><td>Full humanitarian response: relief food, therapeutic nutrition (SAM), emergency water, destocking</td></tr>
       </tbody>
     </table>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Key resources</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="impact.html"><b>PACIDA Impact Dashboard</b><span>236 real projects, FY2010&ndash;FY2026 &mdash; donors, themes, achievements.</span></a>
+      <button class="resource-card" type="button" id="resGlossaryBtn"><b>Glossary of terms</b><span>Plain-language decoder for NDMA, IPC, ASAL and local terms.</span></button>
+      <a class="resource-card" href="#about-section"><b>Rating framework &amp; methodology</b><span>How the 0&ndash;100 Need Index is calculated and where the data comes from.</span></a>
+      <a class="resource-card" href="https://pacida.org" target="_blank" rel="noopener"><b>PACIDA official site<span class="ext-mark">&#8599;</span></b><span>Programme pages, annual reports and contact information.</span></a>
     </div>
   </div>
 
@@ -913,6 +962,52 @@ document.getElementById("exportBtn").addEventListener("click", ()=>{
   });
   downloadCSV("kenya-climate-watch-live-readings.csv", rows);
 });
+document.getElementById("resGlossaryBtn").addEventListener("click", ()=>document.getElementById("glossaryBtn").click());
+
+/* ================= LATEST UPDATES CAROUSEL ================= */
+(function(){
+  const UPDATES = %(updates_json)s; /* [year, text, isNow] */
+  const slide = document.getElementById("ucSlide");
+  const dotsWrap = document.getElementById("ucDots");
+  const carousel = document.getElementById("updatesCarousel");
+  const pauseBtn = document.getElementById("ucPause");
+  let idx = UPDATES.findIndex(u=>u[2]); if(idx<0) idx = UPDATES.length-1;
+  let timer = null;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function render(){
+    const [yr, tx, isNow] = UPDATES[idx];
+    slide.querySelector(".uc-year").innerHTML = yr + (isNow ? ' <span class="now-badge">Now</span>' : "");
+    slide.querySelector(".uc-text").innerHTML = tx;
+    dotsWrap.querySelectorAll(".uc-dot").forEach((d,i)=>{
+      d.classList.toggle("active", i===idx);
+      d.setAttribute("aria-current", i===idx ? "true" : "false");
+    });
+  }
+  dotsWrap.innerHTML = UPDATES.map((_,i)=>`<button class="uc-dot" type="button" aria-label="Update ${i+1} of ${UPDATES.length}"></button>`).join("");
+  dotsWrap.querySelectorAll(".uc-dot").forEach((d,i)=>d.addEventListener("click",()=>{ idx=i; render(); restart(); }));
+  document.querySelector(".uc-prev").addEventListener("click", ()=>{ idx=(idx-1+UPDATES.length)%%UPDATES.length; render(); restart(); });
+  document.querySelector(".uc-next").addEventListener("click", ()=>{ idx=(idx+1)%%UPDATES.length; render(); restart(); });
+  carousel.addEventListener("keydown", e=>{
+    if(e.key==="ArrowLeft"){ idx=(idx-1+UPDATES.length)%%UPDATES.length; render(); restart(); }
+    else if(e.key==="ArrowRight"){ idx=(idx+1)%%UPDATES.length; render(); restart(); }
+  });
+  function start(){ if(reduceMotion || paused) return; timer = setInterval(()=>{ idx=(idx+1)%%UPDATES.length; render(); }, 7000); }
+  function stop(){ clearInterval(timer); }
+  function restart(){ stop(); start(); }
+  let paused = reduceMotion;
+  if(reduceMotion){ pauseBtn.textContent = "Auto-advance off"; pauseBtn.setAttribute("aria-pressed","true"); }
+  pauseBtn.addEventListener("click", ()=>{
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume auto-advance" : "Pause auto-advance";
+    pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
+    if(paused) stop(); else start();
+  });
+  carousel.addEventListener("mouseenter", stop);
+  carousel.addEventListener("mouseleave", ()=>{ if(!paused) start(); });
+  render();
+  start();
+})();
 
 /* ================= LIVE WEATHER ================= */
 async function fetchRegion(r){
