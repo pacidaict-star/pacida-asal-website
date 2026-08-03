@@ -83,7 +83,29 @@ def combined_bbox_center_zoom(geoms, pad=1.15):
     return [round(cy, 3), round(cx, 3)], zoom
 
 
+def raw_bounds(geoms, pad=0.28):
+    """[[south,west],[north,east]] padded bounds for Leaflet's maxBounds — keeps
+    pan/zoom locked to the intervention area instead of the whole world."""
+    pts = []
+
+    def walk(c):
+        if isinstance(c[0], (int, float)):
+            pts.append(c)
+        else:
+            for x in c:
+                walk(x)
+    for g in geoms:
+        walk(g["coordinates"])
+    lons = [p[0] for p in pts]
+    lats = [p[1] for p in pts]
+    lon_pad = (max(lons) - min(lons)) * pad or 0.5
+    lat_pad = (max(lats) - min(lats)) * pad or 0.5
+    return [[round(min(lats) - lat_pad, 3), round(min(lons) - lon_pad, 3)],
+            [round(max(lats) + lat_pad, 3), round(max(lons) + lon_pad, 3)]]
+
+
 PACIDA_CENTER, PACIDA_ZOOM = combined_bbox_center_zoom([BOUNDARIES[s] for s in PACIDA_SLUGS if s in BOUNDARIES])
+PACIDA_BOUNDS = raw_bounds([BOUNDARIES[s] for s in PACIDA_SLUGS if s in BOUNDARIES])
 
 
 DROUGHT_TIMELINE = [
@@ -136,6 +158,19 @@ def page(rid, r):
 
     sect = "".join('<details class="acc"><summary>%s</summary><div class="acc-body">%s</div></details>' % (t, x) for t, x in r["sectors"])
 
+    if r.get("priorityNeeds"):
+        needs_rows = "".join(
+            '<div class="need-row"><div class="need-num">%02d</div><div><b>%s</b><span>%s</span></div></div>' % (i + 1, t, x)
+            for i, (t, x) in enumerate(r["priorityNeeds"])
+        )
+        needs_panel = ('<div class="panel glass"><h2>Priority needs <span class="tag">where continued attention would help most</span></h2>'
+                       '<p style="margin-bottom:14px">Drawn from this page\'s own data — the Need Index components, sector deep-dive above, and NDMA/IPC '
+                       'reporting — not a claim about PACIDA\'s internal plans. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> '
+                       'for what has already been delivered here.</p>'
+                       '<div class="needs-list">%s</div></div>') % needs_rows
+    else:
+        needs_panel = ""
+
     tl_items = "".join(
         '<div class="tl%s"><div class="yr">%s</div><div class="tx">%s</div></div>' % ((" now" if len(item) > 2 else ""), item[0], item[1])
         for item in DROUGHT_TIMELINE
@@ -167,16 +202,17 @@ def page(rid, r):
     sites_json = json.dumps(r["sites"])
     nav = navbar(rid)
     center, zoom = bbox_center_zoom(BOUNDARIES[rid]) if rid in BOUNDARIES else ([r["hq"]["lat"], r["hq"]["lon"]], 8)
+    bounds = raw_bounds([BOUNDARIES[rid]]) if rid in BOUNDARIES else None
 
     return TEMPLATE % dict(
         rid=rid, title=r["title"], country=r["country"],
         nav=nav, intro=r["intro"],
-        center=json.dumps(center), zoom=zoom,
+        center=json.dumps(center), zoom=zoom, bounds_json=json.dumps(bounds),
         hqname=r["hq"]["name"], hqlat=r["hq"]["lat"], hqlon=r["hq"]["lon"],
         households=fmtnum(r["households"]), population=fmtnum(r["population"]),
         area=r["area"], density=r["density"], hhsize=r["hhsize"],
         poverty=r["poverty"], staticVuln=r["staticVuln"], phase=r["phase"], gam=r["gam"],
-        sub_rows=sub_rows, subnote=subnote, lz_rows=lz_rows, sectors=sect,
+        sub_rows=sub_rows, subnote=subnote, lz_rows=lz_rows, sectors=sect, needs_panel=needs_panel,
         seasoncal=seasoncal(), timeline_panel=timeline_panel, pacida_panel=pacida_panel,
         sources_pacida=sources_pacida, sites_json=sites_json,
         interv_panel=interv_panel, interventions_js=interventions_js,
@@ -215,9 +251,20 @@ TEMPLATE = """<!DOCTYPE html>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div id="map" role="application" aria-label="Aerial map of %(title)s"></div>
+<div class="page-shell">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Aerial map of %(title)s"></div>
+  <div class="map-legend map-overlay">
+    <h4>Monitoring sites</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to %(title)s &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+  </div>
+</div>
 
-<div class="overlay">
+<div class="content-pane">
 
 <header class="glass">
   <div class="brand">
@@ -257,19 +304,8 @@ TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <main id="main-content">
-<div class="hero-grid">
-  <div class="map-window">
-    <div class="map-legend glass">
-      <h4>Monitoring sites</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-      <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Shaded outline = %(title)s. Pan &amp; zoom anywhere outside the glass panels. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
-    </div>
-  </div>
-
-  <div class="cards">
+<div class="wide" style="padding-top:0">
+  <div class="cards-grid">
     <div class="card glass">
       <div class="card-top"><div><h3>%(title)s briefing</h3><div class="zone">%(country)s &middot; area %(area)s &middot; density %(density)s &middot; avg household %(hhsize)s persons</div></div></div>
       <p style="font-size:13.5px;color:var(--muted);margin-top:10px">%(intro)s</p>
@@ -324,6 +360,8 @@ TEMPLATE = """<!DOCTYPE html>
     <div class="acc-list">%(sectors)s</div>
   </div>
 
+  %(needs_panel)s
+
   %(timeline_panel)s
 
   %(interv_panel)s
@@ -348,7 +386,8 @@ TEMPLATE = """<!DOCTYPE html>
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-pane -->
+</div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -364,7 +403,7 @@ const SITES = %(sites_json)s;  /* [name, lat, lon, note] */
 const HQ = {name:"%(hqname)s", lat:%(hqlat)s, lon:%(hqlon)s};
 
 startClock();
-const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s);
+const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map", %(bounds_json)s);
 
 /* region outline */
 if (BOUNDARIES[RID]) {
@@ -533,7 +572,8 @@ def build_index():
     out = INDEX_TEMPLATE % dict(
         regions_json=json.dumps(lean, separators=(",", ":")),
         updates_json=json.dumps(updates, separators=(",", ":")),
-        center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM, base_url=BASE_URL
+        center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM, base_url=BASE_URL,
+        bounds_json=json.dumps(PACIDA_BOUNDS)
     )
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
     print("index.html", len(out), "bytes")
@@ -570,9 +610,19 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
+<div class="page-shell">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
+  <div class="map-legend map-overlay">
+    <h4>Map layers</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
+    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
+  </div>
+</div>
 
-<div class="overlay">
+<div class="content-pane">
 
 <header class="glass">
   <div class="brand">
@@ -649,18 +699,6 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <div class="uc-foot">
       <div class="uc-dots" id="ucDots"></div>
       <button class="uc-pause" id="ucPause" type="button" aria-pressed="false">Pause auto-advance</button>
-    </div>
-  </div>
-</div>
-
-<div class="wide" style="padding-top:0">
-  <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
-    <div class="map-legend glass">
-      <h4>Map layers</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
-      <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
     </div>
   </div>
 </div>
@@ -751,7 +789,8 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-pane -->
+</div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -766,7 +805,7 @@ const PACIDA_AREA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 startClock();
 
 /* ================= MAP — framed on PACIDA's operational area ================= */
-const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s);
+const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map", %(bounds_json)s);
 const markerLayer = L.layerGroup().addTo(map);
 const labelLayer  = L.layerGroup().addTo(map);
 const shadeLayer  = L.layerGroup();
@@ -841,7 +880,7 @@ function drawMarkers(){
       <div><span class="pop-k">Rain, past 30 d:</span> <span class="pop-v">${fmtRain(w.rain30)}</span></div>
       <div><span class="pop-k">Topsoil moisture:</span> <span class="pop-v">${(w.soil*100).toFixed(1)}%%</span></div>`:""}
       <div style="margin-top:6px"><span class="pop-k">Key sites:</span> ${r.sites.slice(0,4).join(", ")}</div>
-      <div style="margin-top:6px"><a href="${r.id}.html" style="color:var(--alert)">Open detail page →</a></div>
+      <a class="popup-cta" href="${r.id}.html">View full profile →</a>
     `);
     const label = L.marker([r.lat,r.lon],{interactive:false,
       icon:L.divIcon({className:"", html:`<div class="region-label">${r.name.split(" County")[0]}</div>`, iconAnchor:[-hhRadius(r.households)-6, 8]})});

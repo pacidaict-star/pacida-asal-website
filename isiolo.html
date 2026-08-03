@@ -29,9 +29,20 @@
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div id="map" role="application" aria-label="Aerial map of Isiolo County"></div>
+<div class="page-shell">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Aerial map of Isiolo County"></div>
+  <div class="map-legend map-overlay">
+    <h4>Monitoring sites</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to Isiolo County &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+  </div>
+</div>
 
-<div class="overlay">
+<div class="content-pane">
 
 <header class="glass">
   <div class="brand">
@@ -71,19 +82,8 @@
 </div>
 
 <main id="main-content">
-<div class="hero-grid">
-  <div class="map-window">
-    <div class="map-legend glass">
-      <h4>Monitoring sites</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-      <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Shaded outline = Isiolo County. Pan &amp; zoom anywhere outside the glass panels. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
-    </div>
-  </div>
-
-  <div class="cards">
+<div class="wide" style="padding-top:0">
+  <div class="cards-grid">
     <div class="card glass">
       <div class="card-top"><div><h3>Isiolo County briefing</h3><div class="zone">Kenya &middot; area 25,336 km² &middot; density 11 / km² &middot; avg household 4.6 persons</div></div></div>
       <p style="font-size:13.5px;color:var(--muted);margin-top:10px">The gateway to northern Kenya and a melting pot of Borana, Turkana, Somali, Meru and Samburu communities. The county straddles the Ewaso Ng'iro river — the lifeline that carries highland water into the drylands and around which people, livestock and wildlife concentrate in every drought. Isiolo town is booming (A2 tarmac, abattoir, planned resort city under LAPSSET) while Merti and Garbatulla remain deep pastoral country. Isiolo was among the worst-hit counties in the 2023 floods and slid back into drought Alert through 2025–26 — the classic ASAL whiplash of failed rains and flash floods.</p>
@@ -138,6 +138,8 @@
     <div class="acc-list"><details class="acc"><summary>Livestock economy</summary><div class="acc-body">Borana cattle heartland with growing camel herds. Isiolo livestock market and the export abattoir anchor offtake; in drought, herds converge on the Ewaso riverine strip and Meru NP border, driving disease transmission and human-wildlife conflict.</div></details><details class="acc"><summary>Water & WASH</summary><div class="acc-body">The Ewaso Ng'iro's flow is falling from upstream highland abstraction — the county's central climate-security issue. Flagship response: Merti–Korbesa water supply project (NDMA/EU/NWWDA/County). Elsewhere: boreholes, pans; Sericho and Cherab wards face the longest dry-season distances.</div></details><details class="acc"><summary>Nutrition & health</summary><div class="acc-body">2026 drought reporting documented severe acute malnutrition cases in Isiolo; NDMA lists the county in Alert with worsening food access. GAM typically 12–18% in bad years, concentrated in Merti and Sericho.</div></details><details class="acc"><summary>Floods & multi-hazard</summary><div class="acc-body">Isiolo is the textbook twin-disaster county: among the worst affected by the 2023 El Niño floods (Ewaso burst its banks, displacing riverine villages) followed directly by failed rains. Preparedness must cover both extremes.</div></details><details class="acc"><summary>Conflict & peace</summary><div class="acc-body">Grazing pressure funnels Borana, Somali, Samburu and Turkana herds into the same riverine reserves; flashpoints on the Isiolo–Samburu (Oldonyiro) and Isiolo–Garissa (Modogashe–Sericho) axes. Land speculation along LAPSSET adds a new conflict layer.</div></details></div>
   </div>
 
+  <div class="panel glass"><h2>Priority needs <span class="tag">where continued attention would help most</span></h2><p style="margin-bottom:14px">Drawn from this page's own data — the Need Index components, sector deep-dive above, and NDMA/IPC reporting — not a claim about PACIDA's internal plans. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what has already been delivered here.</p><div class="needs-list"><div class="need-row"><div class="need-num">01</div><div><b>Dual flood-and-drought preparedness</b><span>Isiolo was among the worst-hit by the 2023 El Niño floods and slid back into drought Alert within two years — infrastructure and response plans need to cover both extremes, not just the current one.</span></div></div><div class="need-row"><div class="need-num">02</div><div><b>Protecting the Ewaso Ng'iro's flow</b><span>Upstream highland abstraction is steadily reducing the river's flow, the county's central climate-security issue; the Merti–Korbesa pipeline is the flagship response but needs to reach the wards still relying on the riverine strip directly.</span></div></div><div class="need-row"><div class="need-num">03</div><div><b>Nutrition surveillance in Merti and Sericho</b><span>2026 drought reporting documented severe acute malnutrition cases concentrated in these two wards — the county's longest dry-season water and food-access distances.</span></div></div><div class="need-row"><div class="need-num">04</div><div><b>Grazing-corridor peace amid new land pressure</b><span>Flashpoints on the Isiolo–Samburu (Oldonyiro) and Isiolo–Garissa (Modogashe–Sericho) axes now compete with LAPSSET-driven land speculation — a new conflict layer on top of the old grazing disputes.</span></div></div></div></div>
+
   <div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2><div class="timeline"><div class="tl"><div class="yr">1999–2000</div><div class="tx">Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.</div></div><div class="tl"><div class="yr">2005–06</div><div class="tx">Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).</div></div><div class="tl"><div class="yr">2008–09</div><div class="tx">Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.</div></div><div class="tl"><div class="yr">2010–11</div><div class="tx">Horn of Africa famine — the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.</div></div><div class="tl"><div class="yr">2016–17</div><div class="tx">Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.</div></div><div class="tl"><div class="yr">2020–23</div><div class="tx">Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.</div></div><div class="tl"><div class="yr">2023–24</div><div class="tx">El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern.</div></div><div class="tl now"><div class="yr">2025–26</div><div class="tx">Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.</div></div></div></div>
 
   <div class="panel glass"><h2>PACIDA interventions here <span class="tag"><a href="impact.html" style="color:var(--alert)">full impact dashboard &rarr;</a></span></h2><p>Real projects from PACIDA's own project register, pinned where their title names a specific site in Isiolo County. Star markers on the map are PACIDA field presence/offices.</p><div class="interv-list" id="intervList"></div></div>
@@ -162,7 +164,8 @@
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-pane -->
+</div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -178,7 +181,7 @@ const SITES = [["Isiolo town", 0.3546, 37.5822, "County HQ, A2 corridor"], ["Mer
 const HQ = {name:"Isiolo town", lat:0.3546, lon:37.5822};
 
 startClock();
-const {map, layersControl} = makeGlassMap([1.006, 38.163], 8);
+const {map, layersControl} = makeGlassMap([1.006, 38.163], 8, "map", [[-0.696, 36.137], [2.708, 40.19]]);
 
 /* region outline */
 if (BOUNDARIES[RID]) {

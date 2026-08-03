@@ -29,9 +29,20 @@
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div id="map" role="application" aria-label="Aerial map of Marsabit County"></div>
+<div class="page-shell">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Aerial map of Marsabit County"></div>
+  <div class="map-legend map-overlay">
+    <h4>Monitoring sites</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to Marsabit County &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+  </div>
+</div>
 
-<div class="overlay">
+<div class="content-pane">
 
 <header class="glass">
   <div class="brand">
@@ -71,19 +82,8 @@
 </div>
 
 <main id="main-content">
-<div class="hero-grid">
-  <div class="map-window">
-    <div class="map-legend glass">
-      <h4>Monitoring sites</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-      <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Shaded outline = Marsabit County. Pan &amp; zoom anywhere outside the glass panels. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
-    </div>
-  </div>
-
-  <div class="cards">
+<div class="wide" style="padding-top:0">
+  <div class="cards-grid">
     <div class="card glass">
       <div class="card-top"><div><h3>Marsabit County briefing</h3><div class="zone">Kenya &middot; area 70,961 km² &middot; density 6.5 / km² &middot; avg household 5.8 persons</div></div></div>
       <p style="font-size:13.5px;color:var(--muted);margin-top:10px">Kenya's second-largest county and PACIDA's home base. A vast basalt-and-desert landscape running from the shores of Lake Turkana across the Chalbi Desert — Kenya's only true desert — to the Ethiopian border at Moyale. Mt. Marsabit's forested volcanic massif (1,700&nbsp;m) is a green island whose mist-fed highlands support the county's only rain-fed agriculture; everything around it is camel, goat and small-stock country of the Gabra, Rendille, Borana, Burji, Turkana, Samburu, Dassanach and El Molo peoples. Annual rainfall spans 200&nbsp;mm on the Chalbi floor to 800+&nbsp;mm on the mountain. Poverty (83.2%) is among the highest in Kenya and 80% of livelihoods depend directly on livestock.</p>
@@ -138,6 +138,8 @@
     <div class="acc-list"><details class="acc"><summary>Livestock economy</summary><div class="acc-body">≈80% of household income is livestock-based. Camels are the drought-critical species (milk through dry seasons); Merille and Moyale are the key livestock markets. 2019 census recorded well over 2 million goats and sheep, ~420,000 cattle and ~240,000 camels in the county (indicative).</div></details><details class="acc"><summary>Water & WASH</summary><div class="acc-body">Household water is from boreholes, shallow wells (Chalbi springs at Kalacha/Maikona), pans and rock catchments. In drought, trekking distances exceed 15–25 km in North Horr and Laisamis; NDMA's Jan 2026 bulletin flagged Marsabit among counties with the longest grazing-to-water distances. Badassa dam and desalination pilots serve the highlands.</div></details><details class="acc"><summary>Nutrition & health</summary><div class="acc-body">GAM has repeatedly breached the WHO 15% 'critical' emergency threshold in North Horr and Laisamis during droughts (SMART surveys 18–26%). PPR, CCPP and FMD livestock disease outbreaks were reported county-wide in early 2026, cutting milk availability for children.</div></details><details class="acc"><summary>Education</summary><div class="acc-body">Low enrolment and high dropout track drought cycles as families migrate with herds; school-meals programmes and low-cost boarding ('lchekuti' model) are the main retention tools. PACIDA runs education access programmes across the county.</div></details><details class="acc"><summary>Conflict & peace</summary><div class="acc-body">Resource-based and political flashpoints: Moyale corridor, Turbi–Forolle, and the Marsabit mountain belt (Borana–Gabra dynamics). Peace dividends directly determine access to dry-season grazing reserves. PACIDA facilitates inter-community resource-sharing dialogues and SMS Voices early warning.</div></details></div>
   </div>
 
+  <div class="panel glass"><h2>Priority needs <span class="tag">where continued attention would help most</span></h2><p style="margin-bottom:14px">Drawn from this page's own data — the Need Index components, sector deep-dive above, and NDMA/IPC reporting — not a claim about PACIDA's internal plans. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what has already been delivered here.</p><div class="needs-list"><div class="need-row"><div class="need-num">01</div><div><b>Water access in the far north</b><span>North Horr and Laisamis households already trek 15–25 km to water in drought; boreholes, desalination pilots (Badassa) and rock-catchment repair need to keep pace with the Chalbi's worsening dry seasons.</span></div></div><div class="need-row"><div class="need-num">02</div><div><b>Nutrition surge capacity</b><span>GAM has repeatedly breached the WHO 15% emergency threshold in North Horr and Laisamis (18–26% in SMART surveys) — therapeutic feeding and outreach capacity needs to scale with the caseload, not just respond after the fact.</span></div></div><div class="need-row"><div class="need-num">03</div><div><b>Cross-border grazing corridors</b><span>The Moyale corridor and Turbi–Forolle remain resource-based flashpoints; peace dividends here directly determine whether herds can reach dry-season grazing reserves at all.</span></div></div><div class="need-row"><div class="need-num">04</div><div><b>Livestock disease response</b><span>With ~80% of household income livestock-based and PPR/CCPP/FMD outbreaks reported county-wide in early 2026, veterinary/One Health response needs to stay ahead of disease, not just deworming coverage.</span></div></div></div></div>
+
   <div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2><div class="timeline"><div class="tl"><div class="yr">1999–2000</div><div class="tx">Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.</div></div><div class="tl"><div class="yr">2005–06</div><div class="tx">Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).</div></div><div class="tl"><div class="yr">2008–09</div><div class="tx">Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.</div></div><div class="tl"><div class="yr">2010–11</div><div class="tx">Horn of Africa famine — the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.</div></div><div class="tl"><div class="yr">2016–17</div><div class="tx">Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.</div></div><div class="tl"><div class="yr">2020–23</div><div class="tx">Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.</div></div><div class="tl"><div class="yr">2023–24</div><div class="tx">El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern.</div></div><div class="tl now"><div class="yr">2025–26</div><div class="tx">Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.</div></div></div></div>
 
   <div class="panel glass"><h2>PACIDA interventions here <span class="tag"><a href="impact.html" style="color:var(--alert)">full impact dashboard &rarr;</a></span></h2><p>Real projects from PACIDA's own project register, pinned where their title names a specific site in Marsabit County. Star markers on the map are PACIDA field presence/offices.</p><div class="interv-list" id="intervList"></div></div>
@@ -162,7 +164,8 @@
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-pane -->
+</div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -178,7 +181,7 @@ const SITES = [["Marsabit town", 2.3346, 37.9891, "Saku \u2014 county HQ, highla
 const HQ = {name:"Marsabit town", lat:2.3346, lon:37.9891};
 
 startClock();
-const {map, layersControl} = makeGlassMap([2.86, 37.698], 7);
+const {map, layersControl} = makeGlassMap([2.86, 37.698], 7, "map", [[0.368, 35.127], [5.352, 40.27]]);
 
 /* region outline */
 if (BOUNDARIES[RID]) {

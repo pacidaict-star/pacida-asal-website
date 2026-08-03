@@ -29,9 +29,20 @@
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div id="map" role="application" aria-label="Aerial map of Borena Zone"></div>
+<div class="page-shell">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Aerial map of Borena Zone"></div>
+  <div class="map-legend map-overlay">
+    <h4>Monitoring sites</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to Borena Zone &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+  </div>
+</div>
 
-<div class="overlay">
+<div class="content-pane">
 
 <header class="glass">
   <div class="brand">
@@ -71,19 +82,8 @@
 </div>
 
 <main id="main-content">
-<div class="hero-grid">
-  <div class="map-window">
-    <div class="map-legend glass">
-      <h4>Monitoring sites</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-      <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Shaded outline = Borena Zone. Pan &amp; zoom anywhere outside the glass panels. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
-    </div>
-  </div>
-
-  <div class="cards">
+<div class="wide" style="padding-top:0">
+  <div class="cards-grid">
     <div class="card glass">
       <div class="card-top"><div><h3>Borena Zone briefing</h3><div class="zone">Southern Ethiopia (Oromia) &middot; area ≈45,000 km² &middot; density ≈27 / km² &middot; avg household 5.2 persons</div></div></div>
       <p style="font-size:13.5px;color:var(--muted);margin-top:10px">The Ethiopian half of PACIDA's cross-border footprint and the cultural heartland of the Borana Oromo, whose Gadaa governance system (UNESCO-listed) and deep-well 'tula' system — the famous singing wells — have managed these rangelands for five centuries. The zone lost an estimated 60%+ of cattle in the catastrophic 2020–23 drought (five consecutive failed seasons), a livelihood shock from which herds have not recovered. Rainfall is bimodal: Ganna long rains (Mar–May) and Hagayya short rains (Oct–Nov). Cross-border movement with Marsabit County (Moyale, Dukana–Dillo, Forolle) is constant — grazing, trade, kinship and conflict all flow across the line, which is why single-country programming fails here.</p>
@@ -138,6 +138,8 @@
     <div class="acc-list"><details class="acc"><summary>Livestock economy</summary><div class="acc-body">Cattle are wealth, identity and food security; the 2020–23 drought killed an estimated 3.3+ million livestock across Borena and neighbouring zones, collapsing herd capital. Restocking, fodder value-chains and shifting toward camels/small stock are the recovery frontier. Moyale is the region's cross-border trade artery.</div></details><details class="acc"><summary>Water & the tula system</summary><div class="acc-body">The nine tula deep-well clusters (Dubluk, Mega, Web among them) are communally governed and drought-proof but labour-intensive; motorised boreholes and ponds (haro) supplement them. Water governance through Gadaa institutions is a resilience asset most interventions should build on, not replace.</div></details><details class="acc"><summary>Nutrition & health</summary><div class="acc-body">SAM admissions surged through 2022–23 and stabilisation-centre caseloads remain above pre-drought baselines; measles and cholera outbreaks tracked displacement into IDP sites around Dubluk and Yabelo during the drought peak.</div></details><details class="acc"><summary>Rangelands & bush encroachment</summary><div class="acc-body">Decades of fire suppression drove acacia/commiphora bush encroachment over prime grasslands — a slow-onset crisis reducing carrying capacity independent of rainfall. Participatory rangeland management and controlled clearing are priority interventions.</div></details><details class="acc"><summary>Conflict & cross-border dynamics</summary><div class="acc-body">Borana–Gabra and Borana–Garre dynamics span the Kenya line; Moyale town has repeatedly split along it. Peace here is a precondition for drought-cycle mobility — closed borders during conflict episodes have trapped herds away from reserve grazing with fatal results.</div></details></div>
   </div>
 
+  <div class="panel glass"><h2>Priority needs <span class="tag">where continued attention would help most</span></h2><p style="margin-bottom:14px">Drawn from this page's own data — the Need Index components, sector deep-dive above, and NDMA/IPC reporting — not a claim about PACIDA's internal plans. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what has already been delivered here.</p><div class="needs-list"><div class="need-row"><div class="need-num">01</div><div><b>Herd recovery after catastrophic losses</b><span>The 2020–23 drought killed an estimated 3.3+ million livestock across Borena and neighbouring zones; herds have not recovered, and restocking plus fodder value-chains are the recovery frontier.</span></div></div><div class="need-row"><div class="need-num">02</div><div><b>Modernising the tula system without replacing it</b><span>The nine tula deep-well clusters are drought-proof but labour-intensive and communally governed through Gadaa institutions — supplementary motorised boreholes and ponds need to support that system, not sideline it.</span></div></div><div class="need-row"><div class="need-num">03</div><div><b>Rangeland rehabilitation</b><span>Decades of fire suppression drove acacia/commiphora bush encroachment over prime grasslands, a slow-onset crisis cutting carrying capacity independent of rainfall — participatory rangeland management needs to scale beyond pilot sites.</span></div></div><div class="need-row"><div class="need-num">04</div><div><b>Cross-border corridor peace</b><span>Borana–Gabra and Borana–Garre dynamics have repeatedly split Moyale town; closed borders during conflict episodes have trapped herds away from reserve grazing with fatal results, making peace a precondition for drought-cycle mobility, not a separate agenda.</span></div></div></div></div>
+
   <div class="panel glass"><h2>Drought history &mdash; the recurrence the index is built for</h2><div class="timeline"><div class="tl"><div class="yr">1999–2000</div><div class="tx">Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.</div></div><div class="tl"><div class="yr">2005–06</div><div class="tx">Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).</div></div><div class="tl"><div class="yr">2008–09</div><div class="tx">Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.</div></div><div class="tl"><div class="yr">2010–11</div><div class="tx">Horn of Africa famine — the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.</div></div><div class="tl"><div class="yr">2016–17</div><div class="tx">Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.</div></div><div class="tl"><div class="yr">2020–23</div><div class="tx">Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.</div></div><div class="tl"><div class="yr">2023–24</div><div class="tx">El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern.</div></div><div class="tl now"><div class="yr">2025–26</div><div class="tx">Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.</div></div></div></div>
 
   <div class="panel glass"><h2>PACIDA interventions here <span class="tag"><a href="impact.html" style="color:var(--alert)">full impact dashboard &rarr;</a></span></h2><p>Real projects from PACIDA's own project register, pinned where their title names a specific site in Borena Zone. Star markers on the map are PACIDA field presence/offices.</p><div class="interv-list" id="intervList"></div></div>
@@ -162,7 +164,8 @@
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-pane -->
+</div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -178,7 +181,7 @@ const SITES = [["Yabelo", 4.885, 38.083, "Zone capital"], ["Moyale (ET)", 3.554,
 const HQ = {name:"Yabelo", lat:4.885, lon:38.083};
 
 startClock();
-const {map, layersControl} = makeGlassMap([4.525, 38.225], 8);
+const {map, layersControl} = makeGlassMap([4.525, 38.225], 8, "map", [[2.926, 36.158], [6.124, 40.292]]);
 
 /* region outline */
 if (BOUNDARIES[RID]) {

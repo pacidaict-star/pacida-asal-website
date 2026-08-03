@@ -29,9 +29,19 @@
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
+<div class="page-shell">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
+  <div class="map-legend map-overlay">
+    <h4>Map layers</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
+    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
+  </div>
+</div>
 
-<div class="overlay">
+<div class="content-pane">
 
 <header class="glass">
   <div class="brand">
@@ -108,18 +118,6 @@
     <div class="uc-foot">
       <div class="uc-dots" id="ucDots"></div>
       <button class="uc-pause" id="ucPause" type="button" aria-pressed="false">Pause auto-advance</button>
-    </div>
-  </div>
-</div>
-
-<div class="wide" style="padding-top:0">
-  <div class="map-window" style="min-height:64vh;border-radius:14px;overflow:hidden">
-    <div class="map-legend glass">
-      <h4>Map layers</h4>
-      <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
-      <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
-      <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
     </div>
   </div>
 </div>
@@ -210,7 +208,8 @@
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-pane -->
+</div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -225,7 +224,7 @@ const PACIDA_AREA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 startClock();
 
 /* ================= MAP — framed on PACIDA's operational area ================= */
-const {map, layersControl} = makeGlassMap([2.733, 37.8], 7);
+const {map, layersControl} = makeGlassMap([2.733, 37.8], 7, "map", [[-1.663, 35.07], [7.128, 40.53]]);
 const markerLayer = L.layerGroup().addTo(map);
 const labelLayer  = L.layerGroup().addTo(map);
 const shadeLayer  = L.layerGroup();
@@ -300,7 +299,7 @@ function drawMarkers(){
       <div><span class="pop-k">Rain, past 30 d:</span> <span class="pop-v">${fmtRain(w.rain30)}</span></div>
       <div><span class="pop-k">Topsoil moisture:</span> <span class="pop-v">${(w.soil*100).toFixed(1)}%</span></div>`:""}
       <div style="margin-top:6px"><span class="pop-k">Key sites:</span> ${r.sites.slice(0,4).join(", ")}</div>
-      <div style="margin-top:6px"><a href="${r.id}.html" style="color:var(--alert)">Open detail page →</a></div>
+      <a class="popup-cta" href="${r.id}.html">View full profile →</a>
     `);
     const label = L.marker([r.lat,r.lon],{interactive:false,
       icon:L.divIcon({className:"", html:`<div class="region-label">${r.name.split(" County")[0]}</div>`, iconAnchor:[-hhRadius(r.households)-6, 8]})});

@@ -385,8 +385,15 @@ function yearBarChart(data){
 }
 
 /* Standard glass map (satellite base + labels + dark alternative). Returns {map, layersControl}. */
-function makeGlassMap(center, zoom, elId){
-  const map = L.map(elId||"map",{zoomControl:false, scrollWheelZoom:true}).setView(center, zoom);
+function makeGlassMap(center, zoom, elId, bounds){
+  const opts = {zoomControl:false, scrollWheelZoom:true};
+  if(bounds){
+    opts.maxBounds = bounds;
+    opts.maxBoundsViscosity = 1.0; // hard stop — can't drag past the intervention area
+    opts.minZoom = zoom - 1;       // can't zoom out past ~the framing we chose
+  }
+  const map = L.map(elId||"map", opts).setView(center, zoom);
+  if(bounds) map.setMaxBounds(bounds);
   L.control.zoom({position:"bottomright"}).addTo(map);
   const satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{
     attribution:'Imagery &copy; Esri, Maxar, Earthstar Geographics', maxZoom:17});

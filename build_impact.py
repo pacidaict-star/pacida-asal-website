@@ -5,6 +5,32 @@ from collections import Counter, defaultdict
 
 SITE = os.path.dirname(os.path.abspath(__file__))
 INTERVENTIONS = json.load(open(os.path.join(SITE, "assets", "interventions.json"), encoding="utf-8"))
+BOUNDARIES = json.load(open(os.path.join(SITE, "assets", "boundaries.json"), encoding="utf-8"))
+PACIDA_SLUGS_LIST = ["marsabit", "samburu", "isiolo", "borena"]
+
+
+def raw_bounds(geoms, pad=0.28):
+    """[[south,west],[north,east]] padded bounds for Leaflet's maxBounds — mirrors
+    build_pages.py's helper so this map is locked to the same intervention area."""
+    pts = []
+
+    def walk(c):
+        if isinstance(c[0], (int, float)):
+            pts.append(c)
+        else:
+            for x in c:
+                walk(x)
+    for g in geoms:
+        walk(g["coordinates"])
+    lons = [p[0] for p in pts]
+    lats = [p[1] for p in pts]
+    lon_pad = (max(lons) - min(lons)) * pad or 0.5
+    lat_pad = (max(lats) - min(lats)) * pad or 0.5
+    return [[round(min(lats) - lat_pad, 3), round(min(lons) - lon_pad, 3)],
+            [round(max(lats) + lat_pad, 3), round(max(lons) + lon_pad, 3)]]
+
+
+IMPACT_BOUNDS = raw_bounds([BOUNDARIES[s] for s in PACIDA_SLUGS_LIST if s in BOUNDARIES])
 
 projects = INTERVENTIONS["projects"]
 donors = sorted({p["donor"] for p in projects if p["donor"]})
@@ -235,7 +261,7 @@ document.getElementById("themeLegend").innerHTML = INTERVENTIONS.themes.map(t =>
 ).join("");
 
 /* map (embedded in the panel below, not the page-wide fixed background) */
-const {map} = makeGlassMap([2.3, 38.2], 7, "impactMap");
+const {map} = makeGlassMap([2.3, 38.2], 7, "impactMap", %(impact_bounds_json)s);
 setTimeout(()=>map.invalidateSize(), 300);
 PACIDA_SLUGS.forEach(slug=>{
   const geom = BOUNDARIES[slug];
@@ -335,6 +361,7 @@ out = HTML % dict(
     year_json=json.dumps(year_data, separators=(",", ":")),
     theme_chips=theme_chip_html,
     base_url="https://pacidaict-star.github.io/pacida-asal-website/",
+    impact_bounds_json=json.dumps(IMPACT_BOUNDS),
 )
 open(os.path.join(SITE, "impact.html"), "w", encoding="utf-8").write(out)
 print("impact.html", len(out), "bytes")

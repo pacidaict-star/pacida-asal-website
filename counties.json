@@ -193,7 +193,25 @@
    ]
   ],
   "pacida": "County HQ of PACIDA. Programmes: emergency drought response (water trucking, relief food, cash transfers), mass livestock deworming & treatment (480,000+ animals reached), WASH infrastructure, Ward Climate Change Planning Committees & County Climate Change Fund support, women's climate-resilience projects (Caritas Austria), education access, and peace &amp; governance including the SMS Voices project with the County Government.",
-  "asal": true
+  "asal": true,
+  "priorityNeeds": [
+   [
+    "Water access in the far north",
+    "North Horr and Laisamis households already trek 15–25 km to water in drought; boreholes, desalination pilots (Badassa) and rock-catchment repair need to keep pace with the Chalbi's worsening dry seasons."
+   ],
+   [
+    "Nutrition surge capacity",
+    "GAM has repeatedly breached the WHO 15% emergency threshold in North Horr and Laisamis (18–26% in SMART surveys) — therapeutic feeding and outreach capacity needs to scale with the caseload, not just respond after the fact."
+   ],
+   [
+    "Cross-border grazing corridors",
+    "The Moyale corridor and Turbi–Forolle remain resource-based flashpoints; peace dividends here directly determine whether herds can reach dry-season grazing reserves at all."
+   ],
+   [
+    "Livestock disease response",
+    "With ~80% of household income livestock-based and PPR/CCPP/FMD outbreaks reported county-wide in early 2026, veterinary/One Health response needs to stay ahead of disease, not just deworming coverage."
+   ]
+  ]
  },
  "samburu": {
   "title": "Samburu County",
@@ -334,7 +352,25 @@
    ]
   ],
   "pacida": "PACIDA implements resilience and emergency programming in Samburu: drought response (water, cash and fodder), WASH, livestock health campaigns, and cross-county peace dialogues linking Samburu, Marsabit and Isiolo grazing communities under the Humanitarian-Development-Peace nexus approach.",
-  "asal": true
+  "asal": true,
+  "priorityNeeds": [
+   [
+    "Piped water expansion",
+    "Only ~14% of Samburu households have piped water (2019 census); the rest depend on seasonal rivers, sand dams and boreholes that fail first in drought — this is the single biggest infrastructure gap in the county."
+   ],
+   [
+    "Nutrition response in Samburu North",
+    "NDMA lists Samburu among counties with significant numbers of children needing urgent malnutrition treatment, concentrated in the Tiaty-adjacent belt — the hardest area in the county to reach with outreach teams."
+   ],
+   [
+    "Girls' secondary education",
+    "Secondary attainment sits at 6.4%, about a quarter of the national rate; moran herding duties and early marriage are the main drivers, and bursary/feeding programmes need to specifically target girls' retention."
+   ],
+   [
+    "Disarmament and grazing peace",
+    "The Baragoi–Suguta rustling corridor and the Samburu East–Isiolo boundary dispute over Ewaso grazing block safe access to the Kirisia forest and Mathews Range reserves that droughts make essential."
+   ]
+  ]
  },
  "isiolo": {
   "title": "Isiolo County",
@@ -474,7 +510,25 @@
    ]
   ],
   "pacida": "PACIDA scaled up in Isiolo after the 2023 floods put the organisation on the response frontline. Programmes: flood and drought emergency response, WASH, resilience building with Ward Climate Change Planning Committees, livestock health, and peace dialogues on shared Ewaso grazing.",
-  "asal": true
+  "asal": true,
+  "priorityNeeds": [
+   [
+    "Dual flood-and-drought preparedness",
+    "Isiolo was among the worst-hit by the 2023 El Niño floods and slid back into drought Alert within two years — infrastructure and response plans need to cover both extremes, not just the current one."
+   ],
+   [
+    "Protecting the Ewaso Ng'iro's flow",
+    "Upstream highland abstraction is steadily reducing the river's flow, the county's central climate-security issue; the Merti–Korbesa pipeline is the flagship response but needs to reach the wards still relying on the riverine strip directly."
+   ],
+   [
+    "Nutrition surveillance in Merti and Sericho",
+    "2026 drought reporting documented severe acute malnutrition cases concentrated in these two wards — the county's longest dry-season water and food-access distances."
+   ],
+   [
+    "Grazing-corridor peace amid new land pressure",
+    "Flashpoints on the Isiolo–Samburu (Oldonyiro) and Isiolo–Garissa (Modogashe–Sericho) axes now compete with LAPSSET-driven land speculation — a new conflict layer on top of the old grazing disputes."
+   ]
+  ]
  },
  "borena": {
   "title": "Borena Zone",
@@ -672,6 +726,24 @@
    ]
   ],
   "pacida": "PACIDA's Ethiopian office anchors cross-border programming: drought emergency response, WASH around the tula clusters, livestock health, education support, and Borana-led peace and resource-sharing dialogues that keep the Marsabit–Borena grazing corridors open. Funded partners include Welthungerhilfe and BMZ programmes.",
-  "asal": true
+  "asal": true,
+  "priorityNeeds": [
+   [
+    "Herd recovery after catastrophic losses",
+    "The 2020–23 drought killed an estimated 3.3+ million livestock across Borena and neighbouring zones; herds have not recovered, and restocking plus fodder value-chains are the recovery frontier."
+   ],
+   [
+    "Modernising the tula system without replacing it",
+    "The nine tula deep-well clusters are drought-proof but labour-intensive and communally governed through Gadaa institutions — supplementary motorised boreholes and ponds need to support that system, not sideline it."
+   ],
+   [
+    "Rangeland rehabilitation",
+    "Decades of fire suppression drove acacia/commiphora bush encroachment over prime grasslands, a slow-onset crisis cutting carrying capacity independent of rainfall — participatory rangeland management needs to scale beyond pilot sites."
+   ],
+   [
+    "Cross-border corridor peace",
+    "Borana–Gabra and Borana–Garre dynamics have repeatedly split Moyale town; closed borders during conflict episodes have trapped herds away from reserve grazing with fatal results, making peace a precondition for drought-cycle mobility, not a separate agenda."
+   ]
+  ]
  }
 }

@@ -24,19 +24,34 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
    the root element, regardless of overflow-y. Fix overflow bugs at their
    source instead (see #map below, and wrap any wide table in .table-scroll). */
 
-/* full-page map background + glass surface */
-#map{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;background:#12100B;overflow:hidden}
-.overlay{position:relative;z-index:10;pointer-events:none}
-.overlay > *{pointer-events:none}
+/* split shell: map confined to its own pane, everything else on solid ground */
+.page-shell{display:flex;align-items:flex-start;min-height:100vh}
+.map-pane{position:sticky;top:0;width:46%;height:100vh;flex:none;background:#12100B;overflow:hidden}
+.map-pane #map{width:100%;height:100%}
+.content-pane{flex:1;min-width:0;background:var(--bg)}
+@media(max-width:1020px){
+  .page-shell{flex-direction:column;align-items:stretch}
+  .map-pane{position:relative;top:auto;width:100%;height:52vh}
+  .content-pane{width:100%;min-width:0}
+}
+
+/* solid panels — nothing floats over the map anymore, so no blur/translucency needed */
 .glass{
-  pointer-events:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+}
+
+/* the one exception: things that genuinely still sit on top of the live map
+   (the legend) keep the translucent glass treatment */
+.map-overlay{
   background:rgba(14,11,7,.88);
   -webkit-backdrop-filter:blur(18px) saturate(1.15);
   backdrop-filter:blur(18px) saturate(1.15);
   border:1px solid rgba(251,247,236,.16);
   box-shadow:0 10px 34px rgba(0,0,0,.5);
 }
-@supports not (backdrop-filter:blur(2px)){ .glass{background:rgba(13,10,7,.97)} }
+@supports not (backdrop-filter:blur(2px)){ .map-overlay{background:rgba(13,10,7,.97)} }
 
 /* header + nav */
 header{padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:1200;border-radius:0 0 14px 14px}
@@ -72,12 +87,8 @@ button.refresh:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 .cell .n{font-size:11.5px;color:var(--faint);margin-top:2px}
 
 /* main layout */
-.hero-grid{max-width:1440px;margin:0 auto;padding:22px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(340px,1fr);gap:22px}
-@media(max-width:1020px){.hero-grid{grid-template-columns:1fr}}
 main{display:block}
-.map-window{position:relative;min-height:58vh}
-@media(max-width:1020px){.map-window{min-height:44vh}}
-.map-legend{position:absolute;bottom:14px;left:0;z-index:900;border-radius:10px;padding:12px 14px;font-size:12px;max-width:250px}
+.map-legend{position:absolute;bottom:14px;left:14px;right:14px;z-index:900;border-radius:10px;padding:12px 14px;font-size:12px;max-width:270px}
 .map-legend h4{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--muted);margin-bottom:8px}
 .lg-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
 .lg-swatch{width:12px;height:12px;border-radius:50%;flex:none}
@@ -146,8 +157,8 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .gauge-track{height:10px;border-radius:5px;position:relative;background:linear-gradient(90deg,var(--normal) 0%,var(--alert) 45%,var(--alarm) 70%,var(--emergency) 100%);opacity:.92}
 .gauge-marker{position:absolute;top:-4px;width:4px;height:18px;background:var(--text);border-radius:2px;box-shadow:0 0 0 2px rgba(0,0,0,.6);transition:left 1s ease}
 .gauge-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;font-family:'Barlow Condensed';font-weight:600}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
-@media(max-width:460px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+@media(max-width:460px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .m .mk{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:'Barlow Condensed';font-weight:600}
 .m .mv{font-family:'IBM Plex Mono';font-size:16px;font-weight:500;margin-top:2px}
 .m .mv small{font-size:11px;color:var(--muted)}
@@ -199,7 +210,7 @@ footer .brand-logo{height:24px}
 .lz-pct{font-family:'IBM Plex Mono';text-align:right;color:var(--muted)}
 
 /* seasonal calendar */
-.season{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:12px}
+.season{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;margin-top:12px}
 .season .mo{border-radius:6px;padding:8px 2px 6px;text-align:center;font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.08em;border:1px solid rgba(237,227,204,.1)}
 .season .mo small{display:block;font-family:'Archivo';font-weight:400;font-size:9.5px;color:rgba(22,19,13,.85);letter-spacing:0;margin-top:2px;text-transform:none}
 .mo.rain{background:var(--water);color:#EDF5F7}
@@ -232,6 +243,13 @@ footer .brand-logo{height:24px}
 .leaflet-popup-content{margin:12px 14px;font-size:13px;line-height:1.5}
 .leaflet-popup-content h4{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.07em;font-size:16px;margin-bottom:4px}
 .pop-k{color:var(--muted)} .pop-v{font-family:'IBM Plex Mono'}
+.popup-cta{
+  display:block;margin-top:10px;text-align:center;background:var(--pacida-green);color:#08210F;
+  text-decoration:none;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;font-size:12.5px;padding:8px 10px;border-radius:6px;transition:background .15s;
+}
+.popup-cta:hover,.popup-cta:focus-visible{background:var(--alert)}
+.popup-cta:focus-visible{outline:2px solid var(--text);outline-offset:1px}
 .leaflet-control-layers{background:rgba(31,27,18,.93) !important;color:var(--text) !important;border:1px solid var(--line) !important;border-radius:8px !important;font-family:'Archivo';font-size:12.5px}
 .leaflet-control-layers label{margin:2px 0}
 .shade-tip{background:rgba(31,27,18,.95);color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:'Archivo';font-size:12.5px}
@@ -298,6 +316,14 @@ button.iconbtn:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 
 /* accordions (sector deep-dive) */
 .acc-list{margin-top:10px}
+
+/* priority needs */
+.needs-list{display:flex;flex-direction:column;gap:2px}
+.need-row{display:flex;gap:14px;padding:12px 4px;border-bottom:1px dashed var(--line)}
+.need-row:last-child{border-bottom:none}
+.need-num{font-family:'IBM Plex Mono';font-size:20px;font-weight:600;color:var(--alarm);flex:none;width:34px}
+.need-row b{display:block;font-family:'Barlow Condensed';font-weight:600;font-size:14.5px;letter-spacing:.03em;text-transform:uppercase;margin-bottom:4px;color:var(--text)}
+.need-row span{font-size:13px;color:var(--muted);line-height:1.55}
 details.acc{border:1px solid rgba(237,227,204,.12);border-radius:8px;background:rgba(38,33,21,.5);margin-bottom:10px;overflow:hidden}
 details.acc summary{
   padding:12px 14px;cursor:pointer;list-style:none;font-family:'Barlow Condensed';

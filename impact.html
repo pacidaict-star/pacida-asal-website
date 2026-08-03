@@ -182,7 +182,7 @@ document.getElementById("themeLegend").innerHTML = INTERVENTIONS.themes.map(t =>
 ).join("");
 
 /* map (embedded in the panel below, not the page-wide fixed background) */
-const {map} = makeGlassMap([2.3, 38.2], 7, "impactMap");
+const {map} = makeGlassMap([2.3, 38.2], 7, "impactMap", [[-1.663, 35.07], [7.128, 40.53]]);
 setTimeout(()=>map.invalidateSize(), 300);
 PACIDA_SLUGS.forEach(slug=>{
   const geom = BOUNDARIES[slug];
