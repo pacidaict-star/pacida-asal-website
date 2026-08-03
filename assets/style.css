@@ -19,9 +19,13 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
 }
 .skip-link:focus{top:12px}
 
+/* NOTE: do not add overflow-x:hidden/clip to html or body — Chrome breaks
+   position:sticky (used by header) the moment overflow-x is non-visible on
+   the root element, regardless of overflow-y. Fix overflow bugs at their
+   source instead (see #map below, and wrap any wide table in .table-scroll). */
+
 /* full-page map background + glass surface */
 #map{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;background:#12100B;overflow:hidden}
-html,body{max-width:100%;overflow-x:hidden}
 .overlay{position:relative;z-index:10;pointer-events:none}
 .overlay > *{pointer-events:none}
 .glass{

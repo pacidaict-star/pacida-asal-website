@@ -665,6 +665,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
       Unfamiliar term? Open the <b>Glossary</b> in the header.
     </p>
     <h2 style="font-size:15px;margin-top:6px">Index bands mapped to official phases</h2>
+    <div class="table-scroll">
     <table class="ptable">
       <thead><tr><th>Dashboard band</th><th>Index</th><th>NDMA drought phase</th><th>IPC phase (FAO/WFP/FEWS NET)</th><th>Typical response</th></tr></thead>
       <tbody>
@@ -674,6 +675,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
         <tr><td><span class="chip" style="background:var(--emergency)"></span>Critical</td><td class="mono">75–100</td><td>Emergency</td><td>Phase 4 · Emergency</td><td>Full humanitarian response: relief food, therapeutic nutrition (SAM), emergency water, destocking</td></tr>
       </tbody>
     </table>
+    </div>
   </div>
 
   <div class="panel glass" id="about-section">
