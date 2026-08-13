@@ -1,6 +1,8 @@
 :root{
-  --bg:#16130D; --panel:#1F1B12; --panel-2:#262115; --line:#4A4230;
-  --text:#FBF7EC; --muted:#C6BB9A; --faint:#A0956F;
+  /* warm terracotta/ochre earth tones — echoes the satellite basemap's own
+     colours (sun-baked soil, dry savanna) instead of a generic near-black */
+  --bg:#2A1D12; --panel:#3A2818; --panel-2:#4A331E; --line:#6B4E30;
+  --text:#F7EAD6; --muted:#D8BD98; --faint:#B0906A;
   --normal:#34B44B; --alert:#F0B22E; --alarm:#E8834A; --emergency:#ED1C24;
   --water:#6FA3B4; --radius:10px;
   --pacida-green:#34B44B; --pacida-red:#ED1C24; --pacida-green-dark:#0C6B2E;
@@ -28,14 +30,14 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
    Mobile-first order: map on top, content below (DOM order, no override).
    Desktop: content on the left, map on the right (order-swapped below). */
 .page-shell{display:flex;flex-direction:column;align-items:stretch;min-height:100vh}
-.map-pane{position:relative;top:auto;width:100%;height:52vh;flex:none;background:#12100B;overflow:hidden}
+.map-pane{position:relative;top:auto;width:100%;height:52vh;flex:none;background:#1D140C;overflow:hidden}
 .map-pane #map{width:100%;height:100%}
 .content-pane{width:100%;min-width:0;background:var(--bg)}
 
 /* seam blend — the map fades toward the content colour instead of a hard edge */
 .map-pane::after{
   content:"";position:absolute;left:0;right:0;bottom:0;height:160px;z-index:850;pointer-events:none;
-  background:linear-gradient(to top, var(--bg) 0%, rgba(22,19,13,.75) 30%, rgba(22,19,13,.25) 65%, transparent 100%);
+  background:linear-gradient(to top, var(--bg) 0%, rgba(42,29,18,.75) 30%, rgba(42,29,18,.25) 65%, transparent 100%);
 }
 
 @media(min-width:1021px){
@@ -43,7 +45,7 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
   .content-pane{flex:1;order:1}
   .map-pane{position:sticky;top:0;width:46%;height:100vh;order:2}
   .map-pane::after{left:0;right:auto;bottom:0;top:0;width:240px;height:auto;
-    background:linear-gradient(to right, var(--bg) 0%, rgba(22,19,13,.75) 30%, rgba(22,19,13,.25) 65%, transparent 100%)}
+    background:linear-gradient(to right, var(--bg) 0%, rgba(42,29,18,.75) 30%, rgba(42,29,18,.25) 65%, transparent 100%)}
 }
 
 /* solid panels — nothing floats over the map anymore, so no blur/translucency needed */
@@ -56,13 +58,13 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
 /* the one exception: things that genuinely still sit on top of the live map
    (the legend) keep the translucent glass treatment */
 .map-overlay{
-  background:rgba(14,11,7,.88);
+  background:rgba(33,23,14,.88);
   -webkit-backdrop-filter:blur(18px) saturate(1.15);
   backdrop-filter:blur(18px) saturate(1.15);
-  border:1px solid rgba(251,247,236,.16);
+  border:1px solid rgba(247,234,214,.16);
   box-shadow:0 10px 34px rgba(0,0,0,.5);
 }
-@supports not (backdrop-filter:blur(2px)){ .map-overlay{background:rgba(13,10,7,.97)} }
+@supports not (backdrop-filter:blur(2px)){ .map-overlay{background:rgba(30,21,13,.97)} }
 
 /* header + nav */
 header{padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:1200;border-radius:0 0 14px 14px}
@@ -223,7 +225,7 @@ footer .brand-logo{height:24px}
 /* seasonal calendar */
 .season{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;margin-top:12px}
 .season .mo{border-radius:6px;padding:8px 2px 6px;text-align:center;font-family:'Barlow Condensed';font-weight:600;font-size:12px;letter-spacing:.08em;border:1px solid rgba(237,227,204,.1)}
-.season .mo small{display:block;font-family:'Archivo';font-weight:400;font-size:9.5px;color:rgba(22,19,13,.85);letter-spacing:0;margin-top:2px;text-transform:none}
+.season .mo small{display:block;font-family:'Archivo';font-weight:400;font-size:9.5px;color:rgba(42,29,18,.85);letter-spacing:0;margin-top:2px;text-transform:none}
 .mo.rain{background:var(--water);color:#EDF5F7}
 .mo.rain small{color:rgba(237,245,247,.85)}
 .mo.dry{background:rgba(217,108,43,.3);color:var(--text)}
@@ -249,7 +251,7 @@ footer .brand-logo{height:24px}
 .site-row b{font-family:'IBM Plex Mono';font-weight:500;color:var(--text)}
 
 /* leaflet theme */
-.leaflet-container{background:#12100B;font-family:'Archivo'}
+.leaflet-container{background:#1D140C;font-family:'Archivo'}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--text);border:1px solid var(--line)}
 .leaflet-popup-content{margin:12px 14px;font-size:13px;line-height:1.5}
 .leaflet-popup-content h4{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.07em;font-size:16px;margin-bottom:4px}

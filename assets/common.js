@@ -53,7 +53,7 @@ function sparkline(vals, splitIdx){
   });
   const sx=(splitIdx*bw).toFixed(1);
   return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+bars
-    +'<line x1="'+sx+'" y1="0" x2="'+sx+'" y2="'+H+'" stroke="#C6BB9A" stroke-width="1" stroke-dasharray="3 3"/></svg>';
+    +'<line x1="'+sx+'" y1="0" x2="'+sx+'" y2="'+H+'" stroke="#D8BD98" stroke-width="1" stroke-dasharray="3 3"/></svg>';
 }
 
 /* Clock (East Africa Time) */
@@ -255,7 +255,7 @@ function monthChart(data){
     const barTop = H-34-h;
     bars += `<rect x="${x.toFixed(1)}" y="${barTop.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${isLast?'#F0B22E':'#6FA3B4'}" opacity="${isLast?1:0.9}"><title>${d.month}: ${d.total.toFixed(0)} mm</title></rect>`;
     vals += `<text x="${(x+w/2).toFixed(1)}" y="${(barTop-6).toFixed(1)}" font-size="12" fill="${isLast?'#F0B22E':'#9AB6C0'}" font-family="IBM Plex Mono" text-anchor="middle">${d.total.toFixed(0)}</text>`;
-    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-14}" font-size="13" fill="#C6BB9A" font-family="Barlow Condensed" font-weight="600" text-anchor="middle">${names[mIdx]}</text>`;
+    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-14}" font-size="13" fill="#D8BD98" font-family="Barlow Condensed" font-weight="600" text-anchor="middle">${names[mIdx]}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:240px;display:block" role="img" aria-label="12 month rainfall history">${bars}${vals}${labels}</svg>`;
 }
@@ -265,7 +265,7 @@ function attachVillageLayer(map, slug){
   if(typeof VILLAGES === "undefined" || !VILLAGES[slug] || !VILLAGES[slug].length) return null;
   const layer = L.layerGroup();
   VILLAGES[slug].forEach(([name, lat, lon])=>{
-    const dot = L.circleMarker([lat,lon],{radius:3,color:"#FBF7EC",weight:1,fillColor:"#C6BB9A",fillOpacity:.9});
+    const dot = L.circleMarker([lat,lon],{radius:3,color:"#F7EAD6",weight:1,fillColor:"#D8BD98",fillOpacity:.9});
     const label = L.marker([lat,lon],{interactive:false,
       icon:L.divIcon({className:"",html:'<div class="village-label">'+name+'</div>',iconAnchor:[-7,4]})});
     layer.addLayer(dot); layer.addLayer(label);
@@ -372,7 +372,7 @@ function donutChart(data, size){
     paths += `<path d="M${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large} 1 ${x2.toFixed(2)},${y2.toFixed(2)} L${xi1.toFixed(2)},${yi1.toFixed(2)} A${rInner},${rInner} 0 ${large} 0 ${xi2.toFixed(2)},${yi2.toFixed(2)} Z" fill="${d.color}" opacity="0.92"><title>${d.label}: ${d.value}</title></path>`;
     angle = a2;
   });
-  return `<svg viewBox="0 0 ${size} ${size}" style="width:100%;max-width:${size}px;height:auto;display:block;margin:0 auto">${paths}<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="20" font-weight="700" fill="#FBF7EC" font-family="IBM Plex Mono">${total}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="#C6BB9A" font-family="Barlow Condensed" letter-spacing="1">PROJECTS</text></svg>`;
+  return `<svg viewBox="0 0 ${size} ${size}" style="width:100%;max-width:${size}px;height:auto;display:block;margin:0 auto">${paths}<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="20" font-weight="700" fill="#F7EAD6" font-family="IBM Plex Mono">${total}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="#D8BD98" font-family="Barlow Condensed" letter-spacing="1">PROJECTS</text></svg>`;
 }
 function yearBarChart(data){
   const W=760,H=160,pad=26;
