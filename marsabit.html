@@ -30,21 +30,6 @@
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div class="page-shell">
-<div class="map-pane">
-  <div id="map" role="application" aria-label="Aerial map of Marsabit County"></div>
-  <div class="map-legend map-overlay">
-    <h4>Monitoring sites</h4>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to Marsabit County &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km). Solid coloured dots (toggle &ldquo;PACIDA interventions&rdquo;) mark a specific project site; dashed hollow dots mark regional programmes whose title names no specific place &mdash; shown at an approximate point, not an exact location.</div>
-  </div>
-</div>
-
-<div class="content-pane">
-<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
-<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -73,6 +58,23 @@
   <div class="gl-body"></div>
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
+
+<div class="panes-row">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Aerial map of Marsabit County"></div>
+  <div class="map-legend map-overlay">
+    <h4>Monitoring sites</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to Marsabit County &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km). Solid coloured dots (toggle &ldquo;PACIDA interventions&rdquo;) mark a specific project site; dashed hollow dots mark regional programmes whose title names no specific place &mdash; shown at an approximate point, not an exact location.</div>
+  </div>
+</div>
+
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <div class="strip">
   <div class="cell glass"><div class="k">Need index (live)</div><div class="v" id="needV">&mdash;</div><div class="n" id="needN">recalculating from live weather</div></div>
@@ -168,6 +170,7 @@
 
 </div><!-- /content-inner -->
 </div><!-- /content-pane -->
+</div><!-- /panes-row -->
 </div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

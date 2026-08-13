@@ -252,21 +252,6 @@ TEMPLATE = """<!DOCTYPE html>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div class="page-shell">
-<div class="map-pane">
-  <div id="map" role="application" aria-label="Aerial map of %(title)s"></div>
-  <div class="map-legend map-overlay">
-    <h4>Monitoring sites</h4>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to %(title)s &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km). Solid coloured dots (toggle &ldquo;PACIDA interventions&rdquo;) mark a specific project site; dashed hollow dots mark regional programmes whose title names no specific place &mdash; shown at an approximate point, not an exact location.</div>
-  </div>
-</div>
-
-<div class="content-pane">
-<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
-<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -295,6 +280,23 @@ TEMPLATE = """<!DOCTYPE html>
   <div class="gl-body"></div>
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
+
+<div class="panes-row">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Aerial map of %(title)s"></div>
+  <div class="map-legend map-overlay">
+    <h4>Monitoring sites</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--emergency)"></span> Critical (75&ndash;100)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to %(title)s &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km). Solid coloured dots (toggle &ldquo;PACIDA interventions&rdquo;) mark a specific project site; dashed hollow dots mark regional programmes whose title names no specific place &mdash; shown at an approximate point, not an exact location.</div>
+  </div>
+</div>
+
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <div class="strip">
   <div class="cell glass"><div class="k">Need index (live)</div><div class="v" id="needV">&mdash;</div><div class="n" id="needN">recalculating from live weather</div></div>
@@ -390,6 +392,7 @@ TEMPLATE = """<!DOCTYPE html>
 
 </div><!-- /content-inner -->
 </div><!-- /content-pane -->
+</div><!-- /panes-row -->
 </div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -615,20 +618,6 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
 <div class="page-shell">
-<div class="map-pane">
-  <div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
-  <div class="map-legend map-overlay">
-    <h4>Map layers</h4>
-    <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
-    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Solid dots are project pins at a specific site; dashed hollow dots are regional programmes shown at an approximate point. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
-  </div>
-</div>
-
-<div class="content-pane">
-<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
-<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -661,6 +650,22 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   <div class="gl-body"></div>
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
+
+<div class="panes-row">
+<div class="map-pane">
+  <div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
+  <div class="map-legend map-overlay">
+    <h4>Map layers</h4>
+    <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
+    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
+    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Solid dots are project pins at a specific site; dashed hollow dots are regional programmes shown at an approximate point. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
+  </div>
+</div>
+
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <div class="strip" id="strip">
   <div class="cell glass"><div class="k">PACIDA operational areas</div><div class="v">3<span style="font-size:14px;color:var(--muted)"> + Borena</span></div><div class="n">Marsabit, Samburu, Isiolo counties &amp; the Borena cross-border zone</div></div>
@@ -797,6 +802,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 
 </div><!-- /content-inner -->
 </div><!-- /content-pane -->
+</div><!-- /panes-row -->
 </div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

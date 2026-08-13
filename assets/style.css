@@ -26,12 +26,16 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
    the root element, regardless of overflow-y. Fix overflow bugs at their
    source instead (see #map below, and wrap any wide table in .table-scroll). */
 
-/* split shell: interactive map confined to its own pane; the content pane gets
-   its own second, non-interactive decorative map as a backdrop, with glass
-   panels floating on top of it — so both sides show map, one drivable, one not.
+/* shell: a full-width header sits above everything (spans both panes, no
+   confinement to one side), then the interactive map / content panes-row
+   below it. The content pane gets its own second, non-interactive decorative
+   map as a backdrop, with glass panels floating on top of it — so both sides
+   show map, one drivable, one not, and header uses the same glass treatment
+   with no border so it reads as one continuous surface, not a boxed toolbar.
    Mobile-first order: map on top, content below (DOM order, no override).
    Desktop: content on the left, map on the right (order-swapped below). */
-.page-shell{display:flex;flex-direction:column;align-items:stretch;min-height:100vh}
+.page-shell{display:flex;flex-direction:column;min-height:100vh}
+.panes-row{display:flex;flex-direction:column;align-items:stretch;flex:1}
 .map-pane{position:relative;top:auto;width:100%;height:52vh;flex:none;background:#1D140C;overflow:hidden}
 .map-pane #map{width:100%;height:100%}
 .content-pane{position:relative;width:100%;min-width:0;background:var(--bg)}
@@ -48,7 +52,7 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
 }
 
 @media(min-width:1021px){
-  .page-shell{flex-direction:row;align-items:flex-start}
+  .panes-row{flex-direction:row;align-items:flex-start}
   .content-pane{flex:1;order:1}
   .map-pane{position:sticky;top:0;width:46%;height:100vh;order:2}
   .map-pane::after{left:0;right:auto;bottom:0;top:0;width:240px;height:auto;
@@ -67,6 +71,10 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
   box-shadow:0 10px 34px rgba(0,0,0,.4);
 }
 @supports not (backdrop-filter:blur(2px)){ .glass{background:rgba(38,26,16,.96)} }
+/* header spans the full page width now (sibling of panes-row, not nested in
+   one pane) — no border/radius/shadow, so it blends into whatever is below
+   it (map-pane or content-pane) instead of reading as a separate boxed bar */
+header.glass{border:none;box-shadow:none}
 
 /* the one exception: things that genuinely still sit on top of the live map
    (the legend) keep the translucent glass treatment */
@@ -80,7 +88,7 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
 @supports not (backdrop-filter:blur(2px)){ .map-overlay{background:rgba(30,21,13,.97)} }
 
 /* header + nav */
-header{padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:1200;border-radius:0 0 14px 14px}
+header{padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:1200;width:100%}
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand-logo{height:34px;width:auto;display:block;flex:none}
 .brand h1{font-family:'Barlow Condensed';font-weight:700;font-size:24px;letter-spacing:.08em;text-transform:uppercase}
