@@ -26,13 +26,20 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
    the root element, regardless of overflow-y. Fix overflow bugs at their
    source instead (see #map below, and wrap any wide table in .table-scroll). */
 
-/* split shell: map confined to its own pane, everything else on solid ground.
+/* split shell: interactive map confined to its own pane; the content pane gets
+   its own second, non-interactive decorative map as a backdrop, with glass
+   panels floating on top of it — so both sides show map, one drivable, one not.
    Mobile-first order: map on top, content below (DOM order, no override).
    Desktop: content on the left, map on the right (order-swapped below). */
 .page-shell{display:flex;flex-direction:column;align-items:stretch;min-height:100vh}
 .map-pane{position:relative;top:auto;width:100%;height:52vh;flex:none;background:#1D140C;overflow:hidden}
 .map-pane #map{width:100%;height:100%}
-.content-pane{width:100%;min-width:0;background:var(--bg)}
+.content-pane{position:relative;width:100%;min-width:0;background:var(--bg)}
+
+/* decorative background map for the content side — sticky + negative margin
+   keeps it pinned behind the scrolling content instead of pushing it down */
+.content-bg-map{position:sticky;top:0;height:100vh;margin-bottom:-100vh;z-index:0;overflow:hidden;background:#1D140C}
+.content-inner{position:relative;z-index:1}
 
 /* seam blend — the map fades toward the content colour instead of a hard edge */
 .map-pane::after{
@@ -48,12 +55,18 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
     background:linear-gradient(to right, var(--bg) 0%, rgba(42,29,18,.75) 30%, rgba(42,29,18,.25) 65%, transparent 100%)}
 }
 
-/* solid panels — nothing floats over the map anymore, so no blur/translucency needed */
+/* glass again — panels are translucent + blurred so the decorative map (or,
+   on the map-legend, the live map) shows through softly behind them. Opacity
+   kept fairly high (not the original .55) — a much lower value made text
+   unreadable against bright map imagery in an earlier version of this site. */
 .glass{
-  background:var(--panel);
-  border:1px solid var(--line);
-  box-shadow:0 4px 16px rgba(0,0,0,.35);
+  background:rgba(42,29,18,.82);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);
+  backdrop-filter:blur(16px) saturate(1.15);
+  border:1px solid rgba(247,234,214,.14);
+  box-shadow:0 10px 34px rgba(0,0,0,.4);
 }
+@supports not (backdrop-filter:blur(2px)){ .glass{background:rgba(38,26,16,.96)} }
 
 /* the one exception: things that genuinely still sit on top of the live map
    (the legend) keep the translucent glass treatment */

@@ -391,6 +391,21 @@ function yearBarChart(data){
 }
 
 /* Standard glass map (satellite base + labels + dark alternative). Returns {map, layersControl}. */
+/* Non-interactive decorative map — purely a textured backdrop behind the
+   content column's glass panels. Same imagery as the real map on the same
+   page, which already carries the Esri attribution, so this one omits its
+   own. Fails silently (returns null) if the target element isn't present. */
+function makeBackgroundMap(elId, center, zoom){
+  const el = document.getElementById(elId);
+  if(!el || typeof L === "undefined") return null;
+  const map = L.map(elId, {
+    zoomControl:false, attributionControl:false, dragging:false, touchZoom:false,
+    scrollWheelZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, tap:false
+  }).setView(center, zoom);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:17}).addTo(map);
+  return map;
+}
+
 function makeGlassMap(center, zoom, elId, bounds){
   const opts = {zoomControl:false, scrollWheelZoom:true};
   if(bounds){

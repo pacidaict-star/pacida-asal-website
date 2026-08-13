@@ -43,6 +43,8 @@
 </div>
 
 <div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -164,6 +166,7 @@
   <div class="mono" id="footTime"></div>
 </footer>
 
+</div><!-- /content-inner -->
 </div><!-- /content-pane -->
 </div><!-- /page-shell -->
 
@@ -182,6 +185,7 @@ const HQ = {name:"Maralal", lat:1.0966, lon:36.698};
 
 startClock();
 const {map, layersControl} = makeGlassMap([1.541, 37.184], 8, "map", [[0.019, 35.784], [3.063, 38.583]]);
+makeBackgroundMap("mapBg", [1.541, 37.184], 8);
 
 /* region outline */
 if (BOUNDARIES[RID]) {

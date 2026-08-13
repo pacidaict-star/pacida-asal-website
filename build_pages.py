@@ -265,6 +265,8 @@ TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -386,6 +388,7 @@ TEMPLATE = """<!DOCTYPE html>
   <div class="mono" id="footTime"></div>
 </footer>
 
+</div><!-- /content-inner -->
 </div><!-- /content-pane -->
 </div><!-- /page-shell -->
 
@@ -404,6 +407,7 @@ const HQ = {name:"%(hqname)s", lat:%(hqlat)s, lon:%(hqlon)s};
 
 startClock();
 const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map", %(bounds_json)s);
+makeBackgroundMap("mapBg", %(center)s, %(zoom)s);
 
 /* region outline */
 if (BOUNDARIES[RID]) {
@@ -623,6 +627,8 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -789,6 +795,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   <div class="mono" id="footTime"></div>
 </footer>
 
+</div><!-- /content-inner -->
 </div><!-- /content-pane -->
 </div><!-- /page-shell -->
 
@@ -803,6 +810,7 @@ const REGIONS = %(regions_json)s;
 const PACIDA_AREA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 
 startClock();
+makeBackgroundMap("mapBg", %(center)s, %(zoom)s);
 
 /* ================= MAP — framed on PACIDA's operational area ================= */
 const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map", %(bounds_json)s);
