@@ -109,7 +109,9 @@ HTML = """<!DOCTYPE html>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div class="overlay">
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <header class="glass">
   <div class="brand">
@@ -241,7 +243,8 @@ HTML = """<!DOCTYPE html>
   <div class="mono" id="footTime"></div>
 </footer>
 
-</div><!-- /overlay -->
+</div><!-- /content-inner -->
+</div><!-- /content-pane -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
@@ -259,6 +262,7 @@ function tickFoot(){
   document.getElementById("footTime").textContent = now.toLocaleString("en-GB",{timeZone:"Africa/Nairobi"}) + " EAT";
 }
 tickFoot(); setInterval(tickFoot, 1000);
+makeBackgroundMap("mapBg", [2.3, 38.2], 7);
 
 /* achievements grid */
 document.getElementById("achGrid").innerHTML = INTERVENTIONS.achievements.map(a =>
