@@ -254,6 +254,8 @@ footer .brand-logo{height:24px}
 .leaflet-popup-content{margin:12px 14px;font-size:13px;line-height:1.5}
 .leaflet-popup-content h4{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.07em;font-size:16px;margin-bottom:4px}
 .pop-k{color:var(--muted)} .pop-v{font-family:'IBM Plex Mono'}
+.pop-reach{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.pop-reach .pop-v{font-family:'Archivo';color:var(--text);display:block;margin-top:2px}
 .popup-cta{
   display:block;margin-top:10px;text-align:center;background:var(--pacida-green);color:#08210F;
   text-decoration:none;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.04em;

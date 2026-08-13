@@ -306,9 +306,11 @@ function drawInterventionLayer(map, slug){
       +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
       +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
       +(p.duration?`<div><span class="pop-k">Duration:</span> <span class="pop-v">${p.duration}</span></div>`:"")
+      +(p.population?`<div class="pop-reach"><span class="pop-k">Reach:</span> <span class="pop-v">${p.population}</span></div>`:"")
       +(regional
         ? `<div style="margin-top:6px"><span class="pop-k">Location:</span> Regional / multi-site programme &mdash; title names no specific place, shown at an approximate point within the operational area</div>`
-        : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`)
+        : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`),
+      {maxWidth: 340}
     );
     layer.addLayer(m);
   });

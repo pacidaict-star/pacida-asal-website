@@ -300,6 +300,64 @@ CHALLENGES = [
     {"challenge": "Political dynamics and governance challenges",
      "mitigation": "Strengthen stakeholder engagement, adaptive programming, and institutional risk management."},
 ]
+# ---------- 5b. real target-population / beneficiary figures ----------
+# Sourced from PACIDA's own narrative/progress/final reports (not the financial
+# project-summary register, which has no beneficiary field). One clean summary
+# per project, condensed from the full report text — verified against the
+# register by donor/title/year. Projects with only fragmented activity-level
+# counts (no reliable cumulative total) are deliberately left out rather than
+# forcing a number.
+POPULATIONS = {
+    "proj-0": "231,240 people reached (136,210 in Marsabit) with livestock, cash & WASH support — consortium led by Concern Worldwide",
+    "proj-1": "1,294 people reached (2023–24) through women's climate-resilience groups, training and gender/peace forums, Turbi Ward",
+    "proj-2": "8 community organisations awarded UNDP-GEF small grants (~USD180,000); 800 students reached via school forest sensitization",
+    "proj-3": "400 households reached with unconditional cash assistance (148 male, 252 female-headed persons; 112 with disabilities)",
+    "proj-4": "5,100 people reached (1,400 male, 3,700 female) with food aid, school feeding and water trucking, Moyale/Dire Woredas",
+    "proj-12": "12,000 people targeted via rehabilitated boreholes; 9,600 reached through One Health sensitization, plus indirect reach across Gabbra & Borena communities",
+    "proj-13": "8,220 households targeted (+41,100 indirect); at endline 4,672 households achieved a 25% income increase, Kajiado/Marsabit/Turkana",
+    "proj-14": "392 women & youth trained on county governance processes; 58 WDPCs/WRUAs/CSOs engaged in fiscal-planning review, Samburu",
+    "proj-15": "243 participants reached in one quarter across water-resource, climate-smart agriculture and WASH forums, Samburu",
+    "proj-16": "480 women completed business-skills training; over 85% of surveyed households reported increased income, 4 sub-counties",
+    "proj-17": "2,926 households reached via cross-border livestock vaccination campaigns (215,834 livestock treated); 260 VSLA participants, 80% women",
+    "proj-18": "21 CSOs engaged across 13 counties; 1,300+ people trained on rights-based approaches",
+    "proj-22": "3,310 households reached with cash transfers — 2,580 in Marsabit & Samburu, 730 in Borena Zone",
+    "proj-23": "150 households restocked with goats; 300 households received cash transfers after the 2024 floods, Moyale",
+    "proj-24": "4,704 people reached with safe drinking-water access and hygiene training across Turkana & Kajiado",
+    "proj-26": "7,670 households (41,017 people) targeted for WASH support across 4 counties; 200 households restocked",
+    "proj-27": "Cross-border livestock-market and youth-TVET forums reaching 30–90 participants per session, Forolle–Dirre corridor",
+    "proj-33": "800 households (4,800 people) targeted for six cycles of multi-purpose cash transfers",
+    "proj-36": "90 community members trained on climate-adaptation DRR across 6 sites in Marsabit & Ethiopia",
+    "proj-38": "2,524 people trained in climate-resilient food production (of a 3,000 target); 1,099 households received cash transfers",
+    "proj-49": "400 flood-affected households reached with cash assistance via M-Pesa, Kargi & Maikona",
+    "proj-51": "400 pupils supported at Tiigo Primary School; 37 high schools received Form 1 fee support",
+    "proj-55": "200 persons with disabilities each received livestock restocking; 200 farmers trained, Hurri Hills/Maikona",
+    "proj-60": "700 households supported with 3 months of food supplies, Maikona & Dukana wards",
+    "proj-61": "283 households received cash transfers; 220 households (1,320 people) reached with water trucking, North Horr",
+    "proj-63": "418 households (2,508 people) targeted for drought assistance, Laisamis",
+    "proj-64": "709 households (3,815 people) reached with cash and hygiene support, North Horr (609 main + 100-household top-up)",
+    "proj-68": "1,796 households on the cash-transfer caseload, Kenya COVID-19 Fund response",
+    "proj-71": "23,000 people targeted for cash and water-trucking assistance across 5 wards, Marsabit",
+    "proj-72": "390 women reached with SRHR information; 125 accessed services; 60 youth trained as climate-justice champions, Samburu",
+    "proj-80": "1,060 people reached with early cash assistance, Maikona & Kargi",
+    "proj-81": "750 people trained in Good Agricultural Practices; 300 households received cash transfers; 382 shoats distributed",
+    "proj-85": "425 pupils supported at Tiigo School (up from 365); new dormitory adds capacity for 80 more",
+    "proj-93": "30,000 people served by 16 community-managed boreholes; oxygen support to 10 health facilities during COVID-19",
+    "proj-94": "340 people reached through WCCPC formation forums and public-participation sessions on Ward Development Plans",
+    "proj-101": "503 people reached through ward-based dissemination of Marsabit's County Climate Change Policy",
+    "proj-116": "70 community volunteers trained in disease surveillance across 4 sub-counties, with Oxfam & ALDEF",
+    "proj-125": "Institutional capacity-building for 40 PACIDA staff and 7 Board members",
+    "proj-128": "3,000 pastoralists (500 families) and 20,000 livestock targeted, Chaffa Chachane rangelands",
+    "proj-134": "367 people reached through DRR/contingency-planning forums; rainwater-harvesting structure built, Horonder",
+    "proj-137": "1,975 households (11,850 people) reached with food supplies; 1,089 households via water trucking",
+    "proj-138": "Solar-powered borehole at Balesa supporting 3,200 households and ~15,000 livestock",
+    "proj-140": "Over 1,900 learners and 600 parents benefited; 159 students received high-school fee bursaries",
+    "proj-144": "4,019 households (24,114 people) reached with food, water and school meals, North Horr",
+    "proj-146": "5,000 people and 60,000 livestock targeted, Turbi division",
+    "proj-149": "24,472 people reached with food, school feeding and water-trucking support",
+    "proj-150": "4,000 households (24,000 people) targeted for food distribution; 2,003 households via water trucking",
+    "proj-164": "2,326 households reached with food support (above the 1,750 target); 7 shallow wells rehabilitated",
+}
+
 OFFICES = [
     {"name": "PACIDA HQ", "slug": "marsabit", "site": "Marsabit town", "note": "Head office, warehouse (owned)"},
     {"name": "Moyale field office", "slug": "marsabit", "site": "Moyale", "note": "Kenya field office"},
@@ -316,6 +374,11 @@ for o in OFFICES:
     c = coords_for(o["slug"], "site", o["site"])
     if c:
         o["lat"], o["lon"] = c
+
+for proj in projects:
+    pop = POPULATIONS.get(proj["id"])
+    if pop:
+        proj["population"] = pop
 
 THEMES = sorted({(p["theme"], p["theme_color"]) for p in projects}, key=lambda x: x[0])
 

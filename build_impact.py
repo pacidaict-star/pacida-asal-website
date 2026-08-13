@@ -229,6 +229,7 @@ HTML = """<!DOCTYPE html>
       <div class="src"><b>Achievement figures</b><span>PACIDA's own "@ A Glance 2023-2026" partner briefing &mdash; the same headline numbers shared with donors and partners.</span></div>
       <div class="src"><b>Challenges &amp; gaps</b><span>PACIDA's own stated challenges and mitigation measures, from the same briefing &mdash; not this dashboard's assessment.</span></div>
       <div class="src"><b>Partners &amp; donors</b><span>Organisation names from PACIDA's internal partnership records (current and historical); no financial or contractual detail is used or published.</span></div>
+      <div class="src"><b>Reach figures (map pins)</b><span>Where shown, "Reach" numbers on a project's map pin are condensed from PACIDA's own narrative/progress/final reports to that donor &mdash; not the financial register, which has no beneficiary field. Covers %(pop_count)s of %(total_count)s projects; the rest either have no report on file yet or only fragmented activity-level counts with no reliable total, so no figure is shown rather than an estimated one.</span></div>
       <div class="src"><b>Map locations</b><span>Projects whose title names a specific settlement are pinned exactly there. Regional/multi-county programmes (no named site) are shown as an approximate point within the operational area, weighted by each area's scale, rather than omitted from the map.</span></div>
     </div>
   </div>
@@ -300,9 +301,11 @@ function drawImpactMarkers(){
         +`<div><span class="pop-k">Theme:</span> <span class="pop-v">${p.theme}</span></div>`
         +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
         +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
+        +(p.population?`<div class="pop-reach"><span class="pop-k">Reach:</span> <span class="pop-v">${p.population}</span></div>`:"")
         +(regional
           ? `<div style="margin-top:6px"><span class="pop-k">Location:</span> Regional / multi-site programme &mdash; approximate point within the operational area</div>`
-          : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`));
+          : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`),
+        {maxWidth: 340});
       markerLayer.addLayer(m);
     });
     officesForSlug(slug).forEach(o=>{
@@ -375,6 +378,7 @@ out = HTML % dict(
     mapped_count=len(mapped), total_count=len(projects),
     precise_count=len(precisely_sited), regional_count=len(projects) - len(precisely_sited),
     partner_pills=partner_pills_html, partner_count=len(INTERVENTIONS["partners"]),
+    pop_count=len([p for p in projects if p.get("population")]),
     donut_json=json.dumps(donut_data, separators=(",", ":")),
     year_json=json.dumps(year_data, separators=(",", ":")),
     theme_chips=theme_chip_html,
