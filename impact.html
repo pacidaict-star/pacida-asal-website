@@ -73,7 +73,7 @@
         externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
       </div>
     </div>
-    <div class="hero-stats"><div class="hs"><div class="hn">236</div><div class="hl">Real projects, FY2010–FY2026</div></div><div class="hs"><div class="hn">16</div><div class="hl">Years of continuous operation</div></div><div class="hs"><div class="hn">18</div><div class="hl">Projects active right now</div></div><div class="hs"><div class="hn">68</div><div class="hl">Donor &amp; implementing partners</div></div></div>
+    <div class="hero-stats"><div class="hs"><div class="hn">236</div><div class="hl">Real projects, FY2010–FY2026</div></div><div class="hs"><div class="hn">16</div><div class="hl">Years of continuous operation</div></div><div class="hs"><div class="hn">18</div><div class="hl">Projects active right now</div></div><div class="hs"><div class="hn">54</div><div class="hl">Donor &amp; implementing partners</div></div></div>
   </div>
 
   <div class="panel glass">
@@ -99,8 +99,10 @@
     <div class="map-window" style="min-height:56vh;border-radius:10px;overflow:hidden;position:relative">
       <div id="impactMap" style="position:absolute;inset:0"></div>
     </div>
-    <p class="hist-cap">86 of 236 projects name a specific site in their title and are pinned here;
-    the rest are regional or multi-county programmes (shown in the table below, not on the map, rather than guessing a location).</p>
+    <p class="hist-cap">All 236 projects are shown &mdash; 86 name a specific site in their title and
+    are pinned exactly there (solid dots); the remaining 150 are regional or multi-county programmes with no
+    named site, shown as dashed hollow dots at an approximate point within the operational area rather than guessing a
+    precise location.</p>
   </div>
 
   <div class="panel glass">
@@ -134,12 +136,20 @@
   </div>
 
   <div class="panel glass">
+    <h2>Partners &amp; donors <span class="tag">54 organisations, from PACIDA's own partnership records</span></h2>
+    <p style="margin-bottom:12px">The donors and implementing partners PACIDA has worked with, past and present &mdash;
+    names only, drawn from PACIDA's internal partnership records. No contract, budget or audit detail is used here.</p>
+    <div class="partner-grid"><span class="partner-pill">Accord</span><span class="partner-pill">ACDI/VOCA</span><span class="partner-pill">ACT Alliance</span><span class="partner-pill">ACTED</span><span class="partner-pill">ActionAid</span><span class="partner-pill">ADESO</span><span class="partner-pill">ALDEF</span><span class="partner-pill">AMREF Maanisha</span><span class="partner-pill">Bega Kwa Bega (Kenya COVID-19 Fund)</span><span class="partner-pill">BILD</span><span class="partner-pill">CARE International</span><span class="partner-pill">Caritas Austria</span><span class="partner-pill">Caritas Bolzano</span><span class="partner-pill">Caritas Germany</span><span class="partner-pill">CBM</span><span class="partner-pill">CEWER</span><span class="partner-pill">CFP (Condivisione fra i Popoli)</span><span class="partner-pill">Chemonics Kenya</span><span class="partner-pill">Christian Aid</span><span class="partner-pill">Concern Worldwide</span><span class="partner-pill">Cordaid</span><span class="partner-pill">DKA Austria</span><span class="partner-pill">Dorcas</span><span class="partner-pill">DRC</span><span class="partner-pill">FAO</span><span class="partner-pill">FHI 360</span><span class="partner-pill">Helvetas</span><span class="partner-pill">HIVOS</span><span class="partner-pill">Horizont3000</span><span class="partner-pill">Instiglio</span><span class="partner-pill">Ipas Africa Alliance</span><span class="partner-pill">JICA</span><span class="partner-pill">KCDF</span><span class="partner-pill">Kindermissionswerk</span><span class="partner-pill">Kindernothilfe (KNH)</span><span class="partner-pill">Malteser International</span><span class="partner-pill">Mercy Corps</span><span class="partner-pill">MIRAL Foundation</span><span class="partner-pill">Misereor</span><span class="partner-pill">MWA-STAWI</span><span class="partner-pill">NEAR</span><span class="partner-pill">Oxfam</span><span class="partner-pill">PELUM</span><span class="partner-pill">Save the Children</span><span class="partner-pill">Sharing Love</span><span class="partner-pill">SNV</span><span class="partner-pill">STP</span><span class="partner-pill">TOWA</span><span class="partner-pill">UNDP</span><span class="partner-pill">UNOPS</span><span class="partner-pill">USAID</span><span class="partner-pill">Uwezo Kenya</span><span class="partner-pill">WaterFund</span><span class="partner-pill">Welthungerhilfe</span></div>
+  </div>
+
+  <div class="panel glass">
     <h2>Sources &amp; methodology</h2>
     <div class="src-grid">
       <div class="src"><b>Project register</b><span>PACIDA's internal Project Summary (FY2010&ndash;FY2026): donor, thematic area, title, duration and dates for every grant. Individual grant amounts are intentionally not published here &mdash; they read as internal financial detail rather than material PACIDA already shares externally.</span></div>
       <div class="src"><b>Achievement figures</b><span>PACIDA's own "@ A Glance 2023-2026" partner briefing &mdash; the same headline numbers shared with donors and partners.</span></div>
       <div class="src"><b>Challenges &amp; gaps</b><span>PACIDA's own stated challenges and mitigation measures, from the same briefing &mdash; not this dashboard's assessment.</span></div>
-      <div class="src"><b>Map locations</b><span>Only projects whose title names a specific settlement or ward are pinned, using this site's existing settlement coordinates. Regional/multi-county programmes are listed in the table but not placed on the map.</span></div>
+      <div class="src"><b>Partners &amp; donors</b><span>Organisation names from PACIDA's internal partnership records (current and historical); no financial or contractual detail is used or published.</span></div>
+      <div class="src"><b>Map locations</b><span>Projects whose title names a specific settlement are pinned exactly there. Regional/multi-county programmes (no named site) are shown as an approximate point within the operational area, weighted by each area's scale, rather than omitted from the map.</span></div>
     </div>
   </div>
 </div>
@@ -202,12 +212,17 @@ function drawImpactMarkers(){
       if(currentTheme!=="all" && p.theme!==currentTheme) return;
       const loc = p.locations.find(l=>l.slug===slug);
       if(!loc) return;
-      const m = L.circleMarker([loc.lat, loc.lon], {radius:6,color:"#fff",weight:1,fillColor:p.theme_color,fillOpacity:.88});
+      const regional = loc.kind === "regional";
+      const m = L.circleMarker([loc.lat, loc.lon], regional
+        ? {radius:6,color:p.theme_color,weight:1.5,fillColor:p.theme_color,fillOpacity:.25,dashArray:"2,2"}
+        : {radius:6,color:"#fff",weight:1,fillColor:p.theme_color,fillOpacity:.88});
       m.bindPopup(`<h4>${p.title}</h4>`
         +`<div><span class="pop-k">Theme:</span> <span class="pop-v">${p.theme}</span></div>`
         +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
         +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
-        +`<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`);
+        +(regional
+          ? `<div style="margin-top:6px"><span class="pop-k">Location:</span> Regional / multi-site programme &mdash; approximate point within the operational area</div>`
+          : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`));
       markerLayer.addLayer(m);
     });
     officesForSlug(slug).forEach(o=>{

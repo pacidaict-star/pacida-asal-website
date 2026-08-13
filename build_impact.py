@@ -33,9 +33,9 @@ def raw_bounds(geoms, pad=0.28):
 IMPACT_BOUNDS = raw_bounds([BOUNDARIES[s] for s in PACIDA_SLUGS_LIST if s in BOUNDARIES])
 
 projects = INTERVENTIONS["projects"]
-donors = sorted({p["donor"] for p in projects if p["donor"]})
 ongoing_now = [p for p in projects if p["status"] == "ongoing"]
 mapped = [p for p in projects if p["locations"]]
+precisely_sited = [p for p in projects if p["locations"] and p["locations"][0].get("kind") != "regional"]
 
 theme_counts = Counter(p["theme"] for p in projects)
 theme_color = {t["label"]: t["color"] for t in INTERVENTIONS["themes"]}
@@ -54,7 +54,7 @@ hero_stats = [
     (str(INTERVENTIONS["total_projects"]), "Real projects, FY2010\u2013FY2026"),
     (str(INTERVENTIONS["years_active"]), "Years of continuous operation"),
     (str(len(ongoing_now)), "Projects active right now"),
-    (str(len(donors)), "Donor &amp; implementing partners"),
+    (str(len(INTERVENTIONS["partners"])), "Donor &amp; implementing partners"),
 ]
 
 achievements_html = "".join(
@@ -68,6 +68,7 @@ challenges_html = "".join(
 hero_stats_html = "".join(
     '<div class="hs"><div class="hn">%s</div><div class="hl">%s</div></div>' % (n, l) for n, l in hero_stats
 )
+partner_pills_html = "".join('<span class="partner-pill">%s</span>' % p for p in INTERVENTIONS["partners"])
 legend_html = "".join(
     '<div class="legend-item"><span class="legend-sw" style="background:%s"></span>%s (%d)</div>' % (t["color"], t["label"], theme_counts.get(t["label"], 0))
     for t in INTERVENTIONS["themes"]
@@ -178,8 +179,10 @@ HTML = """<!DOCTYPE html>
     <div class="map-window" style="min-height:56vh;border-radius:10px;overflow:hidden;position:relative">
       <div id="impactMap" style="position:absolute;inset:0"></div>
     </div>
-    <p class="hist-cap">%(mapped_count)s of %(total_count)s projects name a specific site in their title and are pinned here;
-    the rest are regional or multi-county programmes (shown in the table below, not on the map, rather than guessing a location).</p>
+    <p class="hist-cap">All %(total_count)s projects are shown &mdash; %(precise_count)s name a specific site in their title and
+    are pinned exactly there (solid dots); the remaining %(regional_count)s are regional or multi-county programmes with no
+    named site, shown as dashed hollow dots at an approximate point within the operational area rather than guessing a
+    precise location.</p>
   </div>
 
   <div class="panel glass">
@@ -213,12 +216,20 @@ HTML = """<!DOCTYPE html>
   </div>
 
   <div class="panel glass">
+    <h2>Partners &amp; donors <span class="tag">%(partner_count)s organisations, from PACIDA's own partnership records</span></h2>
+    <p style="margin-bottom:12px">The donors and implementing partners PACIDA has worked with, past and present &mdash;
+    names only, drawn from PACIDA's internal partnership records. No contract, budget or audit detail is used here.</p>
+    <div class="partner-grid">%(partner_pills)s</div>
+  </div>
+
+  <div class="panel glass">
     <h2>Sources &amp; methodology</h2>
     <div class="src-grid">
       <div class="src"><b>Project register</b><span>PACIDA's internal Project Summary (FY2010&ndash;FY2026): donor, thematic area, title, duration and dates for every grant. Individual grant amounts are intentionally not published here &mdash; they read as internal financial detail rather than material PACIDA already shares externally.</span></div>
       <div class="src"><b>Achievement figures</b><span>PACIDA's own "@ A Glance 2023-2026" partner briefing &mdash; the same headline numbers shared with donors and partners.</span></div>
       <div class="src"><b>Challenges &amp; gaps</b><span>PACIDA's own stated challenges and mitigation measures, from the same briefing &mdash; not this dashboard's assessment.</span></div>
-      <div class="src"><b>Map locations</b><span>Only projects whose title names a specific settlement or ward are pinned, using this site's existing settlement coordinates. Regional/multi-county programmes are listed in the table but not placed on the map.</span></div>
+      <div class="src"><b>Partners &amp; donors</b><span>Organisation names from PACIDA's internal partnership records (current and historical); no financial or contractual detail is used or published.</span></div>
+      <div class="src"><b>Map locations</b><span>Projects whose title names a specific settlement are pinned exactly there. Regional/multi-county programmes (no named site) are shown as an approximate point within the operational area, weighted by each area's scale, rather than omitted from the map.</span></div>
     </div>
   </div>
 </div>
@@ -281,12 +292,17 @@ function drawImpactMarkers(){
       if(currentTheme!=="all" && p.theme!==currentTheme) return;
       const loc = p.locations.find(l=>l.slug===slug);
       if(!loc) return;
-      const m = L.circleMarker([loc.lat, loc.lon], {radius:6,color:"#fff",weight:1,fillColor:p.theme_color,fillOpacity:.88});
+      const regional = loc.kind === "regional";
+      const m = L.circleMarker([loc.lat, loc.lon], regional
+        ? {radius:6,color:p.theme_color,weight:1.5,fillColor:p.theme_color,fillOpacity:.25,dashArray:"2,2"}
+        : {radius:6,color:"#fff",weight:1,fillColor:p.theme_color,fillOpacity:.88});
       m.bindPopup(`<h4>${p.title}</h4>`
         +`<div><span class="pop-k">Theme:</span> <span class="pop-v">${p.theme}</span></div>`
         +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
         +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
-        +`<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`);
+        +(regional
+          ? `<div style="margin-top:6px"><span class="pop-k">Location:</span> Regional / multi-site programme &mdash; approximate point within the operational area</div>`
+          : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`));
       markerLayer.addLayer(m);
     });
     officesForSlug(slug).forEach(o=>{
@@ -357,6 +373,8 @@ document.getElementById("exportBtn").addEventListener("click", ()=>{
 out = HTML % dict(
     hero_stats=hero_stats_html, achievements_list=achievements_html, challenges_list=challenges_html,
     mapped_count=len(mapped), total_count=len(projects),
+    precise_count=len(precisely_sited), regional_count=len(projects) - len(precisely_sited),
+    partner_pills=partner_pills_html, partner_count=len(INTERVENTIONS["partners"]),
     donut_json=json.dumps(donut_data, separators=(",", ":")),
     year_json=json.dumps(year_data, separators=(",", ":")),
     theme_chips=theme_chip_html,

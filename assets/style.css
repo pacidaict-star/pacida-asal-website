@@ -376,6 +376,13 @@ details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
 .chal-row .cc{font-size:12.5px;color:var(--text);font-weight:600}
 .chal-row .cm{font-size:12px;color:var(--muted);margin-top:3px}
 .legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+
+/* partner/donor pills */
+.partner-grid{display:flex;flex-wrap:wrap;gap:8px}
+.partner-pill{
+  background:rgba(52,180,75,.1);border:1px solid rgba(52,180,75,.35);color:var(--text);
+  padding:6px 13px;border-radius:20px;font-size:12.5px;font-family:'Archivo';
+}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
 .legend-sw{width:10px;height:10px;border-radius:50%;flex:none}
 .hero-logo-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap}

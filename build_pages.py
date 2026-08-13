@@ -260,7 +260,7 @@ TEMPLATE = """<!DOCTYPE html>
     <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High (60&ndash;74)</div>
     <div class="lg-row"><span class="lg-swatch" style="background:var(--alert)"></span> Elevated (45&ndash;59)</div>
     <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch (0&ndash;44)</div>
-    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to %(title)s &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km).</div>
+    <div class="lg-note">Each dot is a settlement-level monitoring point with its own live weather feed. Map is locked to %(title)s &mdash; pan/zoom stays within the intervention area. Site coordinates are indicative (&plusmn;2&ndash;5 km; weather grid resolution ~11 km). Solid coloured dots (toggle &ldquo;PACIDA interventions&rdquo;) mark a specific project site; dashed hollow dots mark regional programmes whose title names no specific place &mdash; shown at an approximate point, not an exact location.</div>
   </div>
 </div>
 
@@ -618,7 +618,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
     <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
     <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
-    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
+    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Solid dots are project pins at a specific site; dashed hollow dots are regional programmes shown at an approximate point. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
   </div>
 </div>
 

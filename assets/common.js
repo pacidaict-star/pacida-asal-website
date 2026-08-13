@@ -295,16 +295,20 @@ function drawInterventionLayer(map, slug){
   projectsForSlug(slug).forEach(p=>{
     const loc = p.locations.find(l=>l.slug===slug);
     if(!loc) return;
-    const m = L.circleMarker([loc.lat, loc.lon], {
-      radius:6, color:"#fff", weight:1, fillColor:p.theme_color, fillOpacity:.85, className:"interv-dot"
-    });
+    const regional = loc.kind === "regional";
+    const m = L.circleMarker([loc.lat, loc.lon], regional
+      ? {radius:6, color:p.theme_color, weight:1.5, fillColor:p.theme_color, fillOpacity:.25, dashArray:"2,2", className:"interv-dot interv-dot-regional"}
+      : {radius:6, color:"#fff", weight:1, fillColor:p.theme_color, fillOpacity:.85, className:"interv-dot"}
+    );
     m.bindPopup(
       `<h4>${p.title}</h4>`
       +`<div><span class="pop-k">Theme:</span> <span class="pop-v">${p.theme}</span></div>`
       +`<div><span class="pop-k">Donor:</span> <span class="pop-v">${p.donor||"—"}</span></div>`
       +`<div><span class="pop-k">Year:</span> <span class="pop-v">${p.year||"—"} &middot; ${p.status==="ongoing"?"Ongoing":"Completed"}</span></div>`
       +(p.duration?`<div><span class="pop-k">Duration:</span> <span class="pop-v">${p.duration}</span></div>`:"")
-      +`<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`
+      +(regional
+        ? `<div style="margin-top:6px"><span class="pop-k">Location:</span> Regional / multi-site programme &mdash; title names no specific place, shown at an approximate point within the operational area</div>`
+        : `<div style="margin-top:6px"><span class="pop-k">Located at:</span> ${loc.name}</div>`)
     );
     layer.addLayer(m);
   });
@@ -324,7 +328,7 @@ function drawInterventionHeat(slugs){
   if(typeof INTERVENTIONS !== "undefined"){
     INTERVENTIONS.projects.forEach(p=>{
       p.locations.forEach(loc=>{
-        if(slugs.includes(loc.slug)) pts.push([loc.lat, loc.lon, 1]);
+        if(slugs.includes(loc.slug)) pts.push([loc.lat, loc.lon, loc.kind==="regional"?0.5:1]);
       });
     });
     INTERVENTIONS.offices.forEach(o=>{

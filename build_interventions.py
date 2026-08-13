@@ -195,6 +195,30 @@ def scattered_county_point(slug, seed_key):
     return COUNTY_HQ.get(slug)
 
 
+# projects whose title names no specific place at all (regional / cross-cutting /
+# multi-county programmes) still get mapped — scattered across PACIDA's real
+# operational area, weighted by each area's households (a proxy for scale of
+# reach), and tagged kind="regional" so the frontend can render/label them
+# honestly as approximate rather than a precise project site.
+PACIDA_AREA_SLUGS = ["marsabit", "samburu", "isiolo", "borena"]
+_area_weights = [counties[s]["households"] for s in PACIDA_AREA_SLUGS]
+_area_total = sum(_area_weights)
+_area_cum = []
+_c = 0
+for _w in _area_weights:
+    _c += _w
+    _area_cum.append(_c / _area_total)
+
+
+def pick_regional_slug(seed_key):
+    rnd = random.Random(seed_key)
+    r = rnd.random()
+    for slug, cum in zip(PACIDA_AREA_SLUGS, _area_cum):
+        if r <= cum:
+            return slug
+    return PACIDA_AREA_SLUGS[-1]
+
+
 def coords_for(slug, kind, name, seed_key=None):
     if kind == "site":
         if (slug, name) in SITE_COORDS:
@@ -216,15 +240,19 @@ for i, p in enumerate(raw):
     end_d = to_date(p["end"])
     status = "ongoing" if (end_d is None or end_d >= NOW) else "completed"
     locs = find_locations(p["title"])
+    loc_list = []
     if locs:
         loc_hits += 1
+        for s, (k, n) in locs.items():
+            c = coords_for(s, k, n, seed_key=f"proj-{i}-{s}")
+            if c:
+                loc_list.append({"slug": s, "kind": k, "name": n, "lat": c[0], "lon": c[1]})
     else:
         no_loc += 1
-    loc_list = []
-    for s, (k, n) in locs.items():
-        c = coords_for(s, k, n, seed_key=f"proj-{i}-{s}")
+        rslug = pick_regional_slug(f"regional-{i}")
+        c = scattered_county_point(rslug, f"regional-{i}")
         if c:
-            loc_list.append({"slug": s, "kind": k, "name": n, "lat": c[0], "lon": c[1]})
+            loc_list.append({"slug": rslug, "kind": "regional", "name": "Regional programme", "lat": c[0], "lon": c[1]})
     projects.append(dict(
         id=f"proj-{i}", year=p["year"], donor=(p["donor"] or "").strip(),
         theme=theme_label, theme_color=theme_color, title=p["title"],
@@ -235,7 +263,7 @@ for i, p in enumerate(raw):
         locations=loc_list,
     ))
 
-print(f"projects: {len(projects)}  with-location: {loc_hits}  no-location(regional/multi-county): {no_loc}")
+print(f"projects: {len(projects)}  precisely-sited: {loc_hits}  scattered-regional (title names no specific place): {no_loc}")
 
 # ---------- 5. curated achievement stats (from PACIDA's own externally-shared @Glance deck) ----------
 ACHIEVEMENTS = [
@@ -291,10 +319,70 @@ for o in OFFICES:
 
 THEMES = sorted({(p["theme"], p["theme_color"]) for p in projects}, key=lambda x: x[0])
 
+# ---------- 6. real donor/partner names — merged from two sources ----------
+# (a) the project register's own "donor" field (complete, but full of typo/
+#     casing variants from years of manual entry — "Caritus Austria",
+#     "Concer Worldwide", "WHH" etc. all mean the same organisation), and
+# (b) PACIDA's Partnership Documents folder names (organisations with a
+#     formal partnership record but not necessarily a completed/dated grant
+#     row yet). Only organisation names are used from either source — no
+#     contract, budget, audit or compliance content.
+DONOR_CANON = {
+    "acdi/voca": "ACDI/VOCA", "acted": "ACTED", "adeso": "ADESO", "aldef": "ALDEF",
+    "amref maanisha": "AMREF Maanisha", "accord": "Accord", "action aid": "ActionAid",
+    "asociatia sharing love": "Sharing Love", "bild": "BILD",
+    "caritas austria": "Caritas Austria", "caritas ausria": "Caritas Austria",
+    "caritus austria": "Caritas Austria", "caritas austria-": "Caritas Austria",
+    "caritas austria-pclp": "Caritas Austria", "caritas bolzano": "Caritas Bolzano",
+    "cbm": "CBM", "cewer": "CEWER", "cordaid": "Cordaid", "cordaid/echo": "Cordaid",
+    "chemonics kenya limited": "Chemonics Kenya", "chemonics kenya": "Chemonics Kenya",
+    "chistian aid": "Christian Aid", "christian aid": "Christian Aid",
+    "concer worldwide": "Concern Worldwide", "concern worldwide": "Concern Worldwide",
+    "concern world wide": "Concern Worldwide", "concernworldwide": "Concern Worldwide",
+    "dka austria": "DKA Austria", "dka": "DKA Austria", "dorcas": "Dorcas", "drc": "DRC",
+    "fao-101": "FAO", "fao-105": "FAO", "un-fao": "FAO", "unfao": "FAO",
+    "un - fao (food and agriculture organizationof the united nations)": "FAO",
+    "fhi": "FHI 360", "helvetas": "Helvetas", "hivos": "HIVOS",
+    "horizon 3000": "Horizont3000", "horizont 3000": "Horizont3000",
+    "instiglio": "Instiglio", "ipas africa alliance": "Ipas Africa Alliance", "ipas": "Ipas Africa Alliance",
+    "jica": "JICA", "kcdf": "KCDF", "kindermissionswerk": "Kindermissionswerk", "knh": "Kindernothilfe (KNH)",
+    "kenya covid - 19 fund (bega kwa bega)": "Bega Kwa Bega (Kenya COVID-19 Fund)",
+    "mercycorps": "Mercy Corps", "mercy corps": "Mercy Corps",
+    "miral foundation": "MIRAL Foundation", "miral": "MIRAL Foundation",
+    "malteser international": "Malteser International", "miserior": "Misereor", "misereor": "Misereor",
+    "mwa": "MWA-STAWI", "mwa-stawi": "MWA-STAWI", "near": "NEAR", "oxfam": "Oxfam",
+    "ofda": "USAID/OFDA", "pelum": "PELUM", "save the children": "Save the Children",
+    "snv": "SNV", "stp": "STP", "towa": "TOWA", "undp": "UNDP", "unops": "UNOPS",
+    "usaid": "USAID", "uwezo-kenya": "Uwezo Kenya", "uwezo": "Uwezo Kenya",
+    "waterfund": "WaterFund",
+    "whh": "Welthungerhilfe", "welthunger hilfe": "Welthungerhilfe",
+    "welthunger hilfe(bmz)": "Welthungerhilfe", "welthunger hilfe(giz)": "Welthungerhilfe",
+    "welthungerhilfe": "Welthungerhilfe",
+    "act alliance": "ACT Alliance", "care international": "CARE International",
+    "cfp (condivisione fra 1 propoli)": "CFP (Condivisione fra i Popoli)",
+    "caritas germany": "Caritas Germany", "caritas german": "Caritas Germany",
+    "caritas german(bmz)": "Caritas Germany", "caritas germany (bmz-s)": "Caritas Germany",
+}
+PARTNER_FOLDERS = [  # Partnership Documents folder names not already covered above
+    "ACT Alliance", "CARE International", "CFP (Condivisione fra i Popoli)", "DRC",
+    "Helvetas", "Instiglio", "Kindernothilfe (KNH)", "PELUM", "Save the Children",
+    "STP", "USAID",
+]
+partner_set = set()
+for p in projects:
+    raw_name = (p["donor"] or "").strip()
+    if not raw_name:
+        continue
+    canon = DONOR_CANON.get(raw_name.lower())
+    partner_set.add(canon if canon else raw_name)
+for name in PARTNER_FOLDERS:
+    partner_set.add(name)
+PARTNERS = sorted(partner_set, key=str.lower)
+
 out = dict(
     generated=str(NOW), total_projects=len(projects), years_active=NOW.year - 2010,
     projects=projects, achievements=ACHIEVEMENTS, challenges=CHALLENGES, offices=OFFICES,
-    themes=[{"label": t, "color": c} for t, c in THEMES],
+    themes=[{"label": t, "color": c} for t, c in THEMES], partners=PARTNERS,
 )
 open(os.path.join(SITE, "assets", "interventions.json"), "w", encoding="utf-8").write(
     json.dumps(out, ensure_ascii=False, indent=1)
