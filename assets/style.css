@@ -45,18 +45,32 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
 .content-bg-map{position:sticky;top:0;height:100vh;margin-bottom:-100vh;z-index:0;overflow:hidden;background:#1D140C}
 .content-inner{position:relative;z-index:1}
 
-/* seam blend — the map fades toward the content colour instead of a hard edge */
+/* seam blend — both sides now show live map imagery (the interactive map-pane,
+   and the content-pane's own decorative backdrop map), so the seam is softened
+   with a low-opacity tint that peaks gently right at the shared edge and fades
+   out on BOTH sides symmetrically. An earlier version faded the map-pane edge
+   to a fully-opaque flat colour — that read as a hard block of solid colour
+   sitting right next to vivid, untouched map imagery on the content side,
+   which was itself a visible seam, just a different one. content-pane::after
+   sits at z-index:0 (above the backdrop map, below content-inner's z-index:1)
+   so cards stay crisp and only the open map gap near the edge gets tinted. */
 .map-pane::after{
   content:"";position:absolute;left:0;right:0;bottom:0;height:160px;z-index:850;pointer-events:none;
-  background:linear-gradient(to top, var(--bg) 0%, rgba(42,29,18,.75) 30%, rgba(42,29,18,.25) 65%, transparent 100%);
+  background:linear-gradient(to top, rgba(42,29,18,.4) 0%, rgba(42,29,18,.18) 50%, transparent 100%);
+}
+.content-pane::after{
+  content:"";position:absolute;left:0;right:0;top:0;height:120px;z-index:0;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(42,29,18,.4) 0%, rgba(42,29,18,.15) 55%, transparent 100%);
 }
 
 @media(min-width:1021px){
   .panes-row{flex-direction:row;align-items:flex-start}
   .content-pane{flex:1;order:1}
   .map-pane{position:sticky;top:0;width:46%;height:100vh;order:2}
-  .map-pane::after{left:0;right:auto;bottom:0;top:0;width:240px;height:auto;
-    background:linear-gradient(to right, var(--bg) 0%, rgba(42,29,18,.75) 30%, rgba(42,29,18,.25) 65%, transparent 100%)}
+  .map-pane::after{left:0;right:auto;bottom:0;top:0;width:200px;height:auto;
+    background:linear-gradient(to right, rgba(42,29,18,.4) 0%, rgba(42,29,18,.15) 45%, transparent 100%)}
+  .content-pane::after{left:auto;right:0;top:0;bottom:0;width:200px;height:auto;
+    background:linear-gradient(to left, rgba(42,29,18,.4) 0%, rgba(42,29,18,.15) 45%, transparent 100%)}
 }
 
 /* glass again — panels are translucent + blurred so the decorative map (or,
