@@ -128,6 +128,36 @@ main{display:block}
 .lg-swatch{width:12px;height:12px;border-radius:50%;flex:none}
 .lg-note{color:var(--faint);font-size:11px;margin-top:6px;line-height:1.4}
 
+/* areas.html — a full-screen, map-only view: header takes its natural
+   height, the map fills the rest of the viewport, no page scroll */
+.areas-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.areas-body{position:relative;flex:1;min-height:0}
+.areas-body #map{position:absolute;inset:0}
+.area-picker{position:absolute;top:14px;left:14px;z-index:900;border-radius:10px;padding:12px 14px;max-width:220px}
+.area-picker h4{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--muted);margin-bottom:8px}
+#areaButtons{display:flex;flex-direction:column;gap:6px}
+.area-btn{
+  background:rgba(38,33,21,.7);color:var(--text);border:1px solid var(--line);
+  padding:8px 12px;border-radius:6px;font-family:'Barlow Condensed';font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;font-size:13px;cursor:pointer;text-align:left;
+  transition:border-color .2s;
+}
+.area-btn:hover{border-color:var(--alert)}
+.area-btn:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+@media(max-width:640px){
+  /* Short viewports (mobile, header taking several wrapped rows) leave little
+     room for the map — keep both overlay panels compact so the map itself,
+     not two stacked info boxes, stays the dominant thing on screen. */
+  .area-picker{max-width:calc(100% - 28px);padding:8px 10px}
+  .area-picker h4{margin-bottom:6px}
+  #areaButtons{flex-direction:row;flex-wrap:wrap;gap:5px}
+  .area-btn{padding:6px 10px;font-size:11.5px}
+  .map-legend{padding:8px 10px;max-width:none}
+  .map-legend h4{margin-bottom:5px}
+  .lg-row{margin-bottom:3px;font-size:11px}
+  .lg-note{display:none}
+}
+
 /* cards */
 .cards{display:flex;flex-direction:column;gap:14px}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:10px}

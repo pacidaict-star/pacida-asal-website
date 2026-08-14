@@ -626,7 +626,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <div class="sub">PACIDA's operational area &middot; Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
   </div>
   <nav class="site">
-    <a href="#pacida-section">Operational areas</a>
+    <a href="areas.html">Operational areas</a>
     <a href="impact.html">PACIDA Impact Dashboard</a>
     <a href="#about-section">About</a>
   </nav>
