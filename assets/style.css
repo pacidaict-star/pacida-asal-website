@@ -165,6 +165,39 @@ nav.site a{
 nav.site a:hover{color:var(--text);border-color:var(--line)}
 nav.site a.active{color:#0A0805;background:var(--alert);border-color:var(--alert)}
 nav.site a:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+
+/* Counties dropdown — every page's header nav is now the same full set of
+   site-wide links (Home / Operational Areas / Impact Dashboard / Counties /
+   About) so any page can reach any other page from its own header; the 4
+   county pages are grouped into this dropdown instead of 4 separate nav
+   links so the row stays short. Click-toggled (not hover-only) so it works
+   identically with mouse, keyboard and touch. */
+.nav-dd{position:relative}
+.nav-dd-btn{
+  background:none;color:var(--muted);border:1px solid transparent;cursor:pointer;
+  font-family:'Barlow Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.08em;
+  font-size:13.5px;padding:6px 11px;border-radius:6px;display:inline-flex;align-items:center;gap:5px;
+  transition:.15s;
+}
+.nav-dd-btn:hover{color:var(--text);border-color:var(--line)}
+.nav-dd-btn:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+.nav-dd-btn.active{color:#0A0805;background:var(--alert);border-color:var(--alert)}
+.nav-dd-btn .caret{font-size:9px;transition:transform .15s}
+.nav-dd.open .nav-dd-btn .caret{transform:rotate(180deg)}
+.nav-dd-menu{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:170px;z-index:1300;
+  background:rgba(23,19,12,.97);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);padding:6px;
+}
+.nav-dd.open .nav-dd-menu{display:block}
+.nav-dd-menu a{
+  display:block;padding:8px 12px;border-radius:6px;color:var(--muted);text-decoration:none;
+  font-family:'Barlow Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:13px;
+}
+.nav-dd-menu a:hover{color:var(--text);background:rgba(240,178,46,.14)}
+.nav-dd-menu a.active{color:#0A0805;background:var(--alert)}
+.nav-dd-menu a:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+
 .head-right{margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 
 /* hamburger toggle + collapsible nav panel — desktop: nav-collapse is
@@ -181,7 +214,19 @@ nav.site a:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 .navToggle:hover{border-color:var(--alert)}
 .navToggle:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 .nav-collapse{display:contents}
-@media(max-width:1020px){
+/* This is a DIFFERENT breakpoint from the 1020/1021px one used for the
+   map-pane/content-pane side-by-side layout above — that one's about screen
+   real estate for two panes, this one's about whether the header's own nav
+   (now 5 links + a dropdown, plus the whole search/live/unit/glossary/
+   export/refresh cluster) fits on one row without wrapping. Measured: it
+   only reliably fits at >=1520px, and unpredictably wraps into 2 rows
+   anywhere below that (flex-wrap jumps between 1 and 2 rows
+   non-monotonically as items reflow near the edge — even 1440px, a common
+   "wide laptop" width, wraps). 1560px gives real clearance instead of
+   sitting right on the edge of that instability, so mid-size laptop
+   screens reliably get the clean compact header instead of an occasional
+   2-row one. */
+@media(max-width:1560px){
   .navToggle{display:flex}
   .nav-collapse{
     display:none;position:fixed;top:var(--header-h,68px);left:0;right:0;z-index:1190;
@@ -191,6 +236,13 @@ nav.site a:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
   }
   .nav-collapse.open{display:flex}
   .nav-collapse nav.site{flex-direction:column;gap:6px}
+  /* inside the mobile panel the dropdown opens inline (pushes the links
+     below it down) rather than floating over the panel like on desktop */
+  .nav-collapse .nav-dd-btn{width:100%;justify-content:space-between}
+  .nav-collapse .nav-dd-menu{
+    position:static;top:auto;left:auto;box-shadow:none;border:none;
+    background:rgba(0,0,0,.22);margin-top:4px;min-width:0;
+  }
   .nav-collapse .head-right{margin-left:0;flex-direction:column;align-items:stretch;gap:10px}
   .nav-collapse .search-wrap input{width:100%}
   .brand .sub{display:none}

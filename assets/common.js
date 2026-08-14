@@ -105,6 +105,25 @@ function attachNavToggle(){
   window.addEventListener("resize", ()=>{ if(window.innerWidth > 1020) close(); });
 }
 
+/* ---------- header "Counties" dropdown (click-toggled, not hover-only, so
+   it works the same with mouse, keyboard and touch) ---------- */
+function attachNavDropdown(){
+  document.querySelectorAll(".nav-dd").forEach(dd=>{
+    const btn = dd.querySelector(".nav-dd-btn");
+    if(!btn) return;
+    const close = ()=>{ dd.classList.remove("open"); btn.setAttribute("aria-expanded","false"); };
+    const open = ()=>{ dd.classList.add("open"); btn.setAttribute("aria-expanded","true"); };
+    btn.addEventListener("click", e=>{
+      e.stopPropagation();
+      dd.classList.contains("open") ? close() : open();
+    });
+    document.addEventListener("click", e=>{
+      if(dd.classList.contains("open") && !dd.contains(e.target)) close();
+    });
+    document.addEventListener("keydown", e=>{ if(e.key === "Escape") close(); });
+  });
+}
+
 function attachUnitToggle(){
   const btn = document.getElementById("unitToggle");
   if(!btn) return;

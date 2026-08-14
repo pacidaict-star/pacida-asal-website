@@ -136,10 +136,33 @@ def fmtnum(v):
     return str(v)
 
 
-def navbar(rid):
-    home_active = ' class="active"' if rid == "home" else ""
-    return ('<a href="index.html"%s>&larr; PACIDA\'s operational areas</a>'
-            '<a href="impact.html">PACIDA Impact Dashboard</a>') % home_active
+COUNTY_NAV_LINKS = [("marsabit", "Marsabit"), ("samburu", "Samburu"), ("isiolo", "Isiolo"), ("borena", "Borena Zone")]
+
+
+def site_nav(active):
+    """Shared, site-wide header nav — every page can reach every other page
+    from its own header, with the current one highlighted. `active` is one
+    of "home", "areas", "impact", "about", or a county slug. Duplicated
+    (identically) into build_impact.py and build_areas.py rather than
+    imported, matching this codebase's existing pattern for small shared
+    helpers (see raw_bounds/combined_bbox_center_zoom) — build_pages.py has
+    import-time file-writing side effects that make importing it unsafe."""
+    def a(href, id_, label):
+        return '<a href="%s"%s>%s</a>' % (href, ' class="active"' if active == id_ else '', label)
+    in_dropdown = active in dict(COUNTY_NAV_LINKS)
+    dd_items = "".join(
+        '<a href="%s.html"%s>%s</a>' % (slug, ' class="active"' if active == slug else '', label)
+        for slug, label in COUNTY_NAV_LINKS)
+    return (
+        a("index.html", "home", "Home")
+        + a("areas.html", "areas", "Operational Areas")
+        + a("impact.html", "impact", "Impact Dashboard")
+        + '<div class="nav-dd">'
+        + '<button type="button" class="nav-dd-btn%s" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button>' % (' active' if in_dropdown else '')
+        + '<div class="nav-dd-menu">%s</div>' % dd_items
+        + '</div>'
+        + a("index.html#about-section", "about", "About")
+    )
 
 
 def page(rid, r):
@@ -200,7 +223,7 @@ def page(rid, r):
         interventions_js = ""
 
     sites_json = json.dumps(r["sites"])
-    nav = navbar(rid)
+    nav = site_nav(rid)
     center, zoom = bbox_center_zoom(BOUNDARIES[rid]) if rid in BOUNDARIES else ([r["hq"]["lat"], r["hq"]["lon"]], 8)
     bounds = raw_bounds([BOUNDARIES[rid]]) if rid in BOUNDARIES else None
 
@@ -500,6 +523,7 @@ document.addEventListener("units-changed", ()=>{
 
 attachHeaderHeightVar();
 attachNavToggle();
+attachNavDropdown();
 attachUnitToggle();
 attachGlossary();
 attachSearch(
@@ -585,7 +609,7 @@ def build_index():
         regions_json=json.dumps(lean, separators=(",", ":")),
         updates_json=json.dumps(updates, separators=(",", ":")),
         center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM, base_url=BASE_URL,
-        bounds_json=json.dumps(PACIDA_BOUNDS)
+        bounds_json=json.dumps(PACIDA_BOUNDS), nav=site_nav("home")
     )
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
     print("index.html", len(out), "bytes")
@@ -632,11 +656,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
   <div class="nav-collapse" id="navCollapse">
-  <nav class="site">
-    <a href="areas.html">Operational areas</a>
-    <a href="impact.html">PACIDA Impact Dashboard</a>
-    <a href="#about-section">About</a>
-  </nav>
+  <nav class="site">%(nav)s</nav>
   <div class="head-right">
     <div class="search-wrap">
       <input type="text" id="searchBox" placeholder="Jump to a county…" aria-label="Search counties">
@@ -1004,6 +1024,7 @@ wireSortableHeaders("#allTable th.sortable", th=>{
 document.addEventListener("units-changed", ()=>{ renderPacidaCards(); drawMarkers(); renderTable(); });
 attachHeaderHeightVar();
 attachNavToggle();
+attachNavDropdown();
 attachUnitToggle();
 attachGlossary();
 attachSearch(

@@ -54,6 +54,29 @@ geoms = [BOUNDARIES[s] for s in PACIDA_SLUGS if s in BOUNDARIES]
 CENTER, ZOOM = combined_bbox_center_zoom(geoms)
 BOUNDS = raw_bounds(geoms)
 
+COUNTY_NAV_LINKS = [("marsabit", "Marsabit"), ("samburu", "Samburu"), ("isiolo", "Isiolo"), ("borena", "Borena Zone")]
+
+
+def site_nav(active):
+    """Shared, site-wide header nav — identical to build_pages.py's site_nav().
+    Duplicated rather than imported (see that copy's docstring for why)."""
+    def a(href, id_, label):
+        return '<a href="%s"%s>%s</a>' % (href, ' class="active"' if active == id_ else '', label)
+    in_dropdown = active in dict(COUNTY_NAV_LINKS)
+    dd_items = "".join(
+        '<a href="%s.html"%s>%s</a>' % (slug, ' class="active"' if active == slug else '', label)
+        for slug, label in COUNTY_NAV_LINKS)
+    return (
+        a("index.html", "home", "Home")
+        + a("areas.html", "areas", "Operational Areas")
+        + a("impact.html", "impact", "Impact Dashboard")
+        + '<div class="nav-dd">'
+        + '<button type="button" class="nav-dd-btn%s" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button>' % (' active' if in_dropdown else '')
+        + '<div class="nav-dd-menu">%s</div>' % dd_items
+        + '</div>'
+        + a("index.html#about-section", "about", "About")
+    )
+
 areas = []
 for slug in PACIDA_SLUGS:
     r = COUNTIES[slug]
@@ -92,10 +115,7 @@ HTML = """<!DOCTYPE html>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
   <div class="nav-collapse" id="navCollapse">
-    <nav class="site">
-      <a href="index.html">&larr; Home</a>
-      <a href="impact.html">PACIDA Impact Dashboard</a>
-    </nav>
+    <nav class="site">%(nav)s</nav>
     <div class="head-right">
       <div class="search-wrap">
         <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
@@ -222,6 +242,7 @@ document.querySelectorAll(".area-btn").forEach(btn=>{
 
 attachHeaderHeightVar();
 attachNavToggle();
+attachNavDropdown();
 attachUnitToggle();
 attachGlossary();
 attachSearch(
@@ -270,6 +291,7 @@ if __name__ == "__main__":
     out = HTML % dict(
         areas_json=json.dumps(areas, separators=(",", ":")),
         center=json.dumps(CENTER), zoom=ZOOM, bounds_json=json.dumps(BOUNDS),
+        nav=site_nav("areas"),
     )
     open(os.path.join(SITE, "areas.html"), "w", encoding="utf-8").write(out)
     print("areas.html", len(out), "bytes")

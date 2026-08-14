@@ -32,6 +32,29 @@ def raw_bounds(geoms, pad=0.28):
 
 IMPACT_BOUNDS = raw_bounds([BOUNDARIES[s] for s in PACIDA_SLUGS_LIST if s in BOUNDARIES])
 
+COUNTY_NAV_LINKS = [("marsabit", "Marsabit"), ("samburu", "Samburu"), ("isiolo", "Isiolo"), ("borena", "Borena Zone")]
+
+
+def site_nav(active):
+    """Shared, site-wide header nav — identical to build_pages.py's site_nav().
+    Duplicated rather than imported (see that copy's docstring for why)."""
+    def a(href, id_, label):
+        return '<a href="%s"%s>%s</a>' % (href, ' class="active"' if active == id_ else '', label)
+    in_dropdown = active in dict(COUNTY_NAV_LINKS)
+    dd_items = "".join(
+        '<a href="%s.html"%s>%s</a>' % (slug, ' class="active"' if active == slug else '', label)
+        for slug, label in COUNTY_NAV_LINKS)
+    return (
+        a("index.html", "home", "Home")
+        + a("areas.html", "areas", "Operational Areas")
+        + a("impact.html", "impact", "Impact Dashboard")
+        + '<div class="nav-dd">'
+        + '<button type="button" class="nav-dd-btn%s" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button>' % (' active' if in_dropdown else '')
+        + '<div class="nav-dd-menu">%s</div>' % dd_items
+        + '</div>'
+        + a("index.html#about-section", "about", "About")
+    )
+
 projects = INTERVENTIONS["projects"]
 ongoing_now = [p for p in projects if p["status"] == "ongoing"]
 mapped = [p for p in projects if p["locations"]]
@@ -121,13 +144,7 @@ HTML = """<!DOCTYPE html>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
   <div class="nav-collapse" id="navCollapse">
-    <nav class="site">
-      <a href="index.html">&larr; PACIDA's operational areas</a>
-      <a href="marsabit.html">Marsabit</a>
-      <a href="samburu.html">Samburu</a>
-      <a href="isiolo.html">Isiolo</a>
-      <a href="borena.html">Borena</a>
-    </nav>
+    <nav class="site">%(nav)s</nav>
     <div class="head-right">
       <div class="search-wrap">
         <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
@@ -365,6 +382,7 @@ renderProjTable();
 /* glossary, search, export */
 attachHeaderHeightVar();
 attachNavToggle();
+attachNavDropdown();
 attachGlossary();
 attachSearch(
   ()=>COUNTY_INDEX.map(c=>({id:c.slug, label:c.name, kind:"county"})),
@@ -393,6 +411,7 @@ out = HTML % dict(
     theme_chips=theme_chip_html,
     base_url="https://pacidaict-star.github.io/pacida-asal-website/",
     impact_bounds_json=json.dumps(IMPACT_BOUNDS),
+    nav=site_nav("impact"),
 )
 open(os.path.join(SITE, "impact.html"), "w", encoding="utf-8").write(out)
 print("impact.html", len(out), "bytes")
