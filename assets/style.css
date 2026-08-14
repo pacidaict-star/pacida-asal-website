@@ -44,6 +44,30 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
    keeps it pinned behind the scrolling content instead of pushing it down */
 .content-bg-map{position:sticky;top:0;height:100vh;margin-bottom:-100vh;z-index:0;overflow:hidden;background:#1D140C}
 .content-inner{position:relative;z-index:1}
+/* header now floats over the top of both panes (see header.header-overlay) —
+   the map-pane is left unpadded on purpose so it extends full-height behind
+   the header for the blend; content-inner needs the padding since its cards
+   would otherwise start underneath the floating header. The extra +36px
+   leaves a strip of bare (softly faded) backdrop map visible right below the
+   header instead of cards butting straight up against the header's bottom
+   edge — without it the header-to-map fade above has no room to show. */
+header.header-overlay ~ .panes-row .content-inner{padding-top:calc(var(--header-h,110px) + 36px)}
+/* header-adjacent top fades — separate from the map-pane/content-pane seam
+   fades below (which handle the pane-to-pane edge, not the header edge).
+   map-pane's applies at every breakpoint since the map sits at page-top in
+   both mobile (stacked) and desktop (side-by-side) layouts; content-pane's
+   only matters on desktop, where it's ALSO a page-top column (on mobile it
+   follows the map-pane lower down the page, out from under the header). */
+header.header-overlay ~ .panes-row .map-pane::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:170px;z-index:850;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(28,19,11,.42) 0%, rgba(28,19,11,.16) 55%, transparent 100%);
+}
+@media(min-width:1021px){
+  header.header-overlay ~ .panes-row .content-pane::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:170px;z-index:0;pointer-events:none;
+    background:linear-gradient(to bottom, rgba(28,19,11,.42) 0%, rgba(28,19,11,.16) 55%, transparent 100%);
+  }
+}
 
 /* seam blend — both sides now show live map imagery (the interactive map-pane,
    and the content-pane's own decorative backdrop map), so the seam is softened
@@ -89,6 +113,19 @@ body{background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans
    one pane) — no border/radius/shadow, so it blends into whatever is below
    it (map-pane or content-pane) instead of reading as a separate boxed bar */
 header.glass{border:none;box-shadow:none}
+/* header-overlay pages: the header floats directly over live map imagery
+   (see header.header-overlay above), so it needs to be genuinely see-through
+   for the blend to read as one continuous surface — .glass's normal .82
+   opacity is too dark to show anything behind it, it just looks like a flat
+   bar again despite the blur technically being active. Dropped much lower
+   here, with a text-shadow safety net so nav/brand text stays legible over
+   bright satellite imagery at any opacity. */
+header.header-overlay.glass{background:rgba(28,19,11,.46)}
+@supports not (backdrop-filter:blur(2px)){ header.header-overlay.glass{background:rgba(28,19,11,.9)} }
+header.header-overlay .brand h1,header.header-overlay .brand .sub,
+header.header-overlay nav.site a,header.header-overlay .livepill,header.header-overlay .clock{
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
 
 /* the one exception: things that genuinely still sit on top of the live map
    (the legend) keep the translucent glass treatment */
@@ -101,9 +138,19 @@ header.glass{border:none;box-shadow:none}
 }
 @supports not (backdrop-filter:blur(2px)){ .map-overlay{background:rgba(30,21,13,.97)} }
 
-/* header + nav */
+/* header + nav
+   header-overlay (map pages: index, county pages, areas.html) makes the
+   header float ON TOP of the map/content instead of pushing it down, so its
+   glass blur actually has live imagery behind it to blend with — the earlier
+   version had nothing behind the header at all (panes-row started only after
+   the header's own box), so "glass" just rendered as a flat opaque bar with a
+   hard line under it. Plain header (impact.html, no adjacent map) stays
+   sticky/in-flow as before — there's nothing to blend there. --header-h is
+   measured in JS (attachHeaderHeightVar) and used to pad content that would
+   otherwise sit under the floating header. */
 header{padding:12px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:1200;width:100%}
-.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header.header-overlay{position:fixed;top:0;left:0;right:0}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
 .brand-logo{height:34px;width:auto;display:block;flex:none}
 .brand h1{font-family:'Barlow Condensed';font-weight:700;font-size:24px;letter-spacing:.08em;text-transform:uppercase}
 .brand h1 a{color:inherit;text-decoration:none}
@@ -119,6 +166,36 @@ nav.site a:hover{color:var(--text);border-color:var(--line)}
 nav.site a.active{color:#0A0805;background:var(--alert);border-color:var(--alert)}
 nav.site a:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 .head-right{margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* hamburger toggle + collapsible nav panel — desktop: nav-collapse is
+   display:contents so its children (nav.site, .head-right) sit directly in
+   header's own flex row exactly as before, and the toggle button is hidden.
+   Mobile: the toggle appears, nav-collapse becomes a real dropdown panel
+   pinned below the header instead of wrapping the header into 5+ tall rows
+   (which used to eat most of the screen and hide the map/content beneath). */
+.navToggle{
+  display:none;margin-left:auto;background:rgba(38,33,21,.7);color:var(--text);
+  border:1px solid var(--line);border-radius:6px;width:40px;height:40px;flex:none;
+  align-items:center;justify-content:center;font-size:19px;line-height:1;cursor:pointer;
+}
+.navToggle:hover{border-color:var(--alert)}
+.navToggle:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+.nav-collapse{display:contents}
+@media(max-width:1020px){
+  .navToggle{display:flex}
+  .nav-collapse{
+    display:none;position:fixed;top:var(--header-h,68px);left:0;right:0;z-index:1190;
+    flex-direction:column;align-items:stretch;gap:14px;
+    background:rgba(23,19,12,.97);border-bottom:1px solid var(--line);
+    padding:16px 20px 20px;max-height:calc(100vh - var(--header-h,68px));overflow-y:auto;
+  }
+  .nav-collapse.open{display:flex}
+  .nav-collapse nav.site{flex-direction:column;gap:6px}
+  .nav-collapse .head-right{margin-left:0;flex-direction:column;align-items:stretch;gap:10px}
+  .nav-collapse .search-wrap input{width:100%}
+  .brand .sub{display:none}
+  .brand h1{font-size:19px}
+}
 .livepill{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-family:'Barlow Condensed';font-weight:600}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--normal);animation:pulse 1.6s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(127,166,83,.5)}70%{box-shadow:0 0 0 8px rgba(127,166,83,0)}100%{box-shadow:0 0 0 0 rgba(127,166,83,0)}}
@@ -147,7 +224,14 @@ main{display:block}
 .areas-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 .areas-body{position:relative;flex:1;min-height:0}
 .areas-body #map{position:absolute;inset:0}
-.area-picker{position:absolute;top:14px;left:14px;z-index:900;border-radius:10px;padding:12px 14px;max-width:220px}
+/* header.header-overlay takes areas.html's header out of flow entirely, so
+   .areas-body naturally fills the full 100vh (map runs edge-to-edge behind
+   the header) — the area-picker just needs pushing down below the header. */
+.areas-body::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:170px;z-index:850;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(28,19,11,.42) 0%, rgba(28,19,11,.16) 55%, transparent 100%);
+}
+.area-picker{position:absolute;top:calc(var(--header-h,68px) + 14px);left:14px;z-index:900;border-radius:10px;padding:12px 14px;max-width:220px}
 .area-picker h4{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--muted);margin-bottom:8px}
 #areaButtons{display:flex;flex-direction:column;gap:6px}
 .area-btn{

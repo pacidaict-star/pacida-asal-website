@@ -119,20 +119,23 @@ HTML = """<!DOCTYPE html>
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">PACIDA Impact Dashboard &middot; real project data, FY2010&ndash;FY2026</div>
   </div>
-  <nav class="site">
-    <a href="index.html">&larr; PACIDA's operational areas</a>
-    <a href="marsabit.html">Marsabit</a>
-    <a href="samburu.html">Samburu</a>
-    <a href="isiolo.html">Isiolo</a>
-    <a href="borena.html">Borena</a>
-  </nav>
-  <div class="head-right">
-    <div class="search-wrap">
-      <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
-      <div class="search-results" id="searchResults"></div>
+  <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
+  <div class="nav-collapse" id="navCollapse">
+    <nav class="site">
+      <a href="index.html">&larr; PACIDA's operational areas</a>
+      <a href="marsabit.html">Marsabit</a>
+      <a href="samburu.html">Samburu</a>
+      <a href="isiolo.html">Isiolo</a>
+      <a href="borena.html">Borena</a>
+    </nav>
+    <div class="head-right">
+      <div class="search-wrap">
+        <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+      <button class="iconbtn" id="exportBtn" type="button" title="Download the full project list as CSV">Export CSV</button>
     </div>
-    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
-    <button class="iconbtn" id="exportBtn" type="button" title="Download the full project list as CSV">Export CSV</button>
   </div>
 </header>
 
@@ -360,6 +363,8 @@ wireSortableHeaders("#projTable th.sortable", th=>{
 renderProjTable();
 
 /* glossary, search, export */
+attachHeaderHeightVar();
+attachNavToggle();
 attachGlossary();
 attachSearch(
   ()=>COUNTY_INDEX.map(c=>({id:c.slug, label:c.name, kind:"county"})),

@@ -73,6 +73,38 @@ function getUnitSystem(){ return localStorage.getItem(UNIT_KEY) || "metric"; }
 function setUnitSystem(v){ localStorage.setItem(UNIT_KEY, v); document.dispatchEvent(new CustomEvent("units-changed")); }
 function fmtTemp(c){ return getUnitSystem()==="imperial" ? (c*9/5+32).toFixed(1)+"°F" : c.toFixed(1)+"°C"; }
 function fmtRain(mm){ return getUnitSystem()==="imperial" ? (mm/25.4).toFixed(2)+" in" : mm.toFixed(0)+" mm"; }
+/* ---------- header height var (drives content padding under a floating
+   header — see header.header-overlay in style.css) ---------- */
+function attachHeaderHeightVar(){
+  const header = document.querySelector("header.glass");
+  if(!header) return;
+  const set = ()=> document.documentElement.style.setProperty("--header-h", header.offsetHeight + "px");
+  set();
+  window.addEventListener("resize", set);
+  // header height can change once web fonts finish loading (text reflows)
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(set);
+}
+
+/* ---------- mobile hamburger menu (collapses nav + header controls into a
+   dropdown panel below the compact header row) ---------- */
+function attachNavToggle(){
+  const btn = document.getElementById("navToggle");
+  const panel = document.getElementById("navCollapse");
+  if(!btn || !panel) return;
+  const close = ()=>{ panel.classList.remove("open"); btn.setAttribute("aria-expanded","false"); };
+  const open = ()=>{ panel.classList.add("open"); btn.setAttribute("aria-expanded","true"); };
+  btn.addEventListener("click", e=>{
+    e.stopPropagation();
+    panel.classList.contains("open") ? close() : open();
+  });
+  panel.addEventListener("click", e=>{ if(e.target.tagName === "A") close(); });
+  document.addEventListener("click", e=>{
+    if(panel.classList.contains("open") && !panel.contains(e.target) && e.target !== btn) close();
+  });
+  document.addEventListener("keydown", e=>{ if(e.key === "Escape") close(); });
+  window.addEventListener("resize", ()=>{ if(window.innerWidth > 1020) close(); });
+}
+
 function attachUnitToggle(){
   const btn = document.getElementById("unitToggle");
   if(!btn) return;

@@ -253,24 +253,27 @@ TEMPLATE = """<!DOCTYPE html>
 
 <div class="page-shell">
 
-<header class="glass">
+<header class="glass header-overlay">
   <div class="brand">
     <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">%(title)s &middot; %(country)s</div>
   </div>
-  <nav class="site">%(nav)s</nav>
-  <div class="head-right">
-    <div class="search-wrap">
-      <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
-      <div class="search-results" id="searchResults"></div>
+  <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
+  <div class="nav-collapse" id="navCollapse">
+    <nav class="site">%(nav)s</nav>
+    <div class="head-right">
+      <div class="search-wrap">
+        <input type="text" id="searchBox" placeholder="Jump to a county or site&hellip;" aria-label="Search counties and monitoring sites">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live &middot; Open-Meteo</span></div>
+      <div class="clock mono" id="clock">--:--:-- EAT</div>
+      <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
+      <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+      <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
+      <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
     </div>
-    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live &middot; Open-Meteo</span></div>
-    <div class="clock mono" id="clock">--:--:-- EAT</div>
-    <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
-    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
-    <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
-    <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
   </div>
 </header>
 
@@ -495,6 +498,8 @@ document.addEventListener("units-changed", ()=>{
   drawSites(); renderSiteGrid();
 });
 
+attachHeaderHeightVar();
+attachNavToggle();
 attachUnitToggle();
 attachGlossary();
 attachSearch(
@@ -619,12 +624,14 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 
 <div class="page-shell">
 
-<header class="glass">
+<header class="glass header-overlay">
   <div class="brand">
     <img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA">
     <h1>Kenya <span>·</span> ASAL Climate Watch</h1>
     <div class="sub">PACIDA's operational area &middot; Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
   </div>
+  <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
+  <div class="nav-collapse" id="navCollapse">
   <nav class="site">
     <a href="areas.html">Operational areas</a>
     <a href="impact.html">PACIDA Impact Dashboard</a>
@@ -641,6 +648,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
     <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
     <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
+  </div>
   </div>
 </header>
 
@@ -994,6 +1002,8 @@ wireSortableHeaders("#allTable th.sortable", th=>{
 
 /* ================= UNITS, GLOSSARY, SEARCH, EXPORT ================= */
 document.addEventListener("units-changed", ()=>{ renderPacidaCards(); drawMarkers(); renderTable(); });
+attachHeaderHeightVar();
+attachNavToggle();
 attachUnitToggle();
 attachGlossary();
 attachSearch(

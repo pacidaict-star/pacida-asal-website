@@ -84,25 +84,28 @@ HTML = """<!DOCTYPE html>
 
 <div class="areas-shell">
 
-<header class="glass">
+<header class="glass header-overlay">
   <div class="brand">
     <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
     <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
     <div class="sub">Operational Areas Map &middot; live intervention footprint</div>
   </div>
-  <nav class="site">
-    <a href="index.html">&larr; Home</a>
-    <a href="impact.html">PACIDA Impact Dashboard</a>
-  </nav>
-  <div class="head-right">
-    <div class="search-wrap">
-      <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
-      <div class="search-results" id="searchResults"></div>
+  <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
+  <div class="nav-collapse" id="navCollapse">
+    <nav class="site">
+      <a href="index.html">&larr; Home</a>
+      <a href="impact.html">PACIDA Impact Dashboard</a>
+    </nav>
+    <div class="head-right">
+      <div class="search-wrap">
+        <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live &middot; Open-Meteo</span></div>
+      <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
+      <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+      <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
     </div>
-    <div class="livepill"><span class="dot" id="liveDot"></span><span id="liveState" role="status" aria-live="polite">Live &middot; Open-Meteo</span></div>
-    <button class="iconbtn" id="unitToggle" type="button" title="Toggle °C/°F, mm/in">&deg;C &middot; mm</button>
-    <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
-    <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
   </div>
 </header>
 
@@ -217,6 +220,8 @@ document.querySelectorAll(".area-btn").forEach(btn=>{
   });
 });
 
+attachHeaderHeightVar();
+attachNavToggle();
 attachUnitToggle();
 attachGlossary();
 attachSearch(
