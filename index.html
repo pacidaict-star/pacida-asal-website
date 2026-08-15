@@ -221,6 +221,7 @@
 <script src="assets/boundaries.js"></script>
 <script src="assets/villages.js"></script>
 <script src="assets/interventions.js"></script>
+<script src="assets/supabase-config.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const REGIONS = [{"id":"borena","name":"Borena Zone","country":"Southern Ethiopia (Oromia)","zone":"Southern Ethiopia (Oromia) \u00b7 Yabelo, Moyale (ET), Mega, Dubluk","lat":4.885,"lon":38.083,"households":232000,"population":1210000,"povertyRate":78.0,"droughtPhase":"IPC Phase 2\u20133 (Stressed\u2013Crisis)","staticVuln":82,"asal":true,"pacida":true,"sites":["Yabelo","Moyale (ET)","Mega","Dubluk","Teltele","Dillo","Arero","Hidi Lola"]},{"id":"isiolo","name":"Isiolo County","country":"Kenya","zone":"Kenya \u00b7 Isiolo town, Merti, Garbatulla, Kinna","lat":0.3546,"lon":37.5822,"households":58072,"population":268002,"povertyRate":65.0,"droughtPhase":"NDMA Alert (worsening)","staticVuln":76,"asal":true,"pacida":true,"sites":["Isiolo town","Merti","Garbatulla","Kinna","Oldonyiro","Sericho","Ngare Mara"]},{"id":"marsabit","name":"Marsabit County","country":"Kenya","zone":"Kenya \u00b7 Marsabit town, Moyale, North Horr, Kalacha","lat":2.3346,"lon":37.9891,"households":77495,"population":459785,"povertyRate":83.2,"droughtPhase":"NDMA Alert (worsening)","staticVuln":88,"asal":true,"pacida":true,"sites":["Marsabit town","Moyale","North Horr","Kalacha","Maikona","Loiyangalani","Laisamis","Korr","Illeret","Sololo","Turbi"]},{"id":"samburu","name":"Samburu County","country":"Kenya","zone":"Kenya \u00b7 Maralal, Baragoi, Wamba, Archer's Post","lat":1.0966,"lon":36.698,"households":65910,"population":310327,"povertyRate":71.0,"droughtPhase":"NDMA Alert","staticVuln":72,"asal":true,"pacida":true,"sites":["Maralal","Baragoi","Wamba","Archer's Post","South Horr","Suguta Marmar","Sereolipi"]}];
@@ -270,18 +271,25 @@ function drawShading(){
 }
 drawShading();
 
-/* intervention-density heat: the "ground surface" colour the dashboard leads with */
-const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
-const interventionLayer = L.layerGroup().addTo(map);
-PACIDA_AREA_SLUGS.forEach(slug=>{
-  drawInterventionLayer(map, slug).eachLayer(l=>interventionLayer.addLayer(l));
-  attachVillageLayer(map, slug);
-});
+PACIDA_AREA_SLUGS.forEach(slug=> attachVillageLayer(map, slug));
 
-layersControl.addOverlay(heatLayer,"Intervention density (heat)");
+/* intervention-density heat: the "ground surface" colour the dashboard leads with.
+   Waits on the live Supabase fetch (falls back to the static snapshot on failure) before
+   drawing, since drawInterventionHeat/drawInterventionLayer read INTERVENTIONS synchronously
+   at call time — see loadLiveProjects() in common.js. */
+const interventionLayer = L.layerGroup().addTo(map);
+(async()=>{
+  await loadLiveProjects();
+  const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
+  PACIDA_AREA_SLUGS.forEach(slug=>{
+    drawInterventionLayer(map, slug).eachLayer(l=>interventionLayer.addLayer(l));
+  });
+  layersControl.addOverlay(heatLayer,"Intervention density (heat)");
+  layersControl.addOverlay(interventionLayer,"PACIDA interventions &amp; offices");
+})();
+
 layersControl.addOverlay(shadeLayer,"Drought-need shading");
 layersControl.addOverlay(markerLayer,"Household markers");
-layersControl.addOverlay(interventionLayer,"PACIDA interventions &amp; offices");
 layersControl.addOverlay(labelLayer,"County labels");
 
 function hhRadius(hh){ return Math.max(5, Math.min(20, Math.sqrt(hh)/22)); }

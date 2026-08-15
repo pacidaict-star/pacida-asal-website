@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Admin — Kenya ASAL Climate Watch</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/admin.css">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+</head>
+<body class="admin-body">
+
+<header class="admin-header glass">
+  <img src="../assets/pacida-logo.png" alt="PACIDA">
+  <h1>Project data admin</h1>
+  <span id="userEmail" class="admin-hint"></span>
+  <button class="admin-btn" id="logoutBtn" type="button">Log out</button>
+</header>
+
+<main class="admin-main">
+  <div class="admin-toolbar">
+    <input type="search" id="searchBox" placeholder="Filter by title, donor or county…">
+    <button class="admin-btn admin-btn-primary" id="addBtn" type="button" style="margin-top:0">+ Add project</button>
+    <span class="admin-count" id="countLabel"></span>
+  </div>
+
+  <div class="admin-error" id="loadError" role="alert" hidden></div>
+
+  <div class="admin-table-wrap glass">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Title</th><th>Theme</th><th>Donor</th><th>Status</th><th>Start</th><th>End</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="admin-empty" id="emptyState" hidden>No projects yet — click "Add project" to create one.</div>
+  </div>
+</main>
+
+<!-- add/edit modal -->
+<div class="admin-modal-backdrop" id="modalBackdrop">
+  <form class="admin-modal glass" id="projectForm">
+    <h2 id="modalTitle">Add project</h2>
+
+    <div class="admin-field">
+      <label for="f-title">Title *</label>
+      <input type="text" id="f-title" required>
+    </div>
+
+    <div class="admin-field-row">
+      <div class="admin-field">
+        <label for="f-donor">Donor</label>
+        <input type="text" id="f-donor">
+      </div>
+      <div class="admin-field">
+        <label for="f-theme">Theme *</label>
+        <select id="f-theme" required></select>
+      </div>
+    </div>
+
+    <div class="admin-field-row">
+      <div class="admin-field">
+        <label for="f-start">Start date *</label>
+        <input type="date" id="f-start" required>
+      </div>
+      <div class="admin-field">
+        <label for="f-end">End date</label>
+        <input type="date" id="f-end">
+        <div class="admin-hint">Leave blank for open-ended. Status (Ongoing/Completed) is worked
+          out automatically from this date — once it passes, the project closes on the map on
+          its own, nothing to update by hand.</div>
+      </div>
+    </div>
+
+    <div class="admin-field">
+      <label for="f-population">Impact / reach note</label>
+      <textarea id="f-population" placeholder="e.g. 1,294 people reached through women's climate-resilience groups…"></textarea>
+    </div>
+
+    <div class="admin-field">
+      <label>Locations *</label>
+      <div id="locList"></div>
+      <button type="button" class="admin-btn admin-btn-small" id="addLocBtn">+ Add another location</button>
+      <div class="admin-hint">One row per county the project touches. Pick a known site to
+        auto-fill coordinates, or type a new one and enter lat/lon by hand.</div>
+    </div>
+
+    <div class="admin-error" id="formError" role="alert" hidden></div>
+
+    <div class="admin-modal-actions">
+      <button type="button" class="admin-btn" id="cancelBtn">Cancel</button>
+      <button type="submit" class="admin-btn admin-btn-primary" id="saveBtn">Save project</button>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/villages.js"></script>
+<script src="../assets/supabase-config.js"></script>
+<script src="../assets/common.js"></script>
+<script>
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const THEMES = Object.keys(THEME_COLORS);
+const COUNTIES = [
+  {slug:"marsabit", label:"Marsabit"}, {slug:"samburu", label:"Samburu"},
+  {slug:"isiolo", label:"Isiolo"}, {slug:"borena", label:"Borena Zone"},
+];
+const KINDS = [
+  {value:"site", label:"Specific site"}, {value:"regional", label:"Regional programme"},
+  {value:"county", label:"County-wide"},
+];
+
+let allProjects = [];
+let editingId = null; // null = creating a new project
+let locBlockSeq = 0;
+
+/* ---------- auth gate ---------- */
+(async()=>{
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){ location.href = "login.html"; return; }
+  document.getElementById("userEmail").textContent = session.user.email;
+  loadProjects();
+})();
+sb.auth.onAuthStateChange((event, session)=>{
+  if(!session) location.href = "login.html";
+});
+document.getElementById("logoutBtn").addEventListener("click", async()=>{
+  await sb.auth.signOut();
+  location.href = "login.html";
+});
+
+/* ---------- load + render table ---------- */
+async function loadProjects(){
+  const errEl = document.getElementById("loadError");
+  errEl.hidden = true;
+  const { data, error } = await sb
+    .from("projects_live")
+    .select("*, project_locations(*)")
+    .order("start_date", {ascending:false});
+  if(error){
+    errEl.textContent = "Couldn't load projects: " + error.message;
+    errEl.hidden = false;
+    return;
+  }
+  allProjects = data;
+  renderTable(allProjects);
+}
+
+function renderTable(projects){
+  const body = document.getElementById("tableBody");
+  const empty = document.getElementById("emptyState");
+  document.getElementById("countLabel").textContent = projects.length + " project" + (projects.length===1?"":"s");
+  if(projects.length === 0){
+    body.innerHTML = "";
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  body.innerHTML = projects.map(p=>{
+    const locs = (p.project_locations||[]).map(l=>l.name).join(", ") || "—";
+    const badge = p.status === "ongoing"
+      ? '<span class="admin-badge admin-badge-ongoing">Ongoing</span>'
+      : '<span class="admin-badge admin-badge-completed">Completed</span>';
+    return `<tr>
+      <td class="admin-title-cell" data-label=""><div class="t">${escapeHtml(p.title)}</div><div class="locs">${escapeHtml(locs)}</div></td>
+      <td data-label="Theme">${escapeHtml(p.theme)}</td>
+      <td data-label="Donor">${escapeHtml(p.donor||"—")}</td>
+      <td data-label="Status">${badge}</td>
+      <td class="mono" data-label="Start">${p.start_date||"—"}</td>
+      <td class="mono" data-label="End">${p.end_date||"open-ended"}</td>
+      <td data-label=""><div class="admin-row-actions">
+        <button type="button" class="admin-btn admin-btn-small" data-edit="${p.id}">Edit</button>
+        <button type="button" class="admin-btn admin-btn-small admin-btn-danger" data-delete="${p.id}">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+  body.querySelectorAll("[data-edit]").forEach(b=> b.addEventListener("click", ()=> openForm(b.dataset.edit)));
+  body.querySelectorAll("[data-delete]").forEach(b=> b.addEventListener("click", ()=> deleteProject(b.dataset.delete)));
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+document.getElementById("searchBox").addEventListener("input", e=>{
+  const q = e.target.value.trim().toLowerCase();
+  if(!q){ renderTable(allProjects); return; }
+  renderTable(allProjects.filter(p=>
+    (p.title||"").toLowerCase().includes(q) ||
+    (p.donor||"").toLowerCase().includes(q) ||
+    (p.project_locations||[]).some(l=>(l.slug||"").toLowerCase().includes(q) || (l.name||"").toLowerCase().includes(q))
+  ));
+});
+
+/* ---------- add/edit form ---------- */
+const backdrop = document.getElementById("modalBackdrop");
+const form = document.getElementById("projectForm");
+const themeSelect = document.getElementById("f-theme");
+themeSelect.innerHTML = THEMES.map(t=>`<option value="${t}">${t}</option>`).join("");
+
+document.getElementById("addBtn").addEventListener("click", ()=> openForm(null));
+document.getElementById("cancelBtn").addEventListener("click", closeForm);
+backdrop.addEventListener("click", e=>{ if(e.target === backdrop) closeForm(); });
+document.addEventListener("keydown", e=>{ if(e.key === "Escape" && backdrop.classList.contains("open")) closeForm(); });
+
+function openForm(id){
+  editingId = id;
+  document.getElementById("formError").hidden = true;
+  const p = id ? allProjects.find(x=>x.id===id) : null;
+  document.getElementById("modalTitle").textContent = p ? "Edit project" : "Add project";
+  document.getElementById("f-title").value = p ? p.title : "";
+  document.getElementById("f-donor").value = p ? (p.donor||"") : "";
+  themeSelect.value = p ? p.theme : THEMES[0];
+  document.getElementById("f-start").value = p ? p.start_date : "";
+  document.getElementById("f-end").value = p ? (p.end_date||"") : "";
+  document.getElementById("f-population").value = p ? (p.population_note||"") : "";
+
+  document.getElementById("locList").innerHTML = "";
+  const locs = p && p.project_locations && p.project_locations.length ? p.project_locations : [null];
+  locs.forEach(addLocationBlock);
+
+  backdrop.classList.add("open");
+  document.getElementById("f-title").focus();
+}
+function closeForm(){
+  backdrop.classList.remove("open");
+  editingId = null;
+}
+
+function addLocationBlock(loc){
+  const id = ++locBlockSeq;
+  const wrap = document.createElement("div");
+  wrap.className = "admin-loc-block";
+  wrap.dataset.blockId = id;
+  wrap.innerHTML = `
+    <button type="button" class="admin-loc-remove" title="Remove this location">&times;</button>
+    <div class="admin-field-row">
+      <div class="admin-field">
+        <label>County *</label>
+        <select class="loc-slug" required>${COUNTIES.map(c=>`<option value="${c.slug}">${c.label}</option>`).join("")}</select>
+      </div>
+      <div class="admin-field">
+        <label>Kind *</label>
+        <select class="loc-kind" required>${KINDS.map(k=>`<option value="${k.value}">${k.label}</option>`).join("")}</select>
+      </div>
+    </div>
+    <div class="admin-field">
+      <label>Site name *</label>
+      <input type="text" class="loc-name" list="loc-datalist-${id}" required>
+      <datalist id="loc-datalist-${id}"></datalist>
+    </div>
+    <div class="admin-field-row">
+      <div class="admin-field"><label>Latitude *</label><input type="number" step="any" class="loc-lat" required></div>
+      <div class="admin-field"><label>Longitude *</label><input type="number" step="any" class="loc-lon" required></div>
+    </div>
+  `;
+  document.getElementById("locList").appendChild(wrap);
+
+  const slugSel = wrap.querySelector(".loc-slug");
+  const kindSel = wrap.querySelector(".loc-kind");
+  const nameInput = wrap.querySelector(".loc-name");
+  const latInput = wrap.querySelector(".loc-lat");
+  const lonInput = wrap.querySelector(".loc-lon");
+  const datalist = wrap.querySelector("datalist");
+
+  function refreshDatalist(){
+    const villages = (typeof VILLAGES !== "undefined" && VILLAGES[slugSel.value]) || [];
+    datalist.innerHTML = villages.map(v=>`<option value="${escapeHtml(v[0])}">`).join("");
+  }
+  slugSel.addEventListener("change", refreshDatalist);
+  nameInput.addEventListener("change", ()=>{
+    const villages = (typeof VILLAGES !== "undefined" && VILLAGES[slugSel.value]) || [];
+    const match = villages.find(v=> v[0].toLowerCase() === nameInput.value.trim().toLowerCase());
+    if(match){ latInput.value = match[1]; lonInput.value = match[2]; }
+  });
+  wrap.querySelector(".admin-loc-remove").addEventListener("click", ()=>{
+    if(document.getElementById("locList").children.length <= 1) return; // keep at least one
+    wrap.remove();
+  });
+
+  if(loc){
+    slugSel.value = loc.slug; kindSel.value = loc.kind;
+    nameInput.value = loc.name; latInput.value = loc.lat; lonInput.value = loc.lon;
+  }
+  refreshDatalist();
+}
+document.getElementById("addLocBtn").addEventListener("click", ()=> addLocationBlock(null));
+
+form.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const errEl = document.getElementById("formError");
+  errEl.hidden = true;
+
+  const title = document.getElementById("f-title").value.trim();
+  const startDate = document.getElementById("f-start").value;
+  const endDate = document.getElementById("f-end").value || null;
+  if(endDate && endDate < startDate){
+    errEl.textContent = "End date can't be before the start date.";
+    errEl.hidden = false;
+    return;
+  }
+
+  const locBlocks = [...document.getElementById("locList").children];
+  const locations = locBlocks.map(b=>({
+    slug: b.querySelector(".loc-slug").value,
+    kind: b.querySelector(".loc-kind").value,
+    name: b.querySelector(".loc-name").value.trim(),
+    lat: parseFloat(b.querySelector(".loc-lat").value),
+    lon: parseFloat(b.querySelector(".loc-lon").value),
+  }));
+  if(locations.some(l=> !l.name || isNaN(l.lat) || isNaN(l.lon))){
+    errEl.textContent = "Every location needs a site name, latitude and longitude.";
+    errEl.hidden = false;
+    return;
+  }
+
+  const saveBtn = document.getElementById("saveBtn");
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving…";
+
+  const projectRow = {
+    title,
+    donor: document.getElementById("f-donor").value.trim() || null,
+    theme: themeSelect.value,
+    start_date: startDate,
+    end_date: endDate,
+    population_note: document.getElementById("f-population").value.trim() || null,
+  };
+
+  try{
+    let projectId = editingId;
+    if(editingId){
+      const { error } = await sb.from("projects").update(projectRow).eq("id", editingId);
+      if(error) throw error;
+      const { error: delErr } = await sb.from("project_locations").delete().eq("project_id", editingId);
+      if(delErr) throw delErr;
+    }else{
+      const { data:{ session } } = await sb.auth.getSession();
+      const { data, error } = await sb.from("projects")
+        .insert({...projectRow, created_by: session.user.id}).select().single();
+      if(error) throw error;
+      projectId = data.id;
+    }
+    const { error: locErr } = await sb.from("project_locations")
+      .insert(locations.map(l=>({...l, project_id: projectId})));
+    if(locErr) throw locErr;
+
+    closeForm();
+    await loadProjects();
+  }catch(err){
+    errEl.textContent = "Save failed: " + err.message;
+    errEl.hidden = false;
+  }finally{
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save project";
+  }
+});
+
+/* ---------- delete ---------- */
+async function deleteProject(id){
+  const p = allProjects.find(x=>x.id===id);
+  if(!confirm(`Delete "${p ? p.title : "this project"}"? This can't be undone.`)) return;
+  const { error } = await sb.from("projects").delete().eq("id", id);
+  if(error){ alert("Delete failed: " + error.message); return; }
+  await loadProjects();
+}
+</script>
+</body>
+</html>

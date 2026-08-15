@@ -333,6 +333,56 @@ function attachVillageLayer(map, slug){
 }
 
 /* ---------- PACIDA interventions (real project data, see assets/interventions.js) ---------- */
+
+/* mirrors build_interventions.py's THEME_MAP — kept in sync by hand since the admin panel's
+   theme <select> is hard-restricted to exactly these 9 values, so this can't drift silently. */
+const THEME_COLORS = {
+  "Emergency":"#ED1C24", "Disaster Risk Reduction":"#E8834A", "WASH":"#6FA3B4",
+  "Health & Nutrition":"#D66FB0", "Education":"#F0B22E", "Climate Change":"#5FBF8F",
+  "Peace & Governance":"#9C87D9", "Livelihood":"#34B44B", "Other":"#9A8F70"
+};
+
+function computeDuration(startISO, endISO){
+  if(!startISO || !endISO) return "";
+  const months = Math.round((new Date(endISO) - new Date(startISO)) / (1000*60*60*24*30.44));
+  return Math.max(1, months) + " month" + (months===1 ? "" : "s");
+}
+
+/* Live project data from Supabase (staff-editable via admin/) — layered on top of the static
+   assets/interventions.js snapshot that's already loaded as the INTERVENTIONS global by the
+   time this runs. On any failure (network blip, misconfigured keys, a paused free-tier
+   Supabase project) this quietly leaves INTERVENTIONS.projects exactly as the static snapshot
+   already set it — the map keeps working, just without the latest staff edits, rather than
+   going blank. Requires assets/supabase-config.js (SUPABASE_URL/SUPABASE_ANON_KEY) loaded
+   before this script. */
+async function loadLiveProjects(){
+  if(typeof SUPABASE_URL === "undefined" || typeof INTERVENTIONS === "undefined") return;
+  try{
+    const res = await fetch(
+      SUPABASE_URL + "/rest/v1/projects_live?select=*,project_locations(*)",
+      {headers:{apikey:SUPABASE_ANON_KEY, Authorization:"Bearer "+SUPABASE_ANON_KEY}}
+    );
+    if(!res.ok) throw new Error("Supabase " + res.status);
+    const rows = await res.json();
+    INTERVENTIONS.projects = rows.map(r => ({
+      id: r.id,
+      year: r.start_date ? +r.start_date.slice(0,4) : null,
+      donor: r.donor,
+      theme: r.theme,
+      theme_color: THEME_COLORS[r.theme] || THEME_COLORS.Other,
+      title: r.title,
+      status: r.status, // pre-derived by the projects_live view (end_date vs today)
+      start: r.start_date,
+      end: r.end_date,
+      duration: computeDuration(r.start_date, r.end_date),
+      population: r.population_note,
+      locations: (r.project_locations || []).map(l => ({slug:l.slug, kind:l.kind, name:l.name, lat:l.lat, lon:l.lon}))
+    }));
+  }catch(e){
+    console.warn("Live projects fetch failed, using static snapshot:", e);
+  }
+}
+
 function projectsForSlug(slug){
   if(typeof INTERVENTIONS === "undefined") return [];
   return INTERVENTIONS.projects.filter(p => p.locations.some(l => l.slug === slug));

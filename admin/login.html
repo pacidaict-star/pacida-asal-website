@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Login — Kenya ASAL Climate Watch</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/admin.css">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+</head>
+<body class="admin-body">
+
+<div class="admin-login-wrap">
+  <form class="admin-login-card glass" id="loginForm" autocomplete="on">
+    <img class="admin-login-logo" src="../assets/pacida-logo.png" alt="PACIDA">
+    <h1>Staff Login</h1>
+    <p class="admin-login-sub">Kenya ASAL Climate Watch &middot; project data admin</p>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" autocomplete="username" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required>
+
+    <div class="admin-error" id="loginError" role="alert" hidden></div>
+
+    <button type="submit" class="admin-btn admin-btn-primary" id="loginBtn">Log in</button>
+
+    <p class="admin-login-note">Accounts are created by PACIDA's site administrator — there's no
+      public sign-up. Contact your administrator if you need access.</p>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/supabase-config.js"></script>
+<script>
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+(async()=>{
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session) location.href = "index.html";
+})();
+
+const form = document.getElementById("loginForm");
+const errEl = document.getElementById("loginError");
+const btn = document.getElementById("loginBtn");
+
+form.addEventListener("submit", async e=>{
+  e.preventDefault();
+  errEl.hidden = true;
+  btn.disabled = true;
+  btn.textContent = "Logging in…";
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){
+    errEl.textContent = "Login failed — check your email and password.";
+    errEl.hidden = false;
+    btn.disabled = false;
+    btn.textContent = "Log in";
+    return;
+  }
+  location.href = "index.html";
+});
+</script>
+</body>
+</html>

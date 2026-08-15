@@ -210,12 +210,15 @@ def page(rid, r):
                          '<p>Real projects from PACIDA\'s own project register, pinned where their title names a specific '
                          'site in %(title)s. Star markers on the map are PACIDA field presence/offices.</p>'
                          '<div class="interv-list" id="intervList"></div></div>') % r
-        interventions_js = ('const intervLayer = drawInterventionLayer(map, RID);\n'
-                             'intervLayer.addTo(map);\n'
-                             'const heatLayer = drawInterventionHeat([RID]).addTo(map);\n'
-                             'layersControl.addOverlay(heatLayer, "Intervention density (heat)");\n'
-                             'layersControl.addOverlay(intervLayer, "PACIDA interventions");\n'
-                             'renderInterventionList("intervList", RID);')
+        interventions_js = ('(async()=>{\n'
+                             '  await loadLiveProjects();\n'
+                             '  const intervLayer = drawInterventionLayer(map, RID);\n'
+                             '  intervLayer.addTo(map);\n'
+                             '  const heatLayer = drawInterventionHeat([RID]).addTo(map);\n'
+                             '  layersControl.addOverlay(heatLayer, "Intervention density (heat)");\n'
+                             '  layersControl.addOverlay(intervLayer, "PACIDA interventions");\n'
+                             '  renderInterventionList("intervList", RID);\n'
+                             '})();')
     else:
         pacida_panel = ""
         sources_pacida = ""
@@ -427,6 +430,7 @@ TEMPLATE = """<!DOCTYPE html>
 <script src="assets/county_index.js"></script>
 <script src="assets/villages.js"></script>
 <script src="assets/interventions.js"></script>
+<script src="assets/supabase-config.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const RID = "%(rid)s";
@@ -838,6 +842,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <script src="assets/boundaries.js"></script>
 <script src="assets/villages.js"></script>
 <script src="assets/interventions.js"></script>
+<script src="assets/supabase-config.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const REGIONS = %(regions_json)s;
@@ -887,18 +892,25 @@ function drawShading(){
 }
 drawShading();
 
-/* intervention-density heat: the "ground surface" colour the dashboard leads with */
-const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
-const interventionLayer = L.layerGroup().addTo(map);
-PACIDA_AREA_SLUGS.forEach(slug=>{
-  drawInterventionLayer(map, slug).eachLayer(l=>interventionLayer.addLayer(l));
-  attachVillageLayer(map, slug);
-});
+PACIDA_AREA_SLUGS.forEach(slug=> attachVillageLayer(map, slug));
 
-layersControl.addOverlay(heatLayer,"Intervention density (heat)");
+/* intervention-density heat: the "ground surface" colour the dashboard leads with.
+   Waits on the live Supabase fetch (falls back to the static snapshot on failure) before
+   drawing, since drawInterventionHeat/drawInterventionLayer read INTERVENTIONS synchronously
+   at call time — see loadLiveProjects() in common.js. */
+const interventionLayer = L.layerGroup().addTo(map);
+(async()=>{
+  await loadLiveProjects();
+  const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
+  PACIDA_AREA_SLUGS.forEach(slug=>{
+    drawInterventionLayer(map, slug).eachLayer(l=>interventionLayer.addLayer(l));
+  });
+  layersControl.addOverlay(heatLayer,"Intervention density (heat)");
+  layersControl.addOverlay(interventionLayer,"PACIDA interventions &amp; offices");
+})();
+
 layersControl.addOverlay(shadeLayer,"Drought-need shading");
 layersControl.addOverlay(markerLayer,"Household markers");
-layersControl.addOverlay(interventionLayer,"PACIDA interventions &amp; offices");
 layersControl.addOverlay(labelLayer,"County labels");
 
 function hhRadius(hh){ return Math.max(5, Math.min(20, Math.sqrt(hh)/22)); }

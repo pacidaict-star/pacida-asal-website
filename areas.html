@@ -73,6 +73,7 @@
 <script src="assets/villages.js"></script>
 <script src="assets/interventions.js"></script>
 <script src="assets/county_index.js"></script>
+<script src="assets/supabase-config.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const AREAS = [{"id":"marsabit","name":"Marsabit County","lat":2.3346,"lon":37.9891,"households":77495,"population":459785,"staticVuln":88,"phase":"NDMA Alert (worsening)"},{"id":"samburu","name":"Samburu County","lat":1.0966,"lon":36.698,"households":65910,"population":310327,"staticVuln":72,"phase":"NDMA Alert"},{"id":"isiolo","name":"Isiolo County","lat":0.3546,"lon":37.5822,"households":58072,"population":268002,"staticVuln":76,"phase":"NDMA Alert (worsening)"},{"id":"borena","name":"Borena Zone","lat":4.885,"lon":38.083,"households":232000,"population":1210000,"staticVuln":82,"phase":"IPC Phase 2\u20133 (Stressed\u2013Crisis)"}];
@@ -111,15 +112,22 @@ function drawShading(){
 }
 drawShading();
 
-const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
-PACIDA_AREA_SLUGS.forEach(slug=>{
-  drawInterventionLayer(map, slug).eachLayer(l=>markerLayer.addLayer(l));
-  attachVillageLayer(map, slug);
-});
+PACIDA_AREA_SLUGS.forEach(slug=> attachVillageLayer(map, slug));
 
-layersControl.addOverlay(heatLayer, "Intervention density (heat)");
+/* waits on the live Supabase fetch (falls back to the static snapshot on failure) before
+   drawing, since drawInterventionHeat/drawInterventionLayer read INTERVENTIONS synchronously
+   at call time — see loadLiveProjects() in common.js. */
+(async()=>{
+  await loadLiveProjects();
+  const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
+  PACIDA_AREA_SLUGS.forEach(slug=>{
+    drawInterventionLayer(map, slug).eachLayer(l=>markerLayer.addLayer(l));
+  });
+  layersControl.addOverlay(heatLayer, "Intervention density (heat)");
+  layersControl.addOverlay(markerLayer, "PACIDA interventions &amp; offices");
+})();
+
 layersControl.addOverlay(shadeLayer, "Drought-need shading");
-layersControl.addOverlay(markerLayer, "PACIDA interventions &amp; offices");
 
 function hqRadius(hh){ return Math.max(8, Math.min(22, Math.sqrt(hh)/20)); }
 function drawAreaPins(){

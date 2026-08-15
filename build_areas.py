@@ -161,6 +161,7 @@ HTML = """<!DOCTYPE html>
 <script src="assets/villages.js"></script>
 <script src="assets/interventions.js"></script>
 <script src="assets/county_index.js"></script>
+<script src="assets/supabase-config.js"></script>
 <script src="assets/common.js"></script>
 <script>
 const AREAS = %(areas_json)s;
@@ -199,15 +200,22 @@ function drawShading(){
 }
 drawShading();
 
-const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
-PACIDA_AREA_SLUGS.forEach(slug=>{
-  drawInterventionLayer(map, slug).eachLayer(l=>markerLayer.addLayer(l));
-  attachVillageLayer(map, slug);
-});
+PACIDA_AREA_SLUGS.forEach(slug=> attachVillageLayer(map, slug));
 
-layersControl.addOverlay(heatLayer, "Intervention density (heat)");
+/* waits on the live Supabase fetch (falls back to the static snapshot on failure) before
+   drawing, since drawInterventionHeat/drawInterventionLayer read INTERVENTIONS synchronously
+   at call time — see loadLiveProjects() in common.js. */
+(async()=>{
+  await loadLiveProjects();
+  const heatLayer = drawInterventionHeat(PACIDA_AREA_SLUGS).addTo(map);
+  PACIDA_AREA_SLUGS.forEach(slug=>{
+    drawInterventionLayer(map, slug).eachLayer(l=>markerLayer.addLayer(l));
+  });
+  layersControl.addOverlay(heatLayer, "Intervention density (heat)");
+  layersControl.addOverlay(markerLayer, "PACIDA interventions &amp; offices");
+})();
+
 layersControl.addOverlay(shadeLayer, "Drought-need shading");
-layersControl.addOverlay(markerLayer, "PACIDA interventions &amp; offices");
 
 function hqRadius(hh){ return Math.max(8, Math.min(22, Math.sqrt(hh)/20)); }
 function drawAreaPins(){
