@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Kenya ASAL Climate Watch</title>
+<meta name="description" content="What this dashboard is, how the live Need Index is calculated, where every figure comes from, and how it relates to PACIDA.">
+<meta name="theme-color" content="#34B44B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="About — Kenya ASAL Climate Watch">
+<meta property="og:description" content="What this dashboard is, how the live Need Index is calculated, and where every figure comes from.">
+<meta property="og:url" content="https://pacidaict-star.github.io/pacida-asal-website/about.html">
+<meta property="og:image" content="https://pacidaict-star.github.io/pacida-asal-website/assets/favicon-512.png">
+<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="About — Kenya ASAL Climate Watch">
+<meta name="twitter:description" content="What this dashboard is, how the live Need Index is calculated, and where every figure comes from.">
+<meta name="twitter:image" content="https://pacidaict-star.github.io/pacida-asal-website/assets/favicon-512.png">
+<link rel="canonical" href="https://pacidaict-star.github.io/pacida-asal-website/about.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
+
+<header class="glass">
+  <div class="brand">
+    <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
+    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <div class="sub">About this site &middot; methodology &amp; sources</div>
+  </div>
+  <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
+  <div class="nav-collapse" id="navCollapse">
+    <nav class="site"><a href="index.html">Home</a><a href="areas.html">Operational Areas</a><a href="impact.html">Impact Dashboard</a><div class="nav-dd"><button type="button" class="nav-dd-btn" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button><div class="nav-dd-menu"><a href="marsabit.html">Marsabit</a><a href="samburu.html">Samburu</a><a href="isiolo.html">Isiolo</a><a href="borena.html">Borena Zone</a></div></div><a href="about.html" class="active">About</a></nav>
+    <div class="head-right">
+      <div class="search-wrap">
+        <input type="text" id="searchBox" placeholder="Jump to a county&hellip;" aria-label="Search counties">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
+    </div>
+  </div>
+</header>
+
+<div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
+  <div class="gl-head"><h3>Glossary</h3><button class="gl-close" type="button" aria-label="Close glossary">&times;</button></div>
+  <input class="gl-search" type="text" placeholder="Filter terms&hellip;" aria-label="Filter glossary terms">
+  <div class="gl-body"></div>
+</div>
+<div class="gl-backdrop" id="glBackdrop"></div>
+
+<main id="main-content">
+<div class="wide" style="padding-top:22px">
+
+  <div class="panel glass">
+    <div class="hero-logo-row">
+      <img class="hero-logo" src="assets/pacida-logo.png" alt="PACIDA — Pastoralist Community Initiative and Development Assistance">
+      <div>
+        <h2 style="margin-bottom:6px">About this website</h2>
+        <p style="margin-bottom:0"><b>Kenya &middot; ASAL Climate Watch</b> is an unofficial live monitoring dashboard for PACIDA's
+        operational area, built in partnership with PACIDA &mdash; it is not PACIDA's official website. It combines PACIDA's own
+        project data with live public weather feeds to show, county by county, where drought pressure is building and where
+        PACIDA has actually worked. For PACIDA's official programme pages, reports and contact details, visit
+        <a href="https://pacida.org" target="_blank" rel="noopener" style="color:var(--alert)">pacida.org&nbsp;&#8599;</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <h2>About PACIDA</h2>
+    <p>This dashboard is a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
+    Northern-Kenya/Southern-Ethiopia NGO working across Marsabit, Samburu and Isiolo counties and the Borena Zone of southern
+    Ethiopia &mdash; drought emergency response, WASH, livestock health, education access, and cross-border peace &amp; governance.
+    Every area shown on this site is somewhere PACIDA actually operates; nothing here is national context or a county PACIDA
+    doesn't work in. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what's been delivered
+    on the ground, project by project, with real locations named.</p>
+  </div>
+
+  <div class="panel glass">
+    <h2>How this site works</h2>
+    <div class="howit-grid">
+      <div class="howit"><b>Live climate signal</b><span>Temperature, rainfall, humidity and soil moisture are pulled from the
+        Open-Meteo API and re-scored into the 0&ndash;100 Need Index every 10 minutes &mdash; the map, the county pages and the
+        homepage stat strip all update themselves, no page reload needed.</span></div>
+      <div class="howit"><b>Interactive map</b><span>Every page pairs a live Leaflet map with the data around it. Toggle layers
+        (heat density, drought-need shading, PACIDA interventions) from the control in the map's corner; zoom in for village-
+        level labels.</span></div>
+      <div class="howit"><b>Operational Areas map</b><span>A map-only view of all four areas with every project pinned, no
+        surrounding dashboard chrome &mdash; useful for a quick, full-screen look. Reached from every page's header nav.</span></div>
+      <div class="howit"><b>Impact Dashboard</b><span>The full 236-project register behind every number here &mdash; searchable,
+        sortable, exportable, with the real donor, theme and location named for each one.</span></div>
+      <div class="howit"><b>Glossary</b><span>Click Glossary in the header on any page for plain-language definitions of
+        NDMA, IPC, ASAL and local pastoralist terms used throughout the site.</span></div>
+      <div class="howit"><b>Search &amp; export</b><span>The search box in the header jumps straight to any county from
+        anywhere on the site. Most data panels also offer a CSV export of what's currently on screen.</span></div>
+    </div>
+  </div>
+
+  <div class="panel glass" id="rating-framework">
+    <h2>Rating framework &mdash; how intervention level is decided</h2>
+    <p style="margin-bottom:14px">
+      The Intervention Need Index (0&ndash;100) is aligned with the frameworks used by the world's main drought and
+      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (Marsabit, Samburu and Isiolo), the
+      <b>IPC</b> (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
+      <b>WHO/UNICEF</b> acute-malnutrition thresholds. Live climate signals are re-scored on every refresh; structural
+      indicators come from the latest published NDMA/IPC assessments.
+      Unfamiliar term? Open the <b>Glossary</b> in the header.
+    </p>
+    <h2 style="font-size:15px;margin-top:6px">Index bands mapped to official phases</h2>
+    <div class="table-scroll">
+    <table class="ptable">
+      <thead><tr><th>Dashboard band</th><th>Index</th><th>NDMA drought phase</th><th>IPC phase (FAO/WFP/FEWS NET)</th><th>Typical response</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip" style="background:var(--normal)"></span>Watch</td><td class="mono">0&ndash;44</td><td>Normal</td><td>Phase 1 &middot; Minimal</td><td>Monitoring, preparedness, resilience building</td></tr>
+        <tr><td><span class="chip" style="background:var(--alert)"></span>Elevated</td><td class="mono">45&ndash;59</td><td>Alert</td><td>Phase 2 &middot; Stressed</td><td>Early action: water trucking standby, livestock offtake planning, cash-transfer scale-up</td></tr>
+        <tr><td><span class="chip" style="background:var(--alarm)"></span>High</td><td class="mono">60&ndash;74</td><td>Alarm</td><td>Phase 3 &middot; Crisis</td><td>Emergency WASH, supplementary feeding, food/cash assistance, fodder distribution</td></tr>
+        <tr><td><span class="chip" style="background:var(--emergency)"></span>Critical</td><td class="mono">75&ndash;100</td><td>Emergency</td><td>Phase 4 &middot; Emergency</td><td>Full humanitarian response: relief food, therapeutic nutrition (SAM), emergency water, destocking</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="panel glass">
+    <h2>Sources &amp; methodology</h2>
+    <div class="src-grid">
+      <div class="src"><b>Live weather &amp; soil</b><span>Open-Meteo API &mdash; temperature, humidity, wind, rainfall (past 30&nbsp;d + 7-d forecast), soil moisture. Refreshed every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
+      <div class="src"><b>County boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source, 2023 release). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
+      <div class="src"><b>Households &amp; population</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). Borena Zone figures are CSA-based projections. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
+      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for Marsabit, Samburu and Isiolo, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
+      <div class="src"><b>PACIDA interventions</b><span>PACIDA's own project register and partner briefings &mdash; see the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for the full picture. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<footer class="glass">
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; unofficial monitoring prototype, in partnership with PACIDA &middot; census figures are the latest published, weather is live</span></div>
+  <div class="mono" id="footTime"></div>
+</footer>
+
+</div><!-- /content-inner -->
+</div><!-- /content-pane -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/county_index.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/common.js"></script>
+<script>
+startClock();
+makeBackgroundMap("mapBg", [2.3, 38.2], 7);
+
+attachHeaderHeightVar();
+attachNavToggle();
+attachNavDropdown();
+attachGlossary();
+attachSearch(
+  ()=>COUNTY_INDEX.map(c=>({id:c.slug, label:c.name, kind:"county"})),
+  m=>{ window.location.href = m.id + ".html"; }
+);
+</script>
+</body>
+</html>

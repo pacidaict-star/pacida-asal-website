@@ -74,7 +74,7 @@ def site_nav(active):
         + '<button type="button" class="nav-dd-btn%s" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button>' % (' active' if in_dropdown else '')
         + '<div class="nav-dd-menu">%s</div>' % dd_items
         + '</div>'
-        + a("index.html#about-section", "about", "About")
+        + a("about.html", "about", "About")
     )
 
 areas = []

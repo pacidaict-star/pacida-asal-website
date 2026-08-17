@@ -39,7 +39,7 @@
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
   <div class="nav-collapse" id="navCollapse">
-  <nav class="site"><a href="index.html" class="active">Home</a><a href="areas.html">Operational Areas</a><a href="impact.html">Impact Dashboard</a><div class="nav-dd"><button type="button" class="nav-dd-btn" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button><div class="nav-dd-menu"><a href="marsabit.html">Marsabit</a><a href="samburu.html">Samburu</a><a href="isiolo.html">Isiolo</a><a href="borena.html">Borena Zone</a></div></div><a href="index.html#about-section">About</a></nav>
+  <nav class="site"><a href="index.html" class="active">Home</a><a href="areas.html">Operational Areas</a><a href="impact.html">Impact Dashboard</a><div class="nav-dd"><button type="button" class="nav-dd-btn" aria-haspopup="true" aria-expanded="false">Counties <span class="caret">&#9662;</span></button><div class="nav-dd-menu"><a href="marsabit.html">Marsabit</a><a href="samburu.html">Samburu</a><a href="isiolo.html">Isiolo</a><a href="borena.html">Borena Zone</a></div></div><a href="about.html">About</a></nav>
   <div class="head-right">
     <div class="search-wrap">
       <input type="text" id="searchBox" placeholder="Jump to a county…" aria-label="Search counties">
@@ -110,7 +110,7 @@
     <h3>PACIDA Impact Dashboard<span class="arrow-mark">&rarr;</span></h3>
     <p>236 real projects, FY2010&ndash;FY2026 &mdash; donors, themes, achievements and where the work has actually happened.</p>
   </a>
-  <a class="entry-card glass" href="#about-section">
+  <a class="entry-card glass" href="about.html">
     <span class="entry-eyebrow">03</span>
     <h3>About &amp; Methodology<span class="arrow-mark">&rarr;</span></h3>
     <p>How the Need Index is calculated, where the data comes from, and PACIDA's role in this project.</p>
@@ -165,53 +165,12 @@
   </div>
 
   <div class="panel glass">
-    <h2>Rating framework — how intervention level is decided</h2>
-    <p style="margin-bottom:14px">
-      The Intervention Need Index (0–100) is aligned with the frameworks used by the world's main drought and
-      food-security institutions: Kenya's <b>NDMA</b> drought early-warning phases (Marsabit, Samburu and Isiolo), the
-      <b>IPC</b> (Integrated Food Security Phase Classification) used by <b>FAO, WFP, UNICEF, OCHA and FEWS&nbsp;NET</b>, and
-      <b>WHO/UNICEF</b> acute-malnutrition thresholds. Live climate signals are re-scored on every refresh; structural
-      indicators come from the latest published NDMA/IPC assessments.
-      Unfamiliar term? Open the <b>Glossary</b> in the header.
-    </p>
-    <h2 style="font-size:15px;margin-top:6px">Index bands mapped to official phases</h2>
-    <div class="table-scroll">
-    <table class="ptable">
-      <thead><tr><th>Dashboard band</th><th>Index</th><th>NDMA drought phase</th><th>IPC phase (FAO/WFP/FEWS NET)</th><th>Typical response</th></tr></thead>
-      <tbody>
-        <tr><td><span class="chip" style="background:var(--normal)"></span>Watch</td><td class="mono">0–44</td><td>Normal</td><td>Phase 1 · Minimal</td><td>Monitoring, preparedness, resilience building</td></tr>
-        <tr><td><span class="chip" style="background:var(--alert)"></span>Elevated</td><td class="mono">45–59</td><td>Alert</td><td>Phase 2 · Stressed</td><td>Early action: water trucking standby, livestock offtake planning, cash-transfer scale-up</td></tr>
-        <tr><td><span class="chip" style="background:var(--alarm)"></span>High</td><td class="mono">60–74</td><td>Alarm</td><td>Phase 3 · Crisis</td><td>Emergency WASH, supplementary feeding, food/cash assistance, fodder distribution</td></tr>
-        <tr><td><span class="chip" style="background:var(--emergency)"></span>Critical</td><td class="mono">75–100</td><td>Emergency</td><td>Phase 4 · Emergency</td><td>Full humanitarian response: relief food, therapeutic nutrition (SAM), emergency water, destocking</td></tr>
-      </tbody>
-    </table>
-    </div>
-  </div>
-
-  <div class="panel glass">
     <h2>Key resources</h2>
     <div class="resource-grid">
       <a class="resource-card" href="impact.html"><b>PACIDA Impact Dashboard</b><span>236 real projects, FY2010&ndash;FY2026 &mdash; donors, themes, achievements.</span></a>
       <button class="resource-card" type="button" id="resGlossaryBtn"><b>Glossary of terms</b><span>Plain-language decoder for NDMA, IPC, ASAL and local terms.</span></button>
-      <a class="resource-card" href="#about-section"><b>Rating framework &amp; methodology</b><span>How the 0&ndash;100 Need Index is calculated and where the data comes from.</span></a>
+      <a class="resource-card" href="about.html#rating-framework"><b>Rating framework &amp; methodology</b><span>How the 0&ndash;100 Need Index is calculated and where the data comes from.</span></a>
       <a class="resource-card" href="https://pacida.org" target="_blank" rel="noopener"><b>PACIDA official site<span class="ext-mark">&#8599;</span></b><span>Programme pages, annual reports and contact information.</span></a>
-    </div>
-  </div>
-
-  <div class="panel glass" id="about-section">
-    <h2>About this project &amp; PACIDA</h2>
-    <p>This dashboard is a monitoring tool for <b>PACIDA</b> (Pastoralist Community Initiative and Development Assistance), a
-    Northern-Kenya/Southern-Ethiopia NGO working across Marsabit, Samburu and Isiolo counties and the Borena Zone of southern
-    Ethiopia — drought emergency response, WASH, livestock health, education access, and cross-border peace &amp; governance.
-    Every area shown here is somewhere PACIDA actually operates; nothing on this map is national context or a county PACIDA
-    doesn't work in. See the <a href="impact.html" style="color:var(--alert)">Impact Dashboard</a> for what's been delivered
-    on the ground, project by project.</p>
-    <div class="src-grid">
-      <div class="src"><b>Live weather &amp; soil</b><span>Open-Meteo API — temperature, humidity, wind, rainfall (past 30 d + 7-d forecast), soil moisture. Refreshed every 10 minutes. </span><a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a></div>
-      <div class="src"><b>County boundaries</b><span>geoBoundaries open geodata project (RCMRD / Africa GeoPortal source, 2023 release). </span><a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoboundaries.org</a></div>
-      <div class="src"><b>Households &amp; population</b><span>Kenya 2019 Population &amp; Housing Census (KNBS). Borena Zone figures are CSA-based projections. </span><a href="https://www.knbs.or.ke" target="_blank" rel="noopener">knbs.or.ke</a></div>
-      <div class="src"><b>Drought phase</b><span>NDMA national drought early-warning bulletins for Marsabit, Samburu and Isiolo, and FEWS NET East Africa outlooks for southern Ethiopia. </span><a href="https://ndma.go.ke" target="_blank" rel="noopener">ndma.go.ke</a></div>
-      <div class="src"><b>PACIDA interventions</b><span>PACIDA's own project register and "@ A Glance" briefing — see the Impact Dashboard for the full picture. </span><a href="https://pacida.org" target="_blank" rel="noopener">pacida.org</a></div>
     </div>
   </div>
 </div>
