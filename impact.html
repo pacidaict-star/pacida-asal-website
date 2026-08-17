@@ -69,7 +69,7 @@
         <h2 style="margin-bottom:6px">PACIDA, at a glance</h2>
         <p style="margin-bottom:0">Sixteen years of continuous humanitarian and development work across Marsabit, Samburu, Isiolo and the
         cross-border Borena Zone of southern Ethiopia &mdash; drawn directly from PACIDA's own project register and its
-        externally-shared "@ A Glance" briefing, not modelled or estimated.</p>
+        externally-shared partner briefing, not modelled or estimated.</p>
       </div>
     </div>
     <div class="hero-stats"><div class="hs"><div class="hn">236</div><div class="hl">Real projects, FY2010–FY2026</div></div><div class="hs"><div class="hn">16</div><div class="hl">Years of continuous operation</div></div><div class="hs"><div class="hn">18</div><div class="hl">Projects active right now</div></div><div class="hs"><div class="hn">54</div><div class="hl">Donor &amp; implementing partners</div></div></div>
@@ -126,6 +126,7 @@
         <th class="sortable" data-key="year">Year <span class="arrow">&#9662;</span></th>
         <th class="sortable" data-key="theme">Theme <span class="arrow">&#9662;</span></th>
         <th>Project</th>
+        <th>Location</th>
         <th class="sortable" data-key="donor">Donor <span class="arrow">&#9662;</span></th>
         <th class="sortable" data-key="status">Status <span class="arrow">&#9662;</span></th>
       </tr></thead>
@@ -145,7 +146,7 @@
     <h2>Sources &amp; methodology</h2>
     <div class="src-grid">
       <div class="src"><b>Project register</b><span>PACIDA's internal Project Summary (FY2010&ndash;FY2026): donor, thematic area, title, duration and dates for every grant. Individual grant amounts are intentionally not published here &mdash; they read as internal financial detail rather than material PACIDA already shares externally.</span></div>
-      <div class="src"><b>Achievement figures</b><span>PACIDA's own "@ A Glance 2023-2026" partner briefing &mdash; the same headline numbers shared with donors and partners.</span></div>
+      <div class="src"><b>Achievement figures</b><span>PACIDA's own 2023&ndash;2026 partner briefing &mdash; the same headline numbers shared with donors and partners.</span></div>
       <div class="src"><b>Challenges &amp; gaps</b><span>PACIDA's own stated challenges and mitigation measures, from the same briefing &mdash; not this dashboard's assessment.</span></div>
       <div class="src"><b>Partners &amp; donors</b><span>Organisation names from PACIDA's internal partnership records (current and historical); no financial or contractual detail is used or published.</span></div>
       <div class="src"><b>Reach figures (map pins)</b><span>Where shown, "Reach" numbers on a project's map pin are condensed from PACIDA's own narrative/progress/final reports to that donor &mdash; not the financial register, which has no beneficiary field. Covers 48 of 236 projects; the rest either have no report on file yet or only fragmented activity-level counts with no reliable total, so no figure is shown rather than an estimated one.</span></div>
@@ -248,6 +249,14 @@ document.querySelectorAll("#themeChips .chip-filter").forEach(btn=>{
 });
 
 /* project table */
+const COUNTY_LABELS = {marsabit:"Marsabit", samburu:"Samburu", isiolo:"Isiolo", borena:"Borena Zone"};
+function locationLabel(p){
+  if(!p.locations || !p.locations.length) return "—";
+  return p.locations.map(l=>
+    l.kind === "regional" ? `${COUNTY_LABELS[l.slug]||l.slug} (regional)` : l.name
+  ).join(", ");
+}
+
 let sortKey="year", sortDir=-1;
 function renderProjTable(){
   const rows = INTERVENTIONS.projects.slice().sort((a,b)=>{
@@ -259,6 +268,7 @@ function renderProjTable(){
     <td class="mono">${p.year||"—"}</td>
     <td><span class="chip" style="background:${p.theme_color}"></span>${p.theme}</td>
     <td>${p.title}</td>
+    <td>${locationLabel(p)}</td>
     <td>${p.donor||"—"}</td>
     <td><span class="${p.status==='ongoing'?'status-ongoing':'status-done'}">${p.status==='ongoing'?'Ongoing':'Completed'}</span></td>
   </tr>`).join("");
@@ -286,9 +296,9 @@ attachSearch(
   m=>{ window.location.href = m.id + ".html"; }
 );
 document.getElementById("exportBtn").addEventListener("click", ()=>{
-  const rows = [["Year","Theme","Project","Donor","Duration","Start","End","Status"]];
+  const rows = [["Year","Theme","Project","Location","Donor","Duration","Start","End","Status"]];
   INTERVENTIONS.projects.forEach(p=>{
-    rows.push([p.year, p.theme, p.title, p.donor, p.duration, p.start, p.end, p.status]);
+    rows.push([p.year, p.theme, p.title, locationLabel(p), p.donor, p.duration, p.start, p.end, p.status]);
   });
   downloadCSV("pacida-project-register.csv", rows);
 });
