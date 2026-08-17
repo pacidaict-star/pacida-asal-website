@@ -115,6 +115,7 @@
       <div class="uc-slide" id="ucSlide">
         <div class="uc-year"></div>
         <div class="uc-text"></div>
+        <div class="uc-sources"></div>
       </div>
       <button class="uc-nav uc-next" type="button" aria-label="Next update">&rarr;</button>
     </div>
@@ -441,7 +442,7 @@ document.getElementById("resGlossaryBtn").addEventListener("click", ()=>document
 
 /* ================= LATEST UPDATES CAROUSEL ================= */
 (function(){
-  const UPDATES = [["1999\u20132000","Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.",false],["2005\u201306","Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).",false],["2008\u201309","Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.",false],["2010\u201311","Horn of Africa famine \u2014 the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.",false],["2016\u201317","Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.",false],["2020\u201323","Five consecutive failed rainy seasons \u2014 worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.",false],["2023\u201324","El Ni\u00f1o whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought \u2014 the twin-disaster pattern.",false],["2025\u201326","Failed 2025 short rains; NDMA moved 12\u201313 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.",true]]; /* [year, text, isNow] */
+  const UPDATES = [["1999\u20132000","Severe Horn drought; emergency operations across northern Kenya and southern Ethiopia.",false,[]],["2005\u201306","Failed short rains; major livestock losses in Marsabit and Borena; catalyst period for founding of local NGOs including PACIDA (2008).",false,[]],["2008\u201309","Back-to-back poor seasons; food-insecure caseload across ASALs peaks above 3.8 million.",false,[]],["2010\u201311","Horn of Africa famine \u2014 the region's worst crisis in 60 years; famine declared in Somalia, Emergency phases across the cross-border cluster.",false,[]],["2016\u201317","Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena.",false,[]],["2020\u201323","Five consecutive failed rainy seasons \u2014 worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half.",false,[]],["2023\u201324","El Ni\u00f1o whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought \u2014 the twin-disaster pattern.",false,[]],["2025\u201326","Failed 2025 short rains; NDMA moved 12\u201313 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists. In July 2026 NDMA launched a Sh130.8 M resilience drive for Isiolo and Samburu &mdash; water-access and climate-resilience projects for an estimated 30,000 people and 50,000+ livestock.",true,[["NDMA drought situation update","https://ndma.go.ke/drought-situation-update/"],["NDMA Sh130.8M resilience drive for Isiolo & Samburu, Standard, 13 Jul 2026","https://www.standardmedia.co.ke/national/article/2001552702/ndma-unveils-sh1308m-drive-to-tackle-drought-crisis-in-four-counties"]]]]; /* [year, text, isNow, sources[[label,url],...]] */
   const slide = document.getElementById("ucSlide");
   const dotsWrap = document.getElementById("ucDots");
   const carousel = document.getElementById("updatesCarousel");
@@ -451,9 +452,13 @@ document.getElementById("resGlossaryBtn").addEventListener("click", ()=>document
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function render(){
-    const [yr, tx, isNow] = UPDATES[idx];
+    const [yr, tx, isNow, sources] = UPDATES[idx];
     slide.querySelector(".uc-year").innerHTML = yr + (isNow ? ' <span class="now-badge">Now</span>' : "");
     slide.querySelector(".uc-text").innerHTML = tx;
+    const srcEl = slide.querySelector(".uc-sources");
+    srcEl.innerHTML = (sources && sources.length)
+      ? "Source: " + sources.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join(" &middot; ")
+      : "";
     dotsWrap.querySelectorAll(".uc-dot").forEach((d,i)=>{
       d.classList.toggle("active", i===idx);
       d.setAttribute("aria-current", i===idx ? "true" : "false");

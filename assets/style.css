@@ -338,6 +338,10 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .uc-year{font-family:'IBM Plex Mono';color:var(--alert);font-size:13px;margin-bottom:6px}
 .uc-year .now-badge{background:var(--pacida-green);color:#08210F;font-family:'Barlow Condensed';font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:10px;padding:2px 8px;border-radius:3px;margin-left:8px;vertical-align:1px}
 .uc-text{font-size:13.5px;color:var(--muted);line-height:1.6}
+.uc-sources{font-size:11px;color:var(--faint);margin-top:8px;line-height:1.5}
+.uc-sources a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.uc-sources a:hover{color:var(--alert)}
+.uc-sources:empty{display:none}
 .uc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
 .uc-dots{display:flex;gap:6px}
 .uc-dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:none;cursor:pointer;padding:0}

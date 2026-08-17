@@ -116,7 +116,10 @@ DROUGHT_TIMELINE = [
  ["2016–17","Drought emergency declared in Kenya; GAM breaches 30% in parts of the north; massive livestock deaths in Borena."],
  ["2020–23","Five consecutive failed rainy seasons — worst drought in 40 years. 3.3+ million livestock deaths in southern Ethiopia; 4.4 M people on relief in Kenya's ASALs; Borena cattle herds cut by over half."],
  ["2023–24","El Niño whiplash: catastrophic floods (Isiolo among worst-hit) immediately after drought — the twin-disaster pattern."],
- ["2025–26","Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists.","now"]
+ ["2025–26","Failed 2025 short rains; NDMA moved 12–13 counties to Alert and 4 to Alarm by Feb 2026; 3.3 M food insecure. March 2026 rains brought partial, uneven relief; long-term recovery deficit persists. "
+  "In July 2026 NDMA launched a Sh130.8 M resilience drive for Isiolo and Samburu &mdash; water-access and climate-resilience projects for an estimated 30,000 people and 50,000+ livestock.","now",
+  [("NDMA drought situation update", "https://ndma.go.ke/drought-situation-update/"),
+   ("NDMA Sh130.8M resilience drive for Isiolo & Samburu, Standard, 13 Jul 2026", "https://www.standardmedia.co.ke/national/article/2001552702/ndma-unveils-sh1308m-drive-to-tackle-drought-crisis-in-four-counties")]]
 ]
 
 
@@ -610,7 +613,7 @@ def build_index():
             sites=[s[0] for s in r["sites"]]
         ))
     lean.sort(key=lambda r: r["name"])
-    updates = [[yr, tx, len(item) > 2] for item in DROUGHT_TIMELINE for yr, tx in [item[:2]]]
+    updates = [[item[0], item[1], len(item) > 2, (item[3] if len(item) > 3 else [])] for item in DROUGHT_TIMELINE]
     out = INDEX_TEMPLATE % dict(
         regions_json=json.dumps(lean, separators=(",", ":")),
         updates_json=json.dumps(updates, separators=(",", ":")),
@@ -738,6 +741,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
       <div class="uc-slide" id="ucSlide">
         <div class="uc-year"></div>
         <div class="uc-text"></div>
+        <div class="uc-sources"></div>
       </div>
       <button class="uc-nav uc-next" type="button" aria-label="Next update">&rarr;</button>
     </div>
@@ -1064,7 +1068,7 @@ document.getElementById("resGlossaryBtn").addEventListener("click", ()=>document
 
 /* ================= LATEST UPDATES CAROUSEL ================= */
 (function(){
-  const UPDATES = %(updates_json)s; /* [year, text, isNow] */
+  const UPDATES = %(updates_json)s; /* [year, text, isNow, sources[[label,url],...]] */
   const slide = document.getElementById("ucSlide");
   const dotsWrap = document.getElementById("ucDots");
   const carousel = document.getElementById("updatesCarousel");
@@ -1074,9 +1078,13 @@ document.getElementById("resGlossaryBtn").addEventListener("click", ()=>document
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function render(){
-    const [yr, tx, isNow] = UPDATES[idx];
+    const [yr, tx, isNow, sources] = UPDATES[idx];
     slide.querySelector(".uc-year").innerHTML = yr + (isNow ? ' <span class="now-badge">Now</span>' : "");
     slide.querySelector(".uc-text").innerHTML = tx;
+    const srcEl = slide.querySelector(".uc-sources");
+    srcEl.innerHTML = (sources && sources.length)
+      ? "Source: " + sources.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join(" &middot; ")
+      : "";
     dotsWrap.querySelectorAll(".uc-dot").forEach((d,i)=>{
       d.classList.toggle("active", i===idx);
       d.setAttribute("aria-current", i===idx ? "true" : "false");
