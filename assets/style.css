@@ -256,12 +256,38 @@ button.refresh{background:rgba(38,33,21,.7);color:var(--text);border:1px solid v
 button.refresh:hover{border-color:var(--alert)}
 button.refresh:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 
-/* stat strip */
+/* stat strip — a coloured top accent per cell signals what kind of number it is (live
+   climate signal / alert count / static census / brand context) at a glance, before you've
+   even read the label. The need-index cell is the lead KPI so it's wider and carries the same
+   Watch/Elevated/High/Critical gauge used on the county pages, instead of a bare number, so the
+   colour-band context reads immediately rather than needing a click-through to a detail page. */
 .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;padding:14px 22px;max-width:1440px;margin:0 auto}
-.strip .cell{padding:13px 16px;border-radius:10px}
-.cell .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;font-family:'Barlow Condensed';font-weight:600;margin-bottom:4px}
+.strip .cell{padding:13px 16px 14px;border-radius:10px;position:relative;overflow:hidden}
+.strip .cell::before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
+.cell-accent-brand::before{background:var(--pacida-green)}
+.cell-accent-static::before{background:var(--line)}
+.cell-accent-alert::before{background:var(--alarm)}
+.cell-hero::before{background:var(--alert)}
+.cell .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;font-family:'Barlow Condensed';font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .cell .v{font-family:'IBM Plex Mono';font-size:22px;font-weight:600}
 .cell .n{font-size:11.5px;color:var(--faint);margin-top:2px}
+
+.cell-hero{grid-column:span 2}
+.cell-hero .v{font-size:32px;line-height:1}
+.cell-hero .gauge{margin:10px 0 5px}
+.cell-hero .gauge-labels{font-size:9.5px}
+
+.live-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;letter-spacing:.1em;color:var(--normal);font-weight:700}
+.live-tag .dot{width:5px;height:5px}
+.static-tag{
+  font-size:9px;letter-spacing:.05em;color:var(--faint);font-weight:600;text-transform:none;
+  background:rgba(176,144,106,.16);padding:2px 6px;border-radius:3px;font-family:'Archivo';
+}
+
+.zone-dots{display:flex;gap:5px;margin-top:7px}
+.zone-dots .zd{width:9px;height:9px;border-radius:50%;background:var(--line);transition:background .3s}
+
+@media(max-width:520px){.cell-hero{grid-column:span 1}}
 
 /* main layout */
 main{display:block}
