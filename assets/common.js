@@ -292,23 +292,78 @@ async function fetchMonthlyRain(lat, lon){
   });
   return Object.keys(months).sort().slice(-12).map(k=>({month:k, total:months[k]}));
 }
+/* Redesigned for self-explanatory reading at a glance, not just on hover:
+   - a real mm y-axis (gridlines + labels) instead of bars floating with no scale
+   - a dashed reference line at the ~60mm/month ASAL norm already quoted elsewhere on this
+     site ("vs ~60mm ASAL expectation"), so it's visible which months actually fell short
+   - shaded bands behind the long-rains (Mar-May) and short-rains (Oct-Nov) months, so a low
+     bar during a "should be rainy" month reads very differently from a low bar in the dry
+     season — this is the whole point of the "did the rains arrive on schedule" caption
+   - the current month is visually marked as in-progress (dashed outline + "*") rather than
+     looking like a genuine below-normal month when it's really just incomplete data
+   - a legend spelling out what every colour/line means, since none of this is self-evident
+     from bars alone */
 function monthChart(data){
   if(!data || !data.length) return "";
-  const W=560,H=240,names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const max = Math.max(20, ...data.map(d=>d.total));
-  const bw = W/data.length;
-  let bars="", labels="", vals="";
+  const W=560, H=280, names=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const NORM = 60; // ASAL monthly norm — matches the "~60mm ASAL expectation" figure used elsewhere
+  const RAINY_MONTHS = new Set([3,4,5,10,11]); // long rains Mar-May, short rains Oct-Nov
+  const plotLeft=40, plotRight=W-6, plotTop=16, plotBottom=H-42;
+  const plotH = plotBottom-plotTop, plotW = plotRight-plotLeft;
+  const bw = plotW/data.length;
+
+  const dataMax = Math.max(...data.map(d=>d.total));
+  const rawCeil = Math.max(dataMax, NORM) * 1.15;
+  const step = rawCeil<=40?10 : rawCeil<=100?20 : rawCeil<=200?50:100;
+  const axisMax = Math.ceil(rawCeil/step)*step;
+  const yFor = v => plotBottom - (v/axisMax)*plotH;
+
+  let seasonBands="", gridlines="", bars="", vals="", labels="";
+
   data.forEach((d,i)=>{
-    const h = Math.max(2,(d.total/max)*(H-56));
-    const x = i*bw+5, w = Math.max(1,bw-10);
-    const isLast = i===data.length-1;
-    const mIdx = parseInt(d.month.slice(5,7),10)-1;
-    const barTop = H-34-h;
-    bars += `<rect x="${x.toFixed(1)}" y="${barTop.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${isLast?'#F0B22E':'#6FA3B4'}" opacity="${isLast?1:0.9}"><title>${d.month}: ${d.total.toFixed(0)} mm</title></rect>`;
-    vals += `<text x="${(x+w/2).toFixed(1)}" y="${(barTop-6).toFixed(1)}" font-size="12" fill="${isLast?'#F0B22E':'#9AB6C0'}" font-family="IBM Plex Mono" text-anchor="middle">${d.total.toFixed(0)}</text>`;
-    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-14}" font-size="13" fill="#D8BD98" font-family="Barlow Condensed" font-weight="600" text-anchor="middle">${names[mIdx]}</text>`;
+    const mIdx = parseInt(d.month.slice(5,7),10);
+    if(RAINY_MONTHS.has(mIdx)){
+      const x = plotLeft + i*bw;
+      seasonBands += `<rect x="${x.toFixed(1)}" y="${plotTop}" width="${bw.toFixed(1)}" height="${plotH.toFixed(1)}" fill="#34B44B" opacity="0.08"/>`;
+    }
   });
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:240px;display:block" role="img" aria-label="12 month rainfall history">${bars}${vals}${labels}</svg>`;
+
+  for(let f=0; f<=1.001; f+=0.25){
+    const v = axisMax*f, y=yFor(v);
+    gridlines += `<line x1="${plotLeft}" y1="${y.toFixed(1)}" x2="${plotRight}" y2="${y.toFixed(1)}" stroke="#6B4E30" stroke-width="1" opacity="${f===0?0.6:0.25}"/>`;
+    gridlines += `<text x="${plotLeft-6}" y="${(y+3).toFixed(1)}" font-size="10.5" fill="#B0906A" font-family="IBM Plex Mono" text-anchor="end">${Math.round(v)}</text>`;
+  }
+  gridlines += `<text x="${plotLeft-6}" y="8" font-size="9.5" fill="#B0906A" font-family="Barlow Condensed" text-anchor="end">mm</text>`;
+  const normY = yFor(NORM);
+  gridlines += `<line x1="${plotLeft}" y1="${normY.toFixed(1)}" x2="${plotRight}" y2="${normY.toFixed(1)}" stroke="#F0B22E" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.9"/>`;
+
+  data.forEach((d,i)=>{
+    const isLast = i===data.length-1;
+    const x = plotLeft + i*bw + 5, w = Math.max(1,bw-10);
+    const barTop = yFor(d.total);
+    const h = Math.max(1.5, plotBottom-barTop);
+    const mIdx = parseInt(d.month.slice(5,7),10)-1;
+    const fill = isLast ? "#F0B22E" : "#6FA3B4";
+    const style = isLast
+      ? `fill="${fill}" fill-opacity="0.32" stroke="${fill}" stroke-width="1.5" stroke-dasharray="3 3"`
+      : `fill="${fill}" opacity="0.9"`;
+    bars += `<rect x="${x.toFixed(1)}" y="${barTop.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" ${style}><title>${d.month}${isLast?" (month in progress)":""}: ${d.total.toFixed(0)} mm${RAINY_MONTHS.has(mIdx+1)?" — typical rainy-season month":""}</title></rect>`;
+    vals += `<text x="${(x+w/2).toFixed(1)}" y="${(barTop-6).toFixed(1)}" font-size="11.5" fill="${isLast?'#F0B22E':'#9AB6C0'}" font-family="IBM Plex Mono" text-anchor="middle">${d.total.toFixed(0)}</text>`;
+    labels += `<text x="${(x+w/2).toFixed(1)}" y="${H-14}" font-size="13" fill="#D8BD98" font-family="Barlow Condensed" font-weight="600" text-anchor="middle">${names[mIdx]}${isLast?"*":""}</text>`;
+  });
+
+  const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:280px;display:block" role="img" `
+    + `aria-label="12 month rainfall history in millimetres, with typical rainy-season months and the ~${NORM}mm ASAL monthly norm marked for reference">`
+    + `${seasonBands}${gridlines}${bars}${vals}${labels}</svg>`;
+
+  const legend = `<div class="hist-legend">`
+    + `<span><i class="hist-sw hist-sw-past"></i>Completed month</span>`
+    + `<span><i class="hist-sw hist-sw-now"></i>This month (in progress)*</span>`
+    + `<span><i class="hist-sw hist-sw-norm"></i>~${NORM}mm ASAL monthly norm</span>`
+    + `<span><i class="hist-sw hist-sw-season"></i>Typical rainy season</span>`
+    + `</div>`;
+
+  return svg + legend;
 }
 
 /* ---------- village tags (OpenStreetMap-geocoded, see assets/villages.js), shown when zoomed in ---------- */

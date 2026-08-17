@@ -553,6 +553,14 @@ details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
 
 /* history chart panel */
 .hist-cap{font-size:12px;color:var(--faint);margin-top:6px}
+.hist-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;padding-top:10px;border-top:1px solid var(--line)}
+.hist-legend span{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);font-family:'Barlow Condensed';font-weight:500;letter-spacing:.02em}
+.hist-sw{width:13px;height:13px;border-radius:3px;flex:none;display:inline-block}
+.hist-sw-past{background:#6FA3B4;opacity:.9}
+.hist-sw-now{background:#F0B22E;opacity:.32;border:1.5px dashed #F0B22E;box-sizing:border-box}
+.hist-sw-norm{background:none;border-top:2px dashed #F0B22E;height:0;align-self:center}
+.hist-sw-season{background:#34B44B;opacity:.28}
+@media(max-width:520px){.hist-legend{gap:10px 16px}}
 
 /* PACIDA interventions */
 .office-pin{color:var(--pacida-red);font-size:18px;text-shadow:0 0 3px #000,0 0 7px #000,0 0 2px #fff;line-height:1}

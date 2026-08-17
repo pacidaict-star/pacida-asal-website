@@ -383,9 +383,9 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
 
   <div class="panel glass">
-    <h2>12-month rainfall history <span class="tag">at %(hqname)s &middot; loaded once per visit</span></h2>
+    <h2>12-month rainfall history <span class="tag" id="histTag">at %(hqname)s &middot; loaded once per visit</span></h2>
     <div id="histChart"><div class="loading">Loading 12-month rainfall history&hellip;</div></div>
-    <p class="hist-cap">Monthly totals from Open-Meteo's historical archive &mdash; shows whether this year's rains actually arrived on schedule.</p>
+    <p class="hist-cap">Monthly totals from Open-Meteo's historical archive, against the dashed ~60mm/month ASAL norm and the typical long-rains (Mar&ndash;May) and short-rains (Oct&ndash;Nov) window &mdash; shows whether this year's rains actually arrived on schedule.</p>
   </div>
 
   <div class="panel glass">
@@ -557,6 +557,8 @@ document.getElementById("exportBtn").addEventListener("click", ()=>{
 
 fetchMonthlyRain(HQ.lat, HQ.lon).then(data=>{
   document.getElementById("histChart").innerHTML = monthChart(data);
+  const total = data.reduce((s,d)=>s+d.total, 0);
+  document.getElementById("histTag").textContent = "at %(hqname)s · " + total.toFixed(0) + "mm total over these 12 months";
 }).catch(e=>{
   console.error("history",e);
   document.getElementById("histChart").innerHTML = '<div class="loading">History unavailable &mdash; check connection</div>';
