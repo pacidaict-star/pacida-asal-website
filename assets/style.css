@@ -352,6 +352,47 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .entry-card h3 .arrow-mark{color:var(--alert);margin-left:4px}
 .entry-card p{color:var(--muted);font-size:12.5px;line-height:1.5}
 
+/* about.html — Strategic Vision 2026-2030 section, drawn from PACIDA's own strategic plan */
+.vision-callout{
+  border-left:3px solid var(--pacida-green);padding:4px 0 4px 20px;margin:16px 0 20px;
+}
+.vision-callout .vc-label{
+  font-family:'Barlow Condensed';font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--pacida-green);margin-bottom:6px;
+}
+.vision-callout .vc-text{
+  font-family:'Barlow Condensed';font-weight:600;font-size:22px;letter-spacing:.01em;color:var(--text);
+  line-height:1.35;
+}
+.vision-callout.mission{border-left-color:var(--alert)}
+.vision-callout.mission .vc-label{color:var(--alert)}
+.vision-callout.mission .vc-text{font-family:'Archivo';font-weight:500;font-size:15px;text-transform:none}
+
+.goal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
+.goal-card{
+  border:1px solid rgba(237,227,204,.14);border-radius:12px;padding:16px 18px;
+  background:rgba(38,33,21,.5);position:relative;overflow:hidden;
+}
+.goal-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--alert)}
+.goal-card .gc-num{
+  font-family:'IBM Plex Mono';font-size:11px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;
+}
+.goal-card h4{font-family:'Barlow Condensed';font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;color:var(--text)}
+.goal-card p{color:var(--muted);font-size:12.5px;line-height:1.5}
+
+.value-pills{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.value-pill{
+  border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:12px;
+  font-family:'Barlow Condensed';font-weight:600;letter-spacing:.04em;color:var(--muted);
+  background:rgba(38,33,21,.5);
+}
+
+.expansion-note{
+  border:1px dashed rgba(52,180,75,.5);border-radius:10px;padding:14px 16px;margin-top:16px;
+  background:rgba(52,180,75,.06);
+}
+.expansion-note b{color:var(--pacida-green)}
+
 /* latest updates carousel */
 .updates-carousel{display:flex;align-items:stretch;gap:12px;margin-top:14px}
 .uc-nav{
