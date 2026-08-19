@@ -105,7 +105,22 @@ def raw_bounds(geoms, pad=0.28):
 
 
 PACIDA_CENTER, PACIDA_ZOOM = combined_bbox_center_zoom([BOUNDARIES[s] for s in PACIDA_SLUGS if s in BOUNDARIES])
-PACIDA_BOUNDS = raw_bounds([BOUNDARIES[s] for s in PACIDA_SLUGS if s in BOUNDARIES])
+# combined_bbox_center_zoom's formula was calibrated back when the interactive map
+# occupied its own ~46%-wide pane, not the full viewport — at that same zoom on a
+# full-width map the operational area now reads small, adrift in a lot of unrelated
+# Somalia/Ethiopia context. Zooming in one level re-fits it to roughly the size it
+# was always meant to appear at, and — just as important — means the pixel shift
+# recenterMapForContentColumn() applies (see below) consumes far fewer degrees of
+# longitude, which is what actually makes that shift fit inside a sane maxBounds
+# padding without triggering Leaflet's own animated snap-back to stay in bounds.
+PACIDA_ZOOM += 1
+# No fixed PACIDA_BOUNDS here (unlike every other page's map) — the homepage's map
+# gets its maxBounds set dynamically in JS, computed AROUND wherever
+# recenterMapForContentColumn() actually ends up after shifting the view, not
+# around the original un-shifted center. A fixed bounds box tight enough to read
+# as "locked to the operational area" was never simultaneously loose enough to let
+# that shift complete without maxBoundsViscosity animating the view straight back —
+# see that function's own comment for the full explanation.
 
 
 DROUGHT_TIMELINE = [
@@ -620,7 +635,7 @@ def build_index():
         regions_json=json.dumps(lean, separators=(",", ":")),
         updates_json=json.dumps(updates, separators=(",", ":")),
         center=json.dumps(PACIDA_CENTER), zoom=PACIDA_ZOOM, base_url=BASE_URL,
-        bounds_json=json.dumps(PACIDA_BOUNDS), nav=site_nav("home")
+        nav=site_nav("home")
     )
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(out)
     print("index.html", len(out), "bytes")
@@ -828,12 +843,57 @@ startClock();
    same sticky + negative-margin trick as every other page's decorative
    background) — one map instance now serves both roles instead of a locked
    decorative one behind the text and a separate real one in its own pane. */
-const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map", %(bounds_json)s);
+/* No bounds passed here (unlike every other page) — they're set dynamically
+   below, once, AFTER the view has already been shifted into place. */
+const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map");
 const markerLayer = L.layerGroup().addTo(map);
 const labelLayer  = L.layerGroup().addTo(map);
 const shadeLayer  = L.layerGroup();
 const outlineLayer = L.layerGroup().addTo(map);
 const markers = {};
+
+/* setView centers the operational area on the FULL viewport's midpoint by default —
+   on desktop that's behind the glass content column, not in the clear/unobstructed
+   right-hand zone. Shift the view right by half the column's width so the actual
+   area of interest lands in the visible portion instead. Resets to the base
+   center first every time (not just panning again from wherever it currently is)
+   so repeated resizes can't accumulate drift. Mobile has no unobstructed side
+   (index-hero-col is full width there), so the shift is a no-op below 1021px.
+
+   Bounds-locking (maxBounds/viscosity/minZoom) is applied AFTER the shift, around
+   whatever view the map is actually showing at that point — not before. Passing a
+   fixed bounds box into makeGlassMap up front (as every other page does) doesn't
+   work here: any box tight enough to still read as "locked to the operational
+   area" was never simultaneously loose enough to let this pan complete — Leaflet's
+   maxBoundsViscosity doesn't just block an out-of-bounds pan, it lets the pan
+   happen and then plays its own ~250ms animated snap-back to get within bounds
+   again, silently undoing the shift a moment later regardless of this function's
+   own {animate:false}. Computing bounds from the post-shift view sidesteps the
+   fight entirely: the view already satisfies bounds computed from itself. */
+function recenterMapForContentColumn(){
+  map.setView(%(center)s, %(zoom)s, {animate:false});
+  const col = document.querySelector('.content-inner');
+  const totalWidth = map.getSize().x; // Leaflet's own cached container width — self-consistent
+  const colWidth = col ? col.getBoundingClientRect().width : 0;
+  if(colWidth > 0 && colWidth < totalWidth * 0.9){ // desktop only: mobile's column isn't narrowed
+    const shift = colWidth / 2;
+    if(shift > 4) map.panBy([-shift, 0], {animate:false});
+  }
+  map.setMaxBounds(map.getBounds().pad(0.6));
+  map.options.maxBoundsViscosity = 1.0;
+  map.setMinZoom(%(zoom)s - 1);
+}
+recenterMapForContentColumn();
+// belt-and-suspenders: on some loads the container's sticky/negative-margin layout
+// (.content-bg-map) hasn't fully settled at the moment this script runs synchronously,
+// so Leaflet's very first pan can land short of the target — re-assert once the
+// browser has actually completed a layout+paint pass, which fully corrects it.
+requestAnimationFrame(()=> requestAnimationFrame(recenterMapForContentColumn));
+let recenterTimer = null;
+window.addEventListener("resize", ()=>{
+  clearTimeout(recenterTimer);
+  recenterTimer = setTimeout(recenterMapForContentColumn, 200);
+});
 
 /* county/zone outlines always shown for orientation; fill shading is opt-in via the layers control */
 PACIDA_AREA_SLUGS.forEach(slug=>{
