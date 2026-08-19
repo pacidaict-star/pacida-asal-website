@@ -214,6 +214,23 @@ nav.site a:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 .navToggle:hover{border-color:var(--alert)}
 .navToggle:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 .nav-collapse{display:contents}
+
+/* kiosk / presentation mode toggle — a plain sibling of nav-collapse (not inside it) so it
+   stays visible even once kiosk-active hides everything else in the header, on every
+   breakpoint: last item in the row on desktop, next to the hamburger on mobile. */
+.kioskBtn{
+  display:flex;align-items:center;justify-content:center;flex:none;
+  background:rgba(38,33,21,.7);color:var(--text);border:1px solid var(--line);border-radius:6px;
+  width:40px;height:40px;font-size:16px;line-height:1;cursor:pointer;
+}
+.kioskBtn:hover{border-color:var(--alert)}
+.kioskBtn:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+
+body.kiosk-active .nav-collapse{display:none !important}
+body.kiosk-active .navToggle{display:none !important}
+body.kiosk-active .brand .sub{display:none}
+body.kiosk-active header{padding-top:8px;padding-bottom:8px}
+body.kiosk-active .kioskBtn{border-color:var(--emergency);color:var(--emergency)}
 /* This is a DIFFERENT breakpoint from the 1020/1021px one used for the
    map-pane/content-pane side-by-side layout above — that one's about screen
    real estate for two panes, this one's about whether the header's own nav

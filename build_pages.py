@@ -304,6 +304,7 @@ TEMPLATE = """<!DOCTYPE html>
       <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
     </div>
   </div>
+  <button class="kioskBtn" id="kioskBtn" type="button" title="Presentation mode — fullscreen, decluttered, auto-tour">&#9974;</button>
 </header>
 
 <div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
@@ -531,6 +532,7 @@ document.addEventListener("units-changed", ()=>{
 attachHeaderHeightVar();
 attachNavToggle();
 attachNavDropdown();
+attachKioskMode();
 attachUnitToggle();
 attachGlossary();
 attachSearch(
@@ -679,6 +681,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
     <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
   </div>
   </div>
+  <button class="kioskBtn" id="kioskBtn" type="button" title="Presentation mode — fullscreen, decluttered, auto-tour">&#9974;</button>
 </header>
 
 <div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
@@ -1012,6 +1015,17 @@ document.addEventListener("units-changed", ()=>{ renderPacidaCards(); drawMarker
 attachHeaderHeightVar();
 attachNavToggle();
 attachNavDropdown();
+let stopKioskTour = null;
+attachKioskMode(
+  ()=>{
+    stopKioskTour = startKioskTour(PACIDA_AREA_SLUGS, {onStop: id=>{
+      const r = REGIONS.find(x=>x.id===id);
+      if(r) map.flyTo([r.lat, r.lon], 8, {duration:1.2});
+      if(markers[id]) markers[id].openPopup();
+    }});
+  },
+  ()=>{ if(stopKioskTour) stopKioskTour(); }
+);
 attachUnitToggle();
 attachGlossary();
 attachSearch(

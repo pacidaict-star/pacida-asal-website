@@ -124,6 +124,46 @@ function attachNavDropdown(){
   });
 }
 
+/* ---------- kiosk / presentation mode — fullscreen + decluttered chrome, for an unattended
+   display (office lobby, donor meeting, conference booth). Always starts off on page load;
+   never persisted, so staff can't accidentally leave a public visitor's browser in kiosk mode.
+   onTourStart/onTourStop let map pages plug in their own auto-cycle (see startKioskTour). ---------- */
+function attachKioskMode(onTourStart, onTourStop){
+  const btn = document.getElementById("kioskBtn");
+  if(!btn) return;
+  let active = false;
+  async function enter(){
+    try{ await document.documentElement.requestFullscreen(); }catch(e){ console.warn("Fullscreen request failed:", e); }
+    document.body.classList.add("kiosk-active");
+    btn.textContent = "✕"; btn.title = "Exit presentation mode (Esc)";
+    active = true;
+    if(onTourStart) onTourStart();
+  }
+  function exit(){
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    document.body.classList.remove("kiosk-active");
+    btn.textContent = "⛶"; btn.title = "Presentation mode — fullscreen, decluttered, auto-tour";
+    active = false;
+    if(onTourStop) onTourStop();
+  }
+  btn.addEventListener("click", ()=> active ? exit() : enter());
+  document.addEventListener("keydown", e=>{ if(e.key === "Escape" && active) exit(); });
+  // covers exiting fullscreen via the browser's own UI (Esc, F11, swipe) not just our button
+  document.addEventListener("fullscreenchange", ()=>{ if(!document.fullscreenElement && active) exit(); });
+}
+
+/* cycles through `stops` (an array of ids) every intervalMs, calling onStop(id) each time —
+   the page decides what "showing" a stop means (flyTo + open a popup, in practice). Returns a
+   function that stops the cycle, for attachKioskMode's onTourStop to call. */
+function startKioskTour(stops, {intervalMs=9000, onStop}={}){
+  if(!stops || !stops.length || !onStop) return ()=>{};
+  let idx = 0;
+  const showNext = ()=>{ onStop(stops[idx % stops.length]); idx++; };
+  showNext();
+  const timer = setInterval(showNext, intervalMs);
+  return ()=> clearInterval(timer);
+}
+
 function attachUnitToggle(){
   const btn = document.getElementById("unitToggle");
   if(!btn) return;

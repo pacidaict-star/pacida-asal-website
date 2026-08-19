@@ -39,6 +39,7 @@
       <button class="iconbtn" id="exportBtn" type="button" title="Download current live readings as CSV">Export CSV</button>
     </div>
   </div>
+  <button class="kioskBtn" id="kioskBtn" type="button" title="Presentation mode — fullscreen, decluttered, auto-tour">&#9974;</button>
 </header>
 
 <div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
@@ -163,6 +164,17 @@ document.querySelectorAll(".area-btn").forEach(btn=>{
 attachHeaderHeightVar();
 attachNavToggle();
 attachNavDropdown();
+let stopKioskTour = null;
+attachKioskMode(
+  ()=>{
+    stopKioskTour = startKioskTour(PACIDA_AREA_SLUGS, {onStop: id=>{
+      const a = AREAS.find(x=>x.id===id);
+      if(a) map.flyTo([a.lat, a.lon], 8, {duration:1.2});
+      if(markers[id]) markers[id].openPopup();
+    }});
+  },
+  ()=>{ if(stopKioskTour) stopKioskTour(); }
+);
 attachUnitToggle();
 attachGlossary();
 attachSearch(

@@ -53,6 +53,7 @@
       <button class="refresh" id="refreshBtn" type="button">Refresh now</button>
     </div>
   </div>
+  <button class="kioskBtn" id="kioskBtn" type="button" title="Presentation mode — fullscreen, decluttered, auto-tour">&#9974;</button>
 </header>
 
 <div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
@@ -288,6 +289,7 @@ document.addEventListener("units-changed", ()=>{
 attachHeaderHeightVar();
 attachNavToggle();
 attachNavDropdown();
+attachKioskMode();
 attachUnitToggle();
 attachGlossary();
 attachSearch(

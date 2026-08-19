@@ -88,6 +88,7 @@ HTML = """<!DOCTYPE html>
       <button class="iconbtn" id="glossaryBtn" type="button" title="Open glossary of terms">Glossary</button>
     </div>
   </div>
+  <button class="kioskBtn" id="kioskBtn" type="button" title="Presentation mode — fullscreen, decluttered">&#9974;</button>
 </header>
 
 <div class="gl-panel" id="glossaryPanel" aria-label="Glossary of terms">
@@ -263,6 +264,7 @@ makeBackgroundMap("mapBg", [2.3, 38.2], 7);
 attachHeaderHeightVar();
 attachNavToggle();
 attachNavDropdown();
+attachKioskMode();
 attachGlossary();
 attachSearch(
   ()=>COUNTY_INDEX.map(c=>({id:c.slug, label:c.name, kind:"county"})),
