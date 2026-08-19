@@ -691,21 +691,16 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
 
-<div class="panes-row">
-<div class="map-pane">
-  <div id="map" role="application" aria-label="Map of PACIDA's operational area"></div>
-  <div class="map-legend map-overlay">
-    <h4>Map layers</h4>
-    <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
-    <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
-    <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Solid dots are project pins at a specific site; dashed hollow dots are regional programmes shown at an approximate point. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels.</div>
-  </div>
-</div>
-
 <div class="content-pane">
-<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
-<div class="content-inner">
+<div id="map" class="content-bg-map" role="application" aria-label="Map of PACIDA's operational area"></div>
+<div class="map-legend map-overlay legend-right">
+  <h4>Map layers</h4>
+  <div class="lg-row"><span class="lg-swatch" style="background:#E8834A"></span> Intervention density (heat)</div>
+  <div class="lg-row"><span class="lg-swatch" style="background:var(--alarm)"></span> High need</div>
+  <div class="lg-row"><span class="lg-swatch" style="background:var(--normal)"></span> Watch</div>
+  <div class="lg-note">Ground colour = density of PACIDA interventions (hot = many projects). Circle size = households. Solid dots are project pins at a specific site; dashed hollow dots are regional programmes shown at an approximate point. Toggle layers (top-right) for drought-need shading. Map is locked to PACIDA's operational area. Borena boundary is approximate (dashed). Zoom in for village &amp; site labels. The map is always live underneath &mdash; scroll, zoom and pan it any time, it won't move this panel.</div>
+</div>
+<div class="content-inner index-hero-col">
 
 <div class="strip" id="strip">
   <div class="cell glass cell-hero" id="needCell">
@@ -812,7 +807,6 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 
 </div><!-- /content-inner -->
 </div><!-- /content-pane -->
-</div><!-- /panes-row -->
 </div><!-- /page-shell -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -827,9 +821,13 @@ const REGIONS = %(regions_json)s;
 const PACIDA_AREA_SLUGS = ["marsabit","samburu","isiolo","borena"];
 
 startClock();
-makeBackgroundMap("mapBg", %(center)s, %(zoom)s);
 
-/* ================= MAP — framed on PACIDA's operational area ================= */
+/* ================= MAP — the whole page background, always live and
+   interactive (drag/zoom/pan), framed on PACIDA's operational area. Doubles
+   as the sticky backdrop behind the scrolling content column (.content-bg-map,
+   same sticky + negative-margin trick as every other page's decorative
+   background) — one map instance now serves both roles instead of a locked
+   decorative one behind the text and a separate real one in its own pane. */
 const {map, layersControl} = makeGlassMap(%(center)s, %(zoom)s, "map", %(bounds_json)s);
 const markerLayer = L.layerGroup().addTo(map);
 const labelLayer  = L.layerGroup().addTo(map);
