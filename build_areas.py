@@ -91,7 +91,7 @@ HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Operational Areas Map — Kenya ASAL Climate Watch</title>
+<title>Operational Areas Map — PACIDA Climate Watch</title>
 <meta name="description" content="A focused map of PACIDA's 4 operational areas — Marsabit, Samburu, Isiolo and the Borena Zone — with live intervention density and every project pinned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,7 +110,7 @@ HTML = """<!DOCTYPE html>
 <header class="glass header-overlay">
   <div class="brand">
     <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
-    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <h1><a href="index.html">PACIDA <span>&middot;</span> Climate Watch</a></h1>
     <div class="sub">Operational Areas Map &middot; live intervention footprint</div>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>

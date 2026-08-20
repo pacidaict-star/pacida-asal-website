@@ -106,15 +106,15 @@ HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PACIDA Impact Dashboard — Kenya ASAL Climate Watch</title>
+<title>Impact Dashboard — PACIDA Climate Watch</title>
 <meta name="description" content="236 real PACIDA projects, FY2010–FY2026, across Marsabit, Samburu, Isiolo and the Borena Zone — drawn directly from PACIDA's own project register, not modelled or estimated.">
 <meta name="theme-color" content="#34B44B">
 <meta property="og:type" content="website">
-<meta property="og:title" content="PACIDA Impact Dashboard — Kenya ASAL Climate Watch">
+<meta property="og:title" content="Impact Dashboard — PACIDA Climate Watch">
 <meta property="og:description" content="236 real PACIDA projects, FY2010–FY2026, across Marsabit, Samburu, Isiolo and the Borena Zone — drawn directly from PACIDA's own project register, not modelled or estimated.">
 <meta property="og:url" content="%(base_url)simpact.html">
 <meta property="og:image" content="%(base_url)sassets/favicon-512.png">
-<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta property="og:site_name" content="PACIDA Climate Watch">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PACIDA Impact Dashboard">
 <meta name="twitter:description" content="236 real PACIDA projects, FY2010–FY2026, across Marsabit, Samburu, Isiolo and the Borena Zone.">
@@ -132,14 +132,10 @@ HTML = """<!DOCTYPE html>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div class="content-pane">
-<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
-<div class="content-inner">
-
-<header class="glass">
+<header class="glass header-overlay">
   <div class="brand">
     <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
-    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <h1><a href="index.html">PACIDA <span>&middot;</span> Climate Watch</a></h1>
     <div class="sub">PACIDA Impact Dashboard &middot; real project data, FY2010&ndash;FY2026</div>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
@@ -163,6 +159,10 @@ HTML = """<!DOCTYPE html>
   <div class="gl-body"></div>
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
+
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
 
 <main id="main-content">
 <div class="wide" style="padding-top:22px">
@@ -261,7 +261,7 @@ HTML = """<!DOCTYPE html>
 </main>
 
 <footer class="glass">
-  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</span></div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>PACIDA Climate Watch &middot; PACIDA Impact Dashboard &middot; built from PACIDA's own project data &mdash; not an audited financial report</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 

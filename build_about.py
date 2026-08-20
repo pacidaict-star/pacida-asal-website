@@ -41,17 +41,17 @@ HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About — Kenya ASAL Climate Watch</title>
+<title>About — PACIDA Climate Watch</title>
 <meta name="description" content="What this dashboard is, how the live Need Index is calculated, where every figure comes from, and how it relates to PACIDA.">
 <meta name="theme-color" content="#34B44B">
 <meta property="og:type" content="website">
-<meta property="og:title" content="About — Kenya ASAL Climate Watch">
+<meta property="og:title" content="About — PACIDA Climate Watch">
 <meta property="og:description" content="What this dashboard is, how the live Need Index is calculated, and where every figure comes from.">
 <meta property="og:url" content="%(base_url)sabout.html">
 <meta property="og:image" content="%(base_url)sassets/favicon-512.png">
-<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta property="og:site_name" content="PACIDA Climate Watch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="About — Kenya ASAL Climate Watch">
+<meta name="twitter:title" content="About — PACIDA Climate Watch">
 <meta name="twitter:description" content="What this dashboard is, how the live Need Index is calculated, and where every figure comes from.">
 <meta name="twitter:image" content="%(base_url)sassets/favicon-512.png">
 <link rel="canonical" href="%(base_url)sabout.html">
@@ -67,14 +67,10 @@ HTML = """<!DOCTYPE html>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div class="content-pane">
-<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
-<div class="content-inner">
-
-<header class="glass">
+<header class="glass header-overlay">
   <div class="brand">
     <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
-    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <h1><a href="index.html">PACIDA <span>&middot;</span> Climate Watch</a></h1>
     <div class="sub">About this site &middot; methodology &amp; sources</div>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
@@ -98,6 +94,10 @@ HTML = """<!DOCTYPE html>
 </div>
 <div class="gl-backdrop" id="glBackdrop"></div>
 
+<div class="content-pane">
+<div id="mapBg" class="content-bg-map" aria-hidden="true"></div>
+<div class="content-inner">
+
 <main id="main-content">
 <div class="wide" style="padding-top:22px">
 
@@ -106,10 +106,10 @@ HTML = """<!DOCTYPE html>
       <img class="hero-logo" src="assets/pacida-logo.png" alt="PACIDA — Pastoralist Community Initiative and Development Assistance">
       <div>
         <h2 style="margin-bottom:6px">About this website</h2>
-        <p style="margin-bottom:0"><b>Kenya &middot; ASAL Climate Watch</b> is an unofficial live monitoring dashboard for PACIDA's
-        operational area, built in partnership with PACIDA &mdash; it is not PACIDA's official website. It combines PACIDA's own
-        project data with live public weather feeds to show, county by county, where drought pressure is building and where
-        PACIDA has actually worked. For PACIDA's official programme pages, reports and contact details, visit
+        <p style="margin-bottom:0"><b>PACIDA Climate Watch</b> is an unofficial live monitoring dashboard for PACIDA's
+        operational area, built in partnership with the organisation &mdash; it is not PACIDA's official website. It combines
+        PACIDA's own project data with live public weather feeds to show, county by county, where drought pressure is building
+        and where the work has actually happened. For official programme pages, reports and contact details, visit
         <a href="https://pacida.org" target="_blank" rel="noopener" style="color:var(--alert)">pacida.org&nbsp;&#8599;</a>.</p>
       </div>
     </div>
@@ -246,7 +246,7 @@ HTML = """<!DOCTYPE html>
 </main>
 
 <footer class="glass">
-  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; unofficial monitoring prototype, in partnership with PACIDA &middot; census figures are the latest published, weather is live</span></div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>PACIDA Climate Watch &middot; unofficial monitoring prototype, in partnership with PACIDA &middot; census figures are the latest published, weather is live</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 

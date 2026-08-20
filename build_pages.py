@@ -269,17 +269,17 @@ TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>%(title)s — Kenya ASAL Climate Watch</title>
+<title>%(title)s — PACIDA Climate Watch</title>
 <meta name="description" content="%(meta_desc)s">
 <meta name="theme-color" content="#34B44B">
 <meta property="og:type" content="website">
-<meta property="og:title" content="%(title)s — Kenya ASAL Climate Watch">
+<meta property="og:title" content="%(title)s — PACIDA Climate Watch">
 <meta property="og:description" content="%(meta_desc)s">
 <meta property="og:url" content="%(canonical_url)s">
 <meta property="og:image" content="%(base_url)sassets/favicon-512.png">
-<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta property="og:site_name" content="PACIDA Climate Watch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="%(title)s — Kenya ASAL Climate Watch">
+<meta name="twitter:title" content="%(title)s — PACIDA Climate Watch">
 <meta name="twitter:description" content="%(meta_desc)s">
 <meta name="twitter:image" content="%(base_url)sassets/favicon-512.png">
 <link rel="canonical" href="%(canonical_url)s">
@@ -300,7 +300,7 @@ TEMPLATE = """<!DOCTYPE html>
 <header class="glass header-overlay">
   <div class="brand">
     <a href="index.html"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"></a>
-    <h1><a href="index.html">Kenya <span>&middot;</span> ASAL Climate Watch</a></h1>
+    <h1><a href="index.html">PACIDA <span>&middot;</span> Climate Watch</a></h1>
     <div class="sub">%(title)s &middot; %(country)s</div>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
@@ -434,7 +434,7 @@ TEMPLATE = """<!DOCTYPE html>
 </main>
 
 <footer class="glass">
-  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</span></div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>PACIDA Climate Watch &middot; %(title)s detail &middot; monitoring prototype, in partnership with PACIDA &mdash; deployment decisions require ground-truthing</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 
@@ -646,17 +646,17 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kenya ASAL Climate Watch — Live County Dashboard</title>
+<title>PACIDA Climate Watch — Live County Dashboard</title>
 <meta name="description" content="Live drought and climate intervention dashboard for PACIDA's operational area — Marsabit, Samburu and Isiolo counties in Kenya, and the cross-border Borena Zone of southern Ethiopia.">
 <meta name="theme-color" content="#34B44B">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Kenya ASAL Climate Watch — Live County Dashboard">
+<meta property="og:title" content="PACIDA Climate Watch — Live County Dashboard">
 <meta property="og:description" content="Live drought and climate intervention dashboard for PACIDA's operational area — Marsabit, Samburu and Isiolo counties in Kenya, and the cross-border Borena Zone of southern Ethiopia.">
 <meta property="og:url" content="%(base_url)s">
 <meta property="og:image" content="%(base_url)sassets/favicon-512.png">
-<meta property="og:site_name" content="Kenya ASAL Climate Watch">
+<meta property="og:site_name" content="PACIDA Climate Watch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Kenya ASAL Climate Watch — Live County Dashboard">
+<meta name="twitter:title" content="PACIDA Climate Watch — Live County Dashboard">
 <meta name="twitter:description" content="Live drought and climate intervention dashboard for PACIDA's operational area in northern Kenya and southern Ethiopia.">
 <meta name="twitter:image" content="%(base_url)sassets/favicon-512.png">
 <link rel="canonical" href="%(base_url)s">
@@ -677,8 +677,8 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <header class="glass header-overlay">
   <div class="brand">
     <img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA">
-    <h1>Kenya <span>·</span> ASAL Climate Watch</h1>
-    <div class="sub">PACIDA's operational area &middot; Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
+    <h1>PACIDA <span>·</span> Climate Watch</h1>
+    <div class="sub">Marsabit, Samburu, Isiolo &amp; the Borena Zone (S. Ethiopia) &middot; live intervention monitor</div>
   </div>
   <button class="navToggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navCollapse">&#9776;</button>
   <div class="nav-collapse" id="navCollapse">
@@ -816,7 +816,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </main>
 
 <footer class="glass">
-  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>Kenya ASAL Climate Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</span></div>
+  <div class="foot-brand"><img class="brand-logo" src="assets/pacida-logo.png" alt="PACIDA"><span>PACIDA Climate Watch · unofficial monitoring prototype, in partnership with PACIDA · census figures are the latest published, weather is live</span></div>
   <div class="mono" id="footTime"></div>
 </footer>
 

@@ -272,6 +272,16 @@ body.kiosk-active .kioskBtn{border-color:var(--emergency);color:var(--emergency)
   .nav-collapse .search-wrap input{width:100%}
   .brand .sub{display:none}
   .brand h1{font-size:19px}
+  /* two icon buttons (hamburger + kiosk) now sit beside a compact brand row —
+     the default 18px header gap and 40px buttons were sized for one button
+     alone and don't leave room for both on narrow phones, wrapping to a
+     second row. Tighter here specifically. */
+  header{gap:8px;padding-left:14px;padding-right:14px}
+  .navToggle,.kioskBtn{width:34px;height:34px;font-size:16px}
+}
+@media(max-width:420px){
+  .brand h1{font-size:14.5px}
+  .brand-logo{height:24px}
 }
 .livepill{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-family:'Barlow Condensed';font-weight:600}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--normal);animation:pulse 1.6s infinite}
@@ -286,7 +296,7 @@ button.refresh:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
    even read the label. The need-index cell is the lead KPI so it's wider and carries the same
    Watch/Elevated/High/Critical gauge used on the county pages, instead of a bare number, so the
    colour-band context reads immediately rather than needing a click-through to a detail page. */
-.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;padding:14px 22px;max-width:1440px;margin:0 auto}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(165px,100%),1fr));gap:10px;padding:14px 22px;max-width:1440px;margin:0 auto}
 .strip .cell{padding:13px 16px 14px;border-radius:10px;position:relative;overflow:hidden}
 .strip .cell::before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
 .cell-accent-brand::before{background:var(--pacida-green)}
@@ -386,10 +396,14 @@ main{display:block}
 
 /* cards */
 .cards{display:flex;flex-direction:column;gap:14px}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:10px}
+/* minmax(min(320px,100%),1fr) not a plain 320px — a bare 320px minimum doesn't
+   account for the container's own side padding, so any viewport narrower than
+   ~364px (320px + padding) forced this grid wider than the page itself. min()
+   caps the minimum at whatever's actually available instead of a fixed guess. */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:14px;margin-top:10px}
 
 /* entry-point cards */
-.entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:1440px;margin:0 auto;padding:0 22px}
+.entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;max-width:1440px;margin:0 auto;padding:0 22px}
 .entry-card{
   display:block;border-radius:14px;padding:20px 22px;text-decoration:none;color:inherit;
   transition:border-color .2s,transform .2s;position:relative;
@@ -418,7 +432,7 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .vision-callout.mission .vc-label{color:var(--alert)}
 .vision-callout.mission .vc-text{font-family:'Archivo';font-weight:500;font-size:15px;text-transform:none}
 
-.goal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
+.goal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin:18px 0}
 .goal-card{
   border:1px solid rgba(237,227,204,.14);border-radius:12px;padding:16px 18px;
   background:rgba(38,33,21,.5);position:relative;overflow:hidden;
@@ -469,7 +483,7 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .uc-pause:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
 
 /* key resources grid */
-.resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px;margin-top:14px}
 .resource-card{
   display:block;text-align:left;border:1px solid rgba(237,227,204,.12);border-radius:10px;padding:14px 16px;
   background:rgba(38,33,21,.5);text-decoration:none;color:inherit;cursor:pointer;font-family:inherit;
@@ -516,7 +530,7 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .panel h2 .tag{font-size:12px;color:var(--muted);letter-spacing:.1em;margin-left:8px}
 .panel p{color:var(--muted);font-size:13.5px;max-width:960px;margin-bottom:10px}
 .panel p b{color:var(--text)}
-.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}
+.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin-top:14px}
 .src{border:1px solid rgba(237,227,204,.12);border-radius:8px;padding:12px 14px;font-size:12.5px;background:rgba(38,33,21,.5)}
 .src > b{display:block;font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.08em;font-size:13px;margin-bottom:4px}
 .src span{color:var(--muted)}
@@ -524,7 +538,7 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
 .src a:hover{text-decoration:underline}
 
 /* about.html — "how this site works" mini-guide */
-.howit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:6px}
+.howit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin-top:6px}
 .howit{border:1px solid rgba(237,227,204,.12);border-radius:8px;padding:12px 14px;font-size:12.5px;background:rgba(38,33,21,.5)}
 .howit > b{display:block;font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.08em;font-size:13px;margin-bottom:4px;color:var(--alert)}
 .howit span{color:var(--muted);line-height:1.5}
@@ -540,7 +554,7 @@ footer .brand-logo{height:24px}
 .ptable td.mono,.ptable td .mono{font-family:'IBM Plex Mono';white-space:nowrap}
 .ptable td small{color:var(--faint)}
 .chip{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:-1px}
-.table-scroll{overflow-x:auto}
+.table-scroll{overflow-x:auto;max-width:100%}
 
 /* livelihood bars */
 .lz{margin-top:10px}
@@ -570,7 +584,7 @@ footer .brand-logo{height:24px}
 .tl .tx b{color:var(--text)}
 
 /* live site grid */
-.sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px;margin-top:12px}
+.sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(215px,100%),1fr));gap:12px;margin-top:12px}
 .site-card{border-radius:10px;padding:12px 14px;border:1px solid rgba(237,227,204,.12);background:rgba(38,33,21,.5)}
 .site-card h4{font-family:'Barlow Condensed';font-weight:600;font-size:15px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .site-dot{width:9px;height:9px;border-radius:50%;flex:none}
@@ -700,7 +714,7 @@ details.acc .acc-body{padding:0 14px 14px;font-size:12.5px;color:var(--muted)}
 .status-done{color:var(--faint)}
 
 /* impact dashboard */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:12px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr));gap:12px;margin-top:12px}
 .stat-tile{border:1px solid rgba(251,247,236,.12);border-radius:10px;padding:14px 16px;background:rgba(38,33,21,.5)}
 .stat-tile .sn{font-family:'IBM Plex Mono';font-size:26px;font-weight:600;color:var(--alert)}
 .stat-tile .sl{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
