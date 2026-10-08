@@ -456,6 +456,16 @@ a.entry-card:focus-visible{outline:2px solid var(--pacida-green);outline-offset:
   background:rgba(52,180,75,.06);
 }
 .expansion-note b{color:var(--pacida-green)}
+.expansion-note .flagship-label{
+  font-family:'Barlow Condensed';font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--alert);margin:12px 0 8px;
+}
+.flagship-pills{display:flex;flex-wrap:wrap;gap:8px}
+.flagship-pill{
+  border:1px solid rgba(240,178,46,.4);border-radius:20px;padding:6px 14px;font-size:12px;
+  font-family:'Barlow Condensed';font-weight:600;letter-spacing:.04em;color:var(--text);
+  background:rgba(240,178,46,.1);
+}
 
 /* latest updates carousel */
 .updates-carousel{display:flex;align-items:stretch;gap:12px;margin-top:14px}
